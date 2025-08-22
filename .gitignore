@@ -1,0 +1,51 @@
+# Database configuration (keep sensitive info private)
+config/database.php
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+error.log
+access.log
+
+# Cache files
+cache/
+tmp/
+temp/
+
+# User uploaded files (optional - you may want to keep these)
+uploads/
+files/uploads/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Node modules (if you add any frontend build tools later)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Composer (if you add PHP dependencies later)
+vendor/
+composer.lock
+
+# Session files
+sessions/
+*.sess
