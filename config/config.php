@@ -6,6 +6,10 @@ define('BASE_URL', 'http://localhost/mentorconnect');
 define('UPLOAD_PATH', __DIR__ . '/../uploads/');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 
+// Environment configuration
+define('ENVIRONMENT', 'development'); // development, staging, production
+define('DEBUG_MODE', ENVIRONMENT === 'development');
+
 // Enhanced Security settings
 define('SESSION_LIFETIME', 3600 * 8); // 8 hours (reduced from 24)
 define('CSRF_TOKEN_LIFETIME', 1800); // 30 minutes (reduced from 1 hour)
@@ -14,6 +18,12 @@ define('MAX_LOGIN_ATTEMPTS', 5);
 define('LOGIN_LOCKOUT_TIME', 900); // 15 minutes
 define('RATE_LIMIT_REQUESTS', 100);
 define('RATE_LIMIT_WINDOW', 3600); // 1 hour
+
+// Performance settings
+define('ENABLE_QUERY_CACHE', true);
+define('CACHE_LIFETIME', 300); // 5 minutes default
+define('ENABLE_GZIP', true);
+define('ENABLE_OPCACHE', true);
 
 // Email settings (configure as needed)
 define('SMTP_HOST', 'localhost');
@@ -26,9 +36,38 @@ define('FROM_NAME', 'MentorConnect');
 // Timezone
 date_default_timezone_set('UTC');
 
-// Error reporting (disable in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Error reporting based on environment
+if (ENVIRONMENT === 'development') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('log_errors', 1);
+} else {
+    error_reporting(E_ERROR | E_WARNING | E_PARSE);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+}
+
+// Performance optimizations
+if (ENABLE_OPCACHE && function_exists('opcache_get_status')) {
+    // OPcache settings should be configured in php.ini, not at runtime
+    // These settings are here for reference only:
+    /*
+    opcache.enable=1
+    opcache.memory_consumption=128
+    opcache.max_accelerated_files=4000
+    opcache.revalidate_freq=60
+    */
+    
+    // Check if OPcache is enabled
+    $opcache_status = opcache_get_status(false);
+    if (!$opcache_status || !$opcache_status['opcache_enabled']) {
+        error_log('Warning: OPcache is not enabled. Enable it in php.ini for better performance.');
+    }
+}
+
+if (ENABLE_GZIP && !ob_get_level()) {
+    ob_start('ob_gzhandler');
+}
 
 // Enhanced Session configuration
 ini_set('session.cookie_httponly', 1);
@@ -46,8 +85,21 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Include database configuration
+// Include database configuration and optimizations
 require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/database-optimizer.php';
+require_once __DIR__ . '/performance-monitor.php';
+
+// Start performance monitoring for all requests
+if (DEBUG_MODE) {
+    PerformanceMonitor::start();
+    register_shutdown_function(function() {
+        $performance = PerformanceMonitor::getPagePerformance();
+        if ($performance && isset($_SERVER['REQUEST_URI'])) {
+            error_log("Page Performance [{$_SERVER['REQUEST_URI']}]: {$performance['page_load_time']} | Memory: {$performance['memory_used']}");
+        }
+    });
+}
 
 // Utility functions
 function sanitizeInput($data) {

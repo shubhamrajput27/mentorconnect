@@ -63,6 +63,18 @@
     --info-color: #3b82f6;
 }
 
+/* Dark theme body background override */
+[data-theme="dark"] body {
+    background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-color) 100%);
+}
+
+[data-theme="dark"] body::before {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+}
+
 /* Modern shadows & effects */
 :root {
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -268,53 +280,106 @@
   }
 }
 
-/* Manual dark theme */
-html[data-theme="dark"] {
+/* Dark theme using class-based approach */
+html.theme-dark {
   --bg-primary: #0f172a !important;
   --bg-secondary: #1e293b !important;
   --surface-color: #334155 !important;
-  --text-primary: #f1f5f9 !important;
+  --text-primary: #ffffff !important;
   --text-secondary: #cbd5e1 !important;
   --text-inverse: #0f172a !important;
   --border-color: #475569 !important;
   --divider-color: #64748b !important;
-  
-  --primary-color: #6366f1 !important;
-  --secondary-color: #10b981 !important;
-  --accent-color: #f59e0b !important;
-  --success-color: #10b981 !important;
-  --warning-color: #f59e0b !important;
-  --error-color: #ef4444 !important;
-  --info-color: #3b82f6 !important;
 }
 
-html[data-theme="dark"] body {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
+html.theme-dark body {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
 }
 
-html[data-theme="dark"] .landing-page {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
+html.theme-dark .landing-page {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
 }
 
-html[data-theme="dark"] .hero-section {
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--surface-color) 100%) !important;
+html.theme-dark .hero-section {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
 }
 
-html[data-theme="dark"] .nav-container {
-  background-color: var(--bg-secondary) !important;
+html.theme-dark .nav-container,
+html.theme-dark .landing-nav {
+  background-color: #1e293b !important;
+  border-bottom: 1px solid #334155 !important;
 }
 
-html[data-theme="dark"] .nav-links a {
-  color: var(--text-primary) !important;
+html.theme-dark .landing-nav .nav-container {
+  background-color: #1e293b !important;
 }
 
-html[data-theme="dark"] .features-section,
-html[data-theme="dark"] .how-it-works,
-html[data-theme="dark"] .cta-section {
-  background-color: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
+html.theme-dark .nav-links a,
+html.theme-dark .logo,
+html.theme-dark .logo h1 {
+  color: #ffffff !important;
+}
+
+html.theme-dark .logo i {
+  color: #6366f1 !important;
+}
+
+html.theme-dark .features-section,
+html.theme-dark .how-it-works,
+html.theme-dark .cta-section,
+html.theme-dark .footer {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+html.theme-dark h1,
+html.theme-dark h2,
+html.theme-dark h3,
+html.theme-dark p,
+html.theme-dark .hero-content h1,
+html.theme-dark .hero-content p,
+html.theme-dark .feature-card h3,
+html.theme-dark .feature-card p,
+html.theme-dark .stats-grid .stat-number,
+html.theme-dark .stats-grid .stat-label,
+html.theme-dark .footer p,
+html.theme-dark .footer a,
+html.theme-dark .footer h4 {
+  color: #ffffff !important;
+}
+
+html.theme-dark .footer {
+  background-color: #0f172a !important;
+  border-top: 1px solid #334155 !important;
+}
+
+html.theme-dark .footer-content {
+  background-color: #0f172a !important;
+}
+
+html.theme-dark .footer-section h4 {
+  color: #ffffff !important;
+}
+
+html.theme-dark .footer-links a {
+  color: #cbd5e1 !important;
+}
+
+html.theme-dark .footer-links a:hover {
+  color: #ffffff !important;
+}
+
+/* Light theme explicit styles */
+html.theme-light body {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+}
+
+html.theme-light .nav-container {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
 }
 
 /* Reset and Base Styles */
