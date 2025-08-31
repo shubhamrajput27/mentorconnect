@@ -39,9 +39,12 @@ class LandingPage {
     }
 
     toggleTheme() {
+        console.log('Toggle theme called');
         const html = document.documentElement;
         const currentTheme = html.getAttribute('data-theme') || 'light';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        console.log('Switching from', currentTheme, 'to', newTheme);
         
         html.classList.add('theme-transitioning');
         html.style.transition = 'all 0.3s ease';
@@ -158,14 +161,19 @@ class LandingPage {
     }
 
     bindEvents() {
+        console.log('Binding events...');
         const themeToggle = document.querySelector('.theme-toggle');
+        console.log('Theme toggle button found:', themeToggle);
         
         if (themeToggle) {
             themeToggle.addEventListener('click', (e) => {
+                console.log('Theme toggle clicked!');
                 e.preventDefault();
                 e.stopPropagation();
                 this.toggleTheme();
             });
+        } else {
+            console.warn('Theme toggle button not found!');
         }
 
         // Scroll handling for navigation
@@ -292,9 +300,11 @@ class LandingPage {
 // Initialize the landing page
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded, initializing LandingPage...');
         window.landingPage = new LandingPage();
     });
 } else {
+    console.log('DOM already loaded, initializing LandingPage...');
     window.landingPage = new LandingPage();
 }
 
@@ -364,6 +374,7 @@ window.toggleTheme = function() {
     if (window.landingPage) {
         window.landingPage.toggleTheme();
     }
+    console.log('Theme toggled via console');
 };
 
 window.resetThemeToLight = function() {
@@ -377,6 +388,7 @@ window.resetThemeToLight = function() {
             themeIcon.className = 'fas fa-moon';
         }
     }
+    console.log('Theme reset to light mode via console');
 };
 
 window.setDarkTheme = function() {
@@ -385,11 +397,14 @@ window.setDarkTheme = function() {
         localStorage.setItem('theme', 'dark');
         window.landingPage.updateThemeIcon('dark');
     }
+    console.log('Theme set to dark mode via console');
 };
 
 window.getCurrentTheme = function() {
     const theme = document.documentElement.getAttribute('data-theme') || 'light';
     const stored = localStorage.getItem('theme') || 'light';
+    console.log('Current theme (DOM):', theme);
+    console.log('Stored theme (localStorage):', stored);
     return {
         dom: theme,
         stored: stored
@@ -398,6 +413,7 @@ window.getCurrentTheme = function() {
 
 window.clearThemeStorage = function() {
     localStorage.removeItem('theme');
+    console.log('Theme storage cleared');
 };
 
 // Export for module systems

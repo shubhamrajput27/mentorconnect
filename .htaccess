@@ -1,28 +1,22 @@
-# MentorConnect - Optimized .htaccess
-# Performance and Security Configuration
+# MentorConnect - Comprehensive Performance & Security Configuration
+# Advanced .htaccess with optimizations
 
 # Enable rewrite engine
 RewriteEngine On
 
-# Security Headers
-<IfModule mod_headers.c>
-    # Security headers
-    Header always set X-Content-Type-Options nosniff
-    Header always set X-Frame-Options DENY
-    Header always set X-XSS-Protection "1; mode=block"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-    
-    # Remove server signature
-    Header unset Server
-    Header unset X-Powered-By
-    
-    # HSTS for HTTPS (uncomment for production with SSL)
-    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-</IfModule>
+# Performance Optimizations
+# ==========================
 
-# Compression
+# Enable compression (Gzip/Deflate)
 <IfModule mod_deflate.c>
+    # Force compression for mangled headers
+    <IfModule mod_setenvif.c>
+        <IfModule mod_headers.c>
+            SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
+            RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
+        </IfModule>
+    </IfModule>
+
     # Compress HTML, CSS, JavaScript, Text, XML and fonts
     AddOutputFilterByType DEFLATE application/javascript
     AddOutputFilterByType DEFLATE application/rss+xml
@@ -45,41 +39,40 @@ RewriteEngine On
     AddOutputFilterByType DEFLATE text/javascript
     AddOutputFilterByType DEFLATE text/plain
     AddOutputFilterByType DEFLATE text/xml
-    
-    # Remove browser bugs (only needed for old browsers)
+
+    # Remove browser bugs (only needed for ancient browsers)
     BrowserMatch ^Mozilla/4 gzip-only-text/html
     BrowserMatch ^Mozilla/4\.0[678] no-gzip
     BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
     Header append Vary User-Agent
 </IfModule>
 
-# Browser Caching
+# Aggressive Caching Rules
 <IfModule mod_expires.c>
-    ExpiresActive on
+    ExpiresActive On
     
-    # Images
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/webp "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
+    # Images - 1 year
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
     ExpiresByType image/x-icon "access plus 1 year"
     
-    # Fonts
+    # Fonts - 1 year
     ExpiresByType font/ttf "access plus 1 year"
     ExpiresByType font/otf "access plus 1 year"
     ExpiresByType font/woff "access plus 1 year"
     ExpiresByType font/woff2 "access plus 1 year"
     ExpiresByType application/font-woff "access plus 1 year"
     
-    # CSS and JavaScript
+    # CSS and JavaScript - 1 month
     ExpiresByType text/css "access plus 1 month"
     ExpiresByType application/javascript "access plus 1 month"
     ExpiresByType text/javascript "access plus 1 month"
     
-    # HTML
-    ExpiresByType text/html "access plus 1 day"
+    # HTML - 1 hour
+    ExpiresByType text/html "access plus 1 hour"
     
     # JSON and XML
     ExpiresByType application/json "access plus 1 day"
@@ -87,7 +80,36 @@ RewriteEngine On
     ExpiresByType text/xml "access plus 1 day"
     
     # Default
-    ExpiresDefault "access plus 1 week"
+    ExpiresDefault "access plus 1 month"
+</IfModule>
+
+# Enhanced Security Headers
+<IfModule mod_headers.c>
+    # HSTS (HTTP Strict Transport Security)
+    # Uncomment for production with HTTPS
+    # Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options nosniff
+    
+    # Clickjacking protection
+    Header always set X-Frame-Options DENY
+    
+    # XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Permissions Policy
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), fullscreen=(self), payment=()"
+    
+    # Content Security Policy
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none';"
+    
+    # Remove server information
+    Header unset Server
+    Header always unset X-Powered-By
 </IfModule>
 
 # Cache Control Headers

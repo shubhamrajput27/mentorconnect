@@ -1,0 +1,138 @@
+/* Enhanced Button Styles for Better Visibility and Accessibility */
+
+/* Navigation button improvements */
+.nav-links .btn {
+    font-size: 0.9rem !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 120px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Primary button - Get Started */
+.nav-links .btn-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: #ffffff !important;
+    border: 2px solid transparent !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3), 
+                0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+.nav-links .btn-primary:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4), 
+                0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.nav-links .btn-primary:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Outline button - Sign In */
+.nav-links .btn-outline {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #6366f1 !important;
+    border: 2px solid #6366f1 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    font-weight: 600 !important;
+}
+
+.nav-links .btn-outline:hover {
+    background: #6366f1 !important;
+    color: #ffffff !important;
+    border-color: #6366f1 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3), 
+                0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.nav-links .btn-outline:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .nav-links .btn-primary {
+    background: linear-gradient(135deg, #818cf8 0%, #a5b4fc 100%) !important;
+    color: #0f172a !important;
+    text-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3), 
+                0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .nav-links .btn-primary:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .nav-links .btn-outline {
+    background: rgba(30, 41, 59, 0.9) !important;
+    color: #818cf8 !important;
+    border-color: #818cf8 !important;
+}
+
+[data-theme="dark"] .nav-links .btn-outline:hover {
+    background: #818cf8 !important;
+    color: #0f172a !important;
+}
+
+/* Focus states for accessibility */
+.nav-links .btn:focus {
+    outline: 2px solid #06b6d4 !important;
+    outline-offset: 2px !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .nav-links .btn {
+        min-width: 100px !important;
+        padding: 0.625rem 1.25rem !important;
+        font-size: 0.875rem !important;
+    }
+}
+
+/* Prevent text selection */
+.nav-links .btn {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Loading state (optional enhancement) */
+.nav-links .btn.loading {
+    pointer-events: none !important;
+    opacity: 0.8 !important;
+}
+
+.nav-links .btn.loading::after {
+    content: '' !important;
+    width: 16px !important;
+    height: 16px !important;
+    border: 2px solid transparent !important;
+    border-top: 2px solid currentColor !important;
+    border-radius: 50% !important;
+    animation: spin 1s linear infinite !important;
+    margin-left: 8px !important;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

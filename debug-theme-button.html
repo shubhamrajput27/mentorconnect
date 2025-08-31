@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theme Button Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        [data-theme="dark"] {
+            background-color: #1a1a1a;
+            color: white;
+        }
+        
+        [data-theme="light"] {
+            background-color: white;
+            color: black;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: #6366f1;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: #4338ca;
+        }
+        
+        .debug-info {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f5f5f5;
+        }
+        
+        [data-theme="dark"] .debug-info {
+            background: #333;
+            border-color: #555;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <h1>Theme Button Debug Test</h1>
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <p>Current Theme: <span id="current-theme">light</span></p>
+        <p>Button Clicks: <span id="click-count">0</span></p>
+        <p>Local Storage: <span id="storage-value">none</span></p>
+        <p>DOM Attribute: <span id="dom-attribute">none</span></p>
+    </div>
+    
+    <button class="theme-toggle" aria-label="Toggle dark mode" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="theme-icon"></i>
+    </button>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="testManualToggle()" style="padding: 10px 20px; margin: 5px;">Manual Toggle</button>
+        <button onclick="resetTheme()" style="padding: 10px 20px; margin: 5px;">Reset to Light</button>
+        <button onclick="checkStorage()" style="padding: 10px 20px; margin: 5px;">Check Storage</button>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateDebugInfo();
+            updateThemeIcon(savedTheme);
+        }
+        
+        function toggleTheme() {
+            clickCount++;
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            console.log('Toggling theme from', currentTheme, 'to', newTheme);
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+            updateDebugInfo();
+        }
+        
+        function updateThemeIcon(theme) {
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) {
+                themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+        
+        function updateDebugInfo() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const storageValue = localStorage.getItem('theme') || 'none';
+            
+            document.getElementById('current-theme').textContent = currentTheme;
+            document.getElementById('click-count').textContent = clickCount;
+            document.getElementById('storage-value').textContent = storageValue;
+            document.getElementById('dom-attribute').textContent = currentTheme;
+        }
+        
+        function testManualToggle() {
+            console.log('Manual toggle triggered');
+            toggleTheme();
+        }
+        
+        function resetTheme() {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+            updateThemeIcon('light');
+            updateDebugInfo();
+        }
+        
+        function checkStorage() {
+            console.log('Local Storage theme:', localStorage.getItem('theme'));
+            console.log('DOM attribute:', document.documentElement.getAttribute('data-theme'));
+            updateDebugInfo();
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initTheme);
+        
+        // Also add click listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeButton = document.querySelector('.theme-toggle');
+            if (themeButton) {
+                themeButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Theme button clicked via event listener');
+                    toggleTheme();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
