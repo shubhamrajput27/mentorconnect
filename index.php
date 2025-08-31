@@ -16,7 +16,7 @@ $pageKeywords = 'mentorship, career coaching, professional development, skill le
 $currentUrl = BASE_URL . '/index.php';
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

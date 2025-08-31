@@ -128,34 +128,94 @@
   --container-max-width: 1200px;
 }
 
-/* Dark theme toggle button */
+/* Theme toggle button - Fixed position bottom right */
 .theme-toggle {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   z-index: 1001;
-  background: var(--surface-color);
-  border: 2px solid var(--border-color);
+  background: var(--card-color);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-md);
-}
-
-.theme-toggle:hover {
-  transform: scale(1.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-lg);
 }
 
+.theme-toggle:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  background: var(--primary-color);
+}
+
+.theme-toggle:hover i {
+  color: white;
+  transform: rotate(360deg);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
 .theme-toggle i {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   color: var(--text-primary);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse animation on first visit */
+.theme-toggle.first-visit {
+  animation: welcomePulse 3s ease-in-out;
+}
+
+@keyframes welcomePulse {
+  0%, 100% { 
+    box-shadow: var(--shadow-lg); 
+  }
+  50% { 
+    box-shadow: var(--shadow-xl), 0 0 0 10px rgba(99, 102, 241, 0.3); 
+    transform: scale(1.05);
+  }
+}
+
+/* Better mobile positioning */
+@media (max-width: 768px) {
+  .theme-toggle {
+    bottom: 80px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .theme-toggle i {
+    font-size: 1.1rem;
+  }
+  
+  .theme-toggle::before {
+    bottom: 60px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Dark theme specific styling */
+[data-theme="dark"] .theme-toggle {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .theme-toggle:hover {
+  background: var(--primary-color);
+}
+
+[data-theme="dark"] .theme-toggle::before {
+  background: var(--text-primary);
+  color: var(--text-inverse);
 }
 
 /* Phone number input styling */
@@ -278,108 +338,6 @@
     --error-color: #ef4444;
     --info-color: #3b82f6;
   }
-}
-
-/* Dark theme using class-based approach */
-html.theme-dark {
-  --bg-primary: #0f172a !important;
-  --bg-secondary: #1e293b !important;
-  --surface-color: #334155 !important;
-  --text-primary: #ffffff !important;
-  --text-secondary: #cbd5e1 !important;
-  --text-inverse: #0f172a !important;
-  --border-color: #475569 !important;
-  --divider-color: #64748b !important;
-}
-
-html.theme-dark body {
-  background-color: #0f172a !important;
-  color: #ffffff !important;
-}
-
-html.theme-dark .landing-page {
-  background-color: #0f172a !important;
-  color: #ffffff !important;
-}
-
-html.theme-dark .hero-section {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
-}
-
-html.theme-dark .nav-container,
-html.theme-dark .landing-nav {
-  background-color: #1e293b !important;
-  border-bottom: 1px solid #334155 !important;
-}
-
-html.theme-dark .landing-nav .nav-container {
-  background-color: #1e293b !important;
-}
-
-html.theme-dark .nav-links a,
-html.theme-dark .logo,
-html.theme-dark .logo h1 {
-  color: #ffffff !important;
-}
-
-html.theme-dark .logo i {
-  color: #6366f1 !important;
-}
-
-html.theme-dark .features-section,
-html.theme-dark .how-it-works,
-html.theme-dark .cta-section,
-html.theme-dark .footer {
-  background-color: #0f172a !important;
-  color: #ffffff !important;
-}
-
-html.theme-dark h1,
-html.theme-dark h2,
-html.theme-dark h3,
-html.theme-dark p,
-html.theme-dark .hero-content h1,
-html.theme-dark .hero-content p,
-html.theme-dark .feature-card h3,
-html.theme-dark .feature-card p,
-html.theme-dark .stats-grid .stat-number,
-html.theme-dark .stats-grid .stat-label,
-html.theme-dark .footer p,
-html.theme-dark .footer a,
-html.theme-dark .footer h4 {
-  color: #ffffff !important;
-}
-
-html.theme-dark .footer {
-  background-color: #0f172a !important;
-  border-top: 1px solid #334155 !important;
-}
-
-html.theme-dark .footer-content {
-  background-color: #0f172a !important;
-}
-
-html.theme-dark .footer-section h4 {
-  color: #ffffff !important;
-}
-
-html.theme-dark .footer-links a {
-  color: #cbd5e1 !important;
-}
-
-html.theme-dark .footer-links a:hover {
-  color: #ffffff !important;
-}
-
-/* Light theme explicit styles */
-html.theme-light body {
-  background-color: #ffffff !important;
-  color: #111827 !important;
-}
-
-html.theme-light .nav-container {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e5e7eb !important;
 }
 
 /* Reset and Base Styles */
@@ -1356,3 +1314,6 @@ textarea {
   }
 }
 
+
+ 
+ 

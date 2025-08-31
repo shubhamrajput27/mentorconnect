@@ -28,26 +28,38 @@ class MentorConnectApp {
         const themeToggle = document.querySelector('.theme-toggle');
         if (!themeToggle) return;
 
-        // Load saved theme
+        // Simple theme initialization - only if no theme is set, default to light
         const savedTheme = localStorage.getItem('theme') || 'light';
+        
         document.documentElement.setAttribute('data-theme', savedTheme);
         this.updateThemeIcon(savedTheme);
 
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            // Add smooth transition
-            document.documentElement.style.transition = 'all 0.3s ease';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            this.updateThemeIcon(newTheme);
-            
-            // Remove transition after animation
-            setTimeout(() => {
-                document.documentElement.style.transition = '';
-            }, 300);
-        });
+        // Only add event listener if this is NOT the landing page
+        if (!document.querySelector('.landing-page')) {
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                // Add smooth transition with better animation
+                document.documentElement.classList.add('theme-transitioning');
+                document.documentElement.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                this.updateThemeIcon(newTheme);
+                
+                // Add button feedback
+                themeToggle.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    themeToggle.style.transform = '';
+                }, 150);
+                
+                // Remove transition after animation
+                setTimeout(() => {
+                    document.documentElement.style.transition = '';
+                    document.documentElement.classList.remove('theme-transitioning');
+                }, 300);
+            });
+        }
     }
 
     updateThemeIcon(theme) {
@@ -67,6 +79,25 @@ class MentorConnectApp {
 
         // Save theme preference to server
         this.saveThemePreference();
+    }
+
+    resetToLightMode() {
+        this.theme = 'light';
+        localStorage.setItem('theme', 'light');
+        document.documentElement.classList.add('theme-transitioning');
+        document.documentElement.style.transition = 'all 0.3s ease';
+        document.documentElement.setAttribute('data-theme', 'light');
+        
+        this.updateThemeIcon('light');
+        this.saveThemePreference();
+        
+        // Show confirmation
+        this.showToast('Theme reset to light mode', 'info');
+        
+        setTimeout(() => {
+            document.documentElement.style.transition = '';
+            document.documentElement.classList.remove('theme-transitioning');
+        }, 300);
     }
 
     async saveThemePreference() {
@@ -233,13 +264,6 @@ class MentorConnectApp {
     }
 
     bindEvents() {
-        // Theme toggle
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.theme-toggle')) {
-                this.toggleTheme();
-            }
-        });
-
         // Sidebar toggle
         document.addEventListener('click', (e) => {
             if (e.target.closest('.menu-toggle')) {
@@ -617,6 +641,22 @@ function initializeFallback() {
     }
 }
 
+// Global reset function for console/manual reset
+window.resetThemeToLight = function() {
+    if (window.mentorConnectApp) {
+        window.mentorConnectApp.resetToLightMode();
+    } else {
+        // Fallback
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        const themeIcon = document.getElementById('theme-icon');
+        if (themeIcon) {
+            themeIcon.className = 'fas fa-moon';
+        }
+    }
+    console.log('Theme reset to light mode');
+};
+
 // Add optimized CSS for new animations
 if (!document.querySelector('#app-styles')) {
     const style = document.createElement('style');
@@ -647,7 +687,24 @@ if (!document.querySelector('#app-styles')) {
         }
         
         .theme-transitioning * {
-            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+            transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                       color 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                       border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                       box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        .theme-toggle {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        
+        .theme-toggle:hover {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
         }
         
         .toast {

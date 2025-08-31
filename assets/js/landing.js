@@ -13,18 +13,25 @@ class LandingPage {
     }
 
     initializeTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        // Always start with light mode as default, unless user explicitly set dark mode
+        const savedTheme = localStorage.getItem('theme');
+        const preferredTheme = savedTheme && savedTheme === 'dark' ? 'dark' : 'light';
         const html = document.documentElement;
         
-        html.setAttribute('data-theme', savedTheme);
+        // If no saved theme, default to light
+        if (!savedTheme) {
+            localStorage.setItem('theme', 'light');
+        }
+        
+        html.setAttribute('data-theme', preferredTheme);
         
         // Wait for DOM to be ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                this.updateThemeIcon(savedTheme);
+                this.updateThemeIcon(preferredTheme);
             });
         } else {
-            this.updateThemeIcon(savedTheme);
+            this.updateThemeIcon(preferredTheme);
         }
     }
 
@@ -40,7 +47,8 @@ class LandingPage {
         const currentTheme = html.getAttribute('data-theme') || 'light';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
-        // Add smooth transition
+        // Add smooth transition class
+        html.classList.add('theme-transitioning');
         html.style.transition = 'all 0.3s ease';
         html.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
@@ -50,6 +58,31 @@ class LandingPage {
         // Remove transition after animation
         setTimeout(() => {
             html.style.transition = '';
+            html.classList.remove('theme-transitioning');
+        }, 300);
+        
+        // Add feedback animation
+        const themeToggle = document.querySelector('.theme-toggle');
+        if (themeToggle) {
+            themeToggle.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                themeToggle.style.transform = '';
+            }, 150);
+        }
+    }
+
+    resetToLightMode() {
+        const html = document.documentElement;
+        html.classList.add('theme-transitioning');
+        html.style.transition = 'all 0.3s ease';
+        html.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        
+        this.updateThemeIcon('light');
+        
+        setTimeout(() => {
+            html.style.transition = '';
+            html.classList.remove('theme-transitioning');
         }, 300);
     }
 
@@ -150,12 +183,15 @@ class LandingPage {
     }
 
     bindEvents() {
-        // Theme toggle
-        document.addEventListener('click', (e) => {
-            if (e.target.closest('.theme-toggle')) {
+        // Theme toggle - Simple and direct
+        const themeToggle = document.querySelector('.theme-toggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 this.toggleTheme();
-            }
-        });
+            });
+        }
 
         // Add scroll effect to navigation
         let lastScroll = 0;
@@ -361,11 +397,49 @@ if (!document.querySelector('#landing-animations')) {
     document.head.appendChild(style);
 }
 
-// Global function for backward compatibility
+// Global functions for backward compatibility and manual reset
 window.toggleTheme = function() {
     if (window.landingPage) {
         window.landingPage.toggleTheme();
     }
+    console.log('Theme toggled via console');
+};
+
+window.resetThemeToLight = function() {
+    if (window.landingPage) {
+        window.landingPage.resetToLightMode();
+    } else {
+        // Fallback if landing page instance doesn't exist
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        const themeIcon = document.getElementById('theme-icon');
+        if (themeIcon) {
+            themeIcon.className = 'fas fa-moon';
+        }
+    }
+    console.log('Theme reset to light mode via console');
+};
+
+window.setDarkTheme = function() {
+    if (window.landingPage) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        window.landingPage.updateThemeIcon('dark');
+    }
+    console.log('Theme set to dark mode via console');
+};
+
+window.getCurrentTheme = function() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const stored = localStorage.getItem('theme') || 'light';
+    console.log('Current theme (DOM):', theme);
+    console.log('Stored theme (localStorage):', stored);
+    return { dom: theme, stored: stored };
+};
+
+window.clearThemeStorage = function() {
+    localStorage.removeItem('theme');
+    console.log('Theme storage cleared');
 };
 
 // Export for module systems
