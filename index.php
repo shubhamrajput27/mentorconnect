@@ -127,6 +127,11 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>" media="print" onload="this.media='all'">
     
+    <!-- Advanced CSS Features (if available) -->
+    <?php if (file_exists(__DIR__ . '/assets/css/advanced.css')): ?>
+    <link rel="stylesheet" href="assets/css/advanced.css?v=<?php echo filemtime(__DIR__ . '/assets/css/advanced.css'); ?>" media="print" onload="this.media='all'">
+    <?php endif; ?>
+    
     <!-- External CSS with Async Loading -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" media="print" onload="this.media='all'" crossorigin>
@@ -609,6 +614,16 @@ $currentUrl = BASE_URL . '/index.php';
     <!-- Main Application Scripts -->
     <script src="assets/js/landing.js?v=<?php echo filemtime(__DIR__ . '/assets/js/landing.js'); ?>" defer></script>
     <script src="assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>" defer></script>
+    
+    <!-- Advanced Features (if available) -->
+    <?php if (file_exists(__DIR__ . '/assets/js/advanced-features.js')): ?>
+    <script src="assets/js/advanced-features.js?v=<?php echo filemtime(__DIR__ . '/assets/js/advanced-features.js'); ?>" defer></script>
+    <?php endif; ?>
+    
+    <!-- Performance Optimizer (if available) -->
+    <?php if (file_exists(__DIR__ . '/assets/js/performance-optimizer.js')): ?>
+    <script src="assets/js/performance-optimizer.js?v=<?php echo filemtime(__DIR__ . '/assets/js/performance-optimizer.js'); ?>" defer></script>
+    <?php endif; ?>
     
     <!-- Load non-critical CSS asynchronously -->
     <script>

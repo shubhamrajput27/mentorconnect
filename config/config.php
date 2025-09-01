@@ -90,6 +90,24 @@ require_once __DIR__ . '/database.php';
 require_once __DIR__ . '/database-optimizer.php';
 require_once __DIR__ . '/performance-monitor.php';
 
+// Include new advanced optimizations
+if (file_exists(__DIR__ . '/advanced-cache.php')) {
+    require_once __DIR__ . '/advanced-cache.php';
+}
+
+// Include enhanced security and optimization modules
+if (file_exists(__DIR__ . '/security-enhancement.php')) {
+    require_once __DIR__ . '/security-enhancement.php';
+}
+
+if (file_exists(__DIR__ . '/database-optimizer-advanced.php')) {
+    require_once __DIR__ . '/database-optimizer-advanced.php';
+}
+
+if (file_exists(__DIR__ . '/api-manager.php')) {
+    require_once __DIR__ . '/api-manager.php';
+}
+
 // Start performance monitoring for all requests
 if (DEBUG_MODE) {
     PerformanceMonitor::start();

@@ -252,4 +252,66 @@ ServerSignature Off
     php_value output_buffering 4096
     php_value zlib.output_compression On
     php_value zlib.output_compression_level 6
+    
+    # OPcache settings
+    php_value opcache.enable 1
+    php_value opcache.memory_consumption 128
+    php_value opcache.max_accelerated_files 4000
+    php_value opcache.revalidate_freq 60
+    
+    # Session optimization
+    php_value session.gc_maxlifetime 28800
+    php_value session.gc_probability 1
+    php_value session.gc_divisor 100
+    
+    # Memory and execution limits
+    php_value memory_limit 256M
+    php_value max_execution_time 30
+    php_value max_input_time 60
+    
+    # File upload limits
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    
+    # Hide PHP version
+    php_value expose_php Off
+</IfModule>
+
+# Asset versioning for cache busting
+<IfModule mod_rewrite.c>
+    # Remove version number from asset requests
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^assets/(.+)\.v[0-9]+\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ assets/$1.$2 [L]
+</IfModule>
+
+# Advanced security protection
+<IfModule mod_rewrite.c>
+    # Block requests with suspicious query strings
+    RewriteCond %{QUERY_STRING} (eval\(|base64_decode|shell_exec) [NC,OR]
+    RewriteCond %{QUERY_STRING} (GLOBALS|REQUEST|_SESSION)= [NC,OR]
+    RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+    RewriteCond %{QUERY_STRING} (\|%7C) [NC]
+    RewriteRule .* - [R=403,L]
+    
+    # Block requests with no referrer on sensitive actions
+    RewriteCond %{HTTP_REFERER} ^$
+    RewriteCond %{REQUEST_METHOD} ^POST$ [NC]
+    RewriteCond %{REQUEST_URI} \.(php)$ [NC]
+    RewriteRule .* - [R=403,L]
+</IfModule>
+
+# Enable Keep-Alive for better performance
+<IfModule mod_headers.c>
+    Header set Connection keep-alive
+</IfModule>
+
+# Conditional loading based on user agent
+<IfModule mod_setenvif.c>
+    # Set environment variable for mobile devices
+    SetEnvIfNoCase User-Agent "(Mobile|Android|iPhone|iPad)" mobile
+    
+    # Serve different cache headers for mobile
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=3600" env=mobile
+    </IfModule>
 </IfModule>
