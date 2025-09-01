@@ -1,54 +1,47 @@
 <?php
-// Application configuration
-define('APP_NAME', 'MentorConnect');
-define('APP_VERSION', '1.0.0');
-define('BASE_URL', 'http://localhost/mentorconnect');
-define('UPLOAD_PATH', __DIR__ . '/../uploads/');
-define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
+/**
+ * MentorConnect Main Configuration File
+ * Optimized and consolidated configuration
+ */
 
-// Environment configuration
-define('ENVIRONMENT', 'development'); // development, staging, production
-define('DEBUG_MODE', ENVIRONMENT === 'development');
+// Load optimized configuration
+require_once __DIR__ . '/optimized-config.php';
 
-// Enhanced Security settings
-define('SESSION_LIFETIME', 3600 * 8); // 8 hours (reduced from 24)
-define('CSRF_TOKEN_LIFETIME', 1800); // 30 minutes (reduced from 1 hour)
-define('PASSWORD_MIN_LENGTH', 12); // Increased from 8
-define('MAX_LOGIN_ATTEMPTS', 5);
-define('LOGIN_LOCKOUT_TIME', 900); // 15 minutes
-define('RATE_LIMIT_REQUESTS', 100);
-define('RATE_LIMIT_WINDOW', 3600); // 1 hour
-
-// Performance settings
-define('ENABLE_QUERY_CACHE', true);
-define('CACHE_LIFETIME', 300); // 5 minutes default
-define('ENABLE_GZIP', true);
-define('ENABLE_OPCACHE', true);
-
-// Email settings (configure as needed)
-define('SMTP_HOST', 'localhost');
-define('SMTP_PORT', 587);
-define('SMTP_USERNAME', '');
-define('SMTP_PASSWORD', '');
-define('FROM_EMAIL', 'noreply@mentorconnect.com');
-define('FROM_NAME', 'MentorConnect');
-
-// Timezone
-date_default_timezone_set('UTC');
-
-// Error reporting based on environment
-if (ENVIRONMENT === 'development') {
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    ini_set('log_errors', 1);
-} else {
-    error_reporting(E_ERROR | E_WARNING | E_PARSE);
-    ini_set('display_errors', 0);
-    ini_set('log_errors', 1);
+// Legacy compatibility - maintain backward compatibility
+if (!function_exists('sanitizeInput')) {
+    require_once __DIR__ . '/security.php';
 }
 
-// Performance optimizations
-if (ENABLE_OPCACHE && function_exists('opcache_get_status')) {
+if (!function_exists('fetchOne')) {
+    require_once __DIR__ . '/functions.php';
+}
+
+// Load database connection only
+require_once __DIR__ . '/database.php';
+
+// Auto-load optimization components only in production
+if (ENVIRONMENT === 'production' && !defined('DISABLE_OPTIMIZATIONS')) {
+    if (file_exists(__DIR__ . '/database-optimizer.php')) {
+        require_once __DIR__ . '/database-optimizer.php';
+    }
+    if (file_exists(__DIR__ . '/performance-monitor.php')) {
+        require_once __DIR__ . '/performance-monitor.php';
+    }
+}
+
+// Development tools - only load in development
+if (DEBUG_MODE) {
+    if (file_exists(__DIR__ . '/database-optimizer-advanced.php')) {
+        // Only load for development debugging
+        // require_once __DIR__ . '/database-optimizer-advanced.php';
+    }
+}
+
+// Initialize performance monitoring if available
+if (class_exists('PerformanceMonitor')) {
+    PerformanceMonitor::start();
+}
+?>
     // OPcache settings should be configured in php.ini, not at runtime
     // These settings are here for reference only:
     /*
@@ -73,7 +66,7 @@ if (ENABLE_GZIP && !ob_get_level()) {
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 0); // Set to 1 for HTTPS in production
 ini_set('session.use_strict_mode', 1);
-ini_set('session.cookie_samesite', 'Strict');
+ini_set('session.cookie_samesite', 'Lax'); // Changed from Strict to Lax for form compatibility
 ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
 ini_set('session.gc_probability', 1);
 ini_set('session.gc_divisor', 100);
@@ -101,7 +94,8 @@ if (file_exists(__DIR__ . '/security-enhancement.php')) {
 }
 
 if (file_exists(__DIR__ . '/database-optimizer-advanced.php')) {
-    require_once __DIR__ . '/database-optimizer-advanced.php';
+    // Temporarily commented out to fix class conflict
+    // require_once __DIR__ . '/database-optimizer-advanced.php';
 }
 
 if (file_exists(__DIR__ . '/api-manager.php')) {

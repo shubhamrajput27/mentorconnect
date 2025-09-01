@@ -29,7 +29,7 @@ $recommendedMentors = fetchAll(
     "SELECT u.*, mp.title, mp.company, mp.rating, mp.hourly_rate, mp.experience_years
      FROM users u 
      JOIN mentor_profiles mp ON u.id = mp.user_id 
-     WHERE u.role = 'mentor' AND u.status = 'active' AND mp.is_verified = TRUE
+     WHERE u.user_type = 'mentor' AND u.is_active = TRUE AND mp.is_verified = TRUE
      ORDER BY mp.rating DESC, mp.total_sessions DESC 
      LIMIT 6"
 );
@@ -39,7 +39,7 @@ $recentMessages = fetchAll(
     "SELECT m.*, u.first_name, u.last_name, u.profile_photo 
      FROM messages m 
      JOIN users u ON m.sender_id = u.id 
-     WHERE m.receiver_id = ? 
+     WHERE m.recipient_id = ? 
      ORDER BY m.created_at DESC 
      LIMIT 5",
     [$user['id']]

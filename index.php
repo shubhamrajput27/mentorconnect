@@ -11,7 +11,8 @@ if (isLoggedIn()) {
 
 // SEO and Meta data
 $pageTitle = APP_NAME . ' - Connect, Learn, Grow with Expert Mentors';
-$pageDescription = 'Join ' . APP_NAME . ' to connect with expert mentors and accelerate your career growth. Find personalized mentorship, book sessions, and achieve your goals faster.';
+$pageDescription = 'Join ' . APP_NAME . ' to connect with expert mentors and accelerate your career growth. Find personalized mentorship, book sessions, and achi    <!-- Optimized JavaScript -->
+    <script src="assets/optimized.js?v=<?php echo filemtime(__DIR__ . '/assets/optimized.js'); ?>" defer></script>ls faster.';
 $pageKeywords = 'mentorship, career coaching, professional development, skill learning, expert mentors';
 $currentUrl = BASE_URL . '/index.php';
 ?>
@@ -77,16 +78,8 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
-    <!-- Preload Critical Resources -->
-    <link rel="preload" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>" as="style">
-    <link rel="preload" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>" as="style">
-    <link rel="preload" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>" as="style">
-    <link rel="preload" href="assets/js/landing.js?v=<?php echo filemtime(__DIR__ . '/assets/js/landing.js'); ?>" as="script">
-    <link rel="preload" href="assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>" as="script">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" crossorigin>
-    
-    <!-- CSS Loading Strategy - Critical CSS Inline -->
-    <style><?php include __DIR__ . '/assets/css/critical.css'; ?></style>
+    <!-- Optimized CSS Loading -->
+    <link rel="stylesheet" href="assets/optimized.css?v=<?php echo filemtime(__DIR__ . '/assets/optimized.css'); ?>">
     
     <!-- Performance & Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -95,37 +88,13 @@ $currentUrl = BASE_URL . '/index.php';
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
     
-    <!-- Performance Monitoring Script -->
+    <!-- Theme persistence and FOUC prevention -->
     <script>
-        // Mark start of critical resource loading
-        performance.mark('critical-css-start');
-        
-        // Performance budget monitoring
-        const PERFORMANCE_BUDGET = {
-            LCP: 2500, // 2.5s
-            FID: 100,  // 100ms
-            CLS: 0.1   // 0.1
-        };
-        
-        // Early error tracking
-        window.addEventListener('error', (e) => {
-            console.error('JS Error:', e.error);
-        });
-        
-        window.addEventListener('unhandledrejection', (e) => {
-            console.error('Promise Rejection:', e.reason);
-        });
-        
-        // Theme persistence and FOUC prevention
         (function() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
-    
-    <!-- Non-Critical CSS with Media Query -->
-    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>" media="print" onload="this.media='all'">
     
     <!-- Advanced CSS Features (if available) -->
     <?php if (file_exists(__DIR__ . '/assets/css/advanced.css')): ?>

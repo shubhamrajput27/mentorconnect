@@ -17,8 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirmPassword = $_POST['confirm_password'] ?? '';
     $role = $_POST['role'] ?? '';
     $phone = trim($_POST['phone'] ?? '');
-    $skills = trim($_POST['skills'] ?? '');
-    $interests = trim($_POST['interests'] ?? '');
     $terms = isset($_POST['terms']);
     
     // Basic validation
@@ -73,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Insert user
                 $stmt = $conn->prepare("
                     INSERT INTO users (
-                        username, email, password, first_name, last_name, role, 
+                        username, email, password_hash, first_name, last_name, user_type, 
                         phone, created_at
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
                 ");
@@ -89,21 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 
                 $userId = $conn->lastInsertId();
-                
-                // Create profile based on role
-                if ($role === 'mentor') {
-                    $stmt = $conn->prepare("
-                        INSERT INTO mentor_profiles (user_id, skills, created_at) 
-                        VALUES (?, ?, NOW())
-                    ");
-                    $stmt->execute([$userId, $skills]);
-                } else {
-                    $stmt = $conn->prepare("
-                        INSERT INTO student_profiles (user_id, interests, created_at) 
-                        VALUES (?, ?, NOW())
-                    ");
-                    $stmt->execute([$userId, $interests]);
-                }
                 
                 $conn->commit();
                 
