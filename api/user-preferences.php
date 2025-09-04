@@ -1,6 +1,6 @@
 <?php
 require_once '../config/config.php';
-require_once '../config/database.php';
+// Database connection is already loaded via config.php
 
 header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');

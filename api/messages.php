@@ -29,7 +29,7 @@ try {
             
             // Insert message
             executeQuery(
-                "INSERT INTO messages (sender_id, receiver_id, subject, message) VALUES (?, ?, ?, ?)",
+                "INSERT INTO messages (sender_id, recipient_id, subject, message) VALUES (?, ?, ?, ?)",
                 [$user['id'], $receiverId, $subject, $message]
             );
             
@@ -68,7 +68,7 @@ try {
                 throw new Exception('Contact ID required');
             }
             
-            $whereClause = "((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?))";
+            $whereClause = "((sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?))";
             $params = [$user['id'], $contactId, $contactId, $user['id']];
             
             if ($after > 0) {
@@ -87,26 +87,29 @@ try {
             ]);
             
         } elseif ($action === 'conversations') {
-            // Get user's conversations
+            // Optimized: Use a more efficient query with proper indexing
             $conversations = fetchAll(
-                "SELECT 
-                    CASE 
-                        WHEN m.sender_id = ? THEN m.receiver_id 
-                        ELSE m.sender_id 
-                    END as contact_id,
-                    u.first_name, u.last_name, u.profile_photo,
-                    MAX(m.created_at) as last_message_time,
-                    (SELECT message FROM messages m2 
-                     WHERE (m2.sender_id = ? AND m2.receiver_id = contact_id) 
-                        OR (m2.sender_id = contact_id AND m2.receiver_id = ?)
-                     ORDER BY m2.created_at DESC LIMIT 1) as last_message,
-                    (SELECT COUNT(*) FROM messages m3 
-                     WHERE m3.sender_id = contact_id AND m3.receiver_id = ? AND m3.is_read = FALSE) as unread_count
-                 FROM messages m
-                 JOIN users u ON (CASE WHEN m.sender_id = ? THEN m.receiver_id ELSE m.sender_id END) = u.id
-                 WHERE m.sender_id = ? OR m.receiver_id = ?
-                 GROUP BY contact_id, u.first_name, u.last_name, u.profile_photo
-                 ORDER BY last_message_time DESC",
+                "SELECT DISTINCT
+                    CASE WHEN m.sender_id = ? THEN m.recipient_id ELSE m.sender_id END as contact_id,
+                    u.first_name, u.last_name, u.profile_picture,
+                    m.created_at as last_message_time,
+                    m.message as last_message,
+                    COALESCE(unread.unread_count, 0) as unread_count
+                FROM messages m
+                INNER JOIN users u ON u.id = CASE WHEN m.sender_id = ? THEN m.recipient_id ELSE m.sender_id END
+                LEFT JOIN (
+                    SELECT recipient_id, COUNT(*) as unread_count 
+                    FROM messages 
+                    WHERE recipient_id = ? AND is_read = 0 
+                    GROUP BY recipient_id
+                ) unread ON unread.recipient_id = u.id
+                WHERE (m.sender_id = ? OR m.recipient_id = ?) 
+                AND m.id IN (
+                    SELECT MAX(id) FROM messages m2 
+                    WHERE (m2.sender_id = ? AND m2.recipient_id = u.id) 
+                       OR (m2.sender_id = u.id AND m2.recipient_id = ?)
+                )
+                ORDER BY m.created_at DESC",
                 [$user['id'], $user['id'], $user['id'], $user['id'], $user['id'], $user['id'], $user['id']]
             );
             

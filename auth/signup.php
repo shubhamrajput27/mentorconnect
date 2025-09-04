@@ -1,7 +1,7 @@
 <?php
 // Include required files first (before starting session)
 require_once '../config/config.php';
-require_once '../config/database.php';
+// Database connection is already loaded via config.php
 
 $error = '';
 $success = '';

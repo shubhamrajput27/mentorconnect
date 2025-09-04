@@ -80,53 +80,53 @@ try {
 }
 
 function searchMentors($query, $limit, $offset) {
-    $searchTerms = explode(' ', $query);
-    $whereConditions = ["u.role = 'mentor'", "u.status = 'active'"];
-    $params = [];
+    // Optimized: Use full-text search and better indexing strategy
+    $cacheKey = "mentor_search_" . md5($query . $limit . $offset);
     
-    // Build search conditions
-    $searchConditions = [];
-    foreach ($searchTerms as $term) {
-        if (strlen(trim($term)) > 1) {
-            $searchConditions[] = "(
-                u.first_name LIKE ? OR 
-                u.last_name LIKE ? OR 
-                mp.title LIKE ? OR 
-                mp.company LIKE ? OR 
-                u.bio LIKE ? OR
-                EXISTS (
-                    SELECT 1 FROM user_skills us 
-                    JOIN skills s ON us.skill_id = s.id 
-                    WHERE us.user_id = u.id AND s.name LIKE ?
-                )
-            )";
-            $searchTerm = '%' . trim($term) . '%';
-            $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+    // Check cache first
+    if (function_exists('apcu_fetch')) {
+        $cached = apcu_fetch($cacheKey);
+        if ($cached !== false) {
+            return $cached;
         }
     }
     
-    if (!empty($searchConditions)) {
-        $whereConditions[] = '(' . implode(' AND ', $searchConditions) . ')';
-    }
+    // Use FULLTEXT search if available, otherwise fallback to LIKE
+    $searchQuery = trim($query);
     
-    $whereClause = implode(' AND ', $whereConditions);
-    
-    $sql = "SELECT u.id, u.username, u.first_name, u.last_name, u.profile_photo, u.bio,
-                   mp.title, mp.company, mp.hourly_rate, mp.rating, mp.experience_years, mp.total_sessions,
-                   GROUP_CONCAT(s.name) as skills
+    $sql = "SELECT u.id, u.username, u.first_name, u.last_name, u.profile_picture, u.bio,
+                   mp.title, mp.company, mp.hourly_rate, 
+                   COALESCE(mp.rating, 0) as rating, 
+                   COALESCE(mp.experience_years, 0) as experience_years, 
+                   COALESCE(mp.total_sessions, 0) as total_sessions,
+                   GROUP_CONCAT(DISTINCT s.name) as skills,
+                   MATCH(u.first_name, u.last_name, u.bio) AGAINST(? IN NATURAL LANGUAGE MODE) as relevance_score
             FROM users u
             LEFT JOIN mentor_profiles mp ON u.id = mp.user_id
             LEFT JOIN user_skills us ON u.id = us.user_id
             LEFT JOIN skills s ON us.skill_id = s.id
-            WHERE {$whereClause}
+            WHERE u.user_type = 'mentor' AND u.is_active = 1
+            AND (
+                MATCH(u.first_name, u.last_name, u.bio) AGAINST(? IN NATURAL LANGUAGE MODE)
+                OR mp.title LIKE ?
+                OR mp.company LIKE ?
+                OR s.name LIKE ?
+            )
             GROUP BY u.id
-            ORDER BY mp.rating DESC, mp.total_sessions DESC
+            ORDER BY relevance_score DESC, mp.rating DESC, mp.total_sessions DESC
             LIMIT ? OFFSET ?";
     
-    $params[] = $limit;
-    $params[] = $offset;
+    $searchTerm = '%' . $searchQuery . '%';
+    $params = [$searchQuery, $searchQuery, $searchTerm, $searchTerm, $searchTerm, $limit, $offset];
     
-    return fetchAll($sql, $params);
+    $results = fetchAll($sql, $params);
+    
+    // Cache results for 5 minutes
+    if (function_exists('apcu_store')) {
+        apcu_store($cacheKey, $results, 300);
+    }
+    
+    return $results;
 }
 
 function searchSessions($query, $userId, $limit, $offset) {

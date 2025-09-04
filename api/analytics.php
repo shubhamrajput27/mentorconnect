@@ -40,26 +40,43 @@ class AnalyticsEngine {
      * Get overview metrics
      */
     private function getOverviewMetrics($dateFilter) {
-        $sql = "
-            SELECT 
-                COUNT(DISTINCT CASE WHEN u.role = 'student' THEN u.id END) as total_students,
-                COUNT(DISTINCT CASE WHEN u.role = 'mentor' THEN u.id END) as total_mentors,
-                COUNT(DISTINCT s.id) as total_sessions,
-                COUNT(DISTINCT CASE WHEN s.status = 'completed' THEN s.id END) as completed_sessions,
-                COUNT(DISTINCT m.id) as total_messages,
-                COUNT(DISTINCT r.id) as total_reviews,
-                AVG(r.rating) as average_rating,
-                SUM(CASE WHEN s.status = 'completed' THEN s.duration ELSE 0 END) as total_session_hours
-            FROM users u 
-            LEFT JOIN sessions s ON (u.id = s.mentor_id OR u.id = s.student_id) {$dateFilter['sessions']}
-            LEFT JOIN messages m ON (u.id = m.sender_id OR u.id = m.receiver_id) {$dateFilter['messages']}
-            LEFT JOIN reviews r ON u.id = r.mentor_id {$dateFilter['reviews']}
-            WHERE u.created_at >= ? AND u.status = 'active'
-        ";
+        // Optimized: Use separate queries instead of complex JOINs for better performance
+        $cacheKey = "overview_metrics_" . md5($dateFilter['start_date']);
         
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$dateFilter['start_date']]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $this->cache->remember($cacheKey, function() use ($dateFilter) {
+            // Users count
+            $usersSql = "SELECT 
+                COUNT(CASE WHEN user_type = 'student' THEN 1 END) as total_students,
+                COUNT(CASE WHEN user_type = 'mentor' THEN 1 END) as total_mentors
+                FROM users WHERE created_at >= ? AND is_active = 1";
+            $stmt = $this->db->prepare($usersSql);
+            $stmt->execute([$dateFilter['start_date']]);
+            $users = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Sessions count
+            $sessionsSql = "SELECT 
+                COUNT(*) as total_sessions,
+                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_sessions,
+                SUM(CASE WHEN status = 'completed' THEN duration_minutes ELSE 0 END) as total_session_hours
+                FROM sessions WHERE scheduled_at >= ?";
+            $stmt = $this->db->prepare($sessionsSql);
+            $stmt->execute([$dateFilter['start_date']]);
+            $sessions = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Messages count
+            $messagesSql = "SELECT COUNT(*) as total_messages FROM messages WHERE created_at >= ?";
+            $stmt = $this->db->prepare($messagesSql);
+            $stmt->execute([$dateFilter['start_date']]);
+            $messages = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Reviews count and average
+            $reviewsSql = "SELECT COUNT(*) as total_reviews, AVG(rating) as average_rating FROM reviews WHERE created_at >= ?";
+            $stmt = $this->db->prepare($reviewsSql);
+            $stmt->execute([$dateFilter['start_date']]);
+            $reviews = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return array_merge($users, $sessions, $messages, $reviews);
+        }, 600); // Cache for 10 minutes
     }
     
     /**

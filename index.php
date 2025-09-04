@@ -11,8 +11,7 @@ if (isLoggedIn()) {
 
 // SEO and Meta data
 $pageTitle = APP_NAME . ' - Connect, Learn, Grow with Expert Mentors';
-$pageDescription = 'Join ' . APP_NAME . ' to connect with expert mentors and accelerate your career growth. Find personalized mentorship, book sessions, and achi    <!-- Optimized JavaScript -->
-    <script src="assets/optimized.js?v=<?php echo filemtime(__DIR__ . '/assets/optimized.js'); ?>" defer></script>ls faster.';
+$pageDescription = 'Join ' . APP_NAME . ' to connect with expert mentors and accelerate your career growth. Find personalized mentorship, book sessions, and achieve your goals faster.';
 $pageKeywords = 'mentorship, career coaching, professional development, skill learning, expert mentors';
 $currentUrl = BASE_URL . '/index.php';
 ?>
@@ -77,6 +76,9 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- Landing Page CSS -->
+    <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>">
     
     <!-- Optimized CSS Loading -->
     <link rel="stylesheet" href="assets/optimized.css?v=<?php echo filemtime(__DIR__ . '/assets/optimized.css'); ?>">
@@ -292,11 +294,6 @@ $currentUrl = BASE_URL . '/index.php';
     }
     </script>
     
-    <!-- Performance and Security -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     
     <!-- Analytics and Monitoring -->
     <script>
@@ -329,27 +326,6 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"></noscript>
     
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "<?php echo APP_NAME; ?>",
-        "url": "<?php echo BASE_URL; ?>",
-        "logo": "<?php echo BASE_URL; ?>/assets/images/logo.png",
-        "description": "<?php echo $pageDescription; ?>",
-        "sameAs": [
-            "https://twitter.com/mentorconnect",
-            "https://linkedin.com/company/mentorconnect",
-            "https://facebook.com/mentorconnect"
-        ],
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer service",
-            "url": "<?php echo BASE_URL; ?>/contact"
-        }
-    }
-    </script>
 </head>
 <body>
     <!-- Landing Page -->
@@ -580,8 +556,11 @@ $currentUrl = BASE_URL . '/index.php';
         })();
     </script>
     
-    <!-- Main Application Scripts -->
-    <script src="assets/js/landing.js?v=<?php echo filemtime(__DIR__ . '/assets/js/landing.js'); ?>" defer></script>
+    <!-- Optimized JavaScript -->
+    <script src="assets/optimized.js?v=<?php echo filemtime(__DIR__ . '/assets/optimized.js'); ?>" defer></script>
+    
+    <!-- Performance Enhancements -->
+    <script src="assets/js/performance-enhancements.js?v=<?php echo filemtime(__DIR__ . '/assets/js/performance-enhancements.js'); ?>" defer></script>
     <script src="assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>" defer></script>
     
     <!-- Advanced Features (if available) -->
