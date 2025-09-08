@@ -41,15 +41,15 @@ function handleDownload() {
         throw new Exception('File ID is required');
     }
     
-    // Check if user has access to this file
+    // Check if user has access to this file (optimized with index hints)
     $file = fetchOne(
         "SELECT f.*, u.first_name, u.last_name 
-         FROM files f
+         FROM files f USE INDEX (PRIMARY, idx_uploader_public)
          JOIN users u ON f.uploader_id = u.id
          WHERE f.id = ? AND (
              f.uploader_id = ? OR 
              f.is_public = 1 OR 
-             EXISTS (SELECT 1 FROM file_permissions fp WHERE fp.file_id = f.id AND fp.user_id = ?)
+             EXISTS (SELECT 1 FROM file_permissions fp USE INDEX (idx_file_user) WHERE fp.file_id = f.id AND fp.user_id = ?)
          )",
         [$fileId, $user['id'], $user['id']]
     );

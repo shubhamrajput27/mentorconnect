@@ -98,6 +98,10 @@ $currentUrl = BASE_URL . '/index.php';
         })();
     </script>
     
+    <!-- Resource Preloading for Performance -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" crossorigin>
+    
     <!-- Advanced CSS Features (if available) -->
     <?php if (file_exists(__DIR__ . '/assets/css/advanced.css')): ?>
     <link rel="stylesheet" href="assets/css/advanced.css?v=<?php echo filemtime(__DIR__ . '/assets/css/advanced.css'); ?>" media="print" onload="this.media='all'">
@@ -109,108 +113,41 @@ $currentUrl = BASE_URL . '/index.php';
     
     <!-- Fallback for disabled JavaScript -->
     <noscript>
+        <link rel="stylesheet" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>">
         <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>">
         <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" crossorigin>
     </noscript>
     
-    <!-- Enhanced Button Styles for Better Visibility and Accessibility -->
+    <!-- Critical CSS Inline -->
+    <link rel="stylesheet" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>">
+    
+    <!-- Main CSS with Async Loading -->
+    <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>" media="print" onload="this.media='all'">
+    
+    <!-- Optimized Button Styles -->
     <style>
-    /* Enhanced Button Styles for Better Visibility and Accessibility */
-    .nav-links .btn {
-        font-size: 0.9rem !important;
-        padding: 0.75rem 1.5rem !important;
-        font-weight: 600 !important;
-        border-radius: 8px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        text-decoration: none !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        min-width: 120px !important;
-        position: relative !important;
-        overflow: hidden !important;
-    }
+    .nav-links .btn{font-size:.9rem!important;padding:.75rem 1.5rem!important;font-weight:600!important;border-radius:25px!important;transition:all .3s cubic-bezier(.4,0,.2,1)!important;text-decoration:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:120px!important;position:relative!important;overflow:hidden!important}
+    .nav-links .btn-primary{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%)!important;color:#fff!important;border:2px solid transparent!important;box-shadow:0 4px 12px rgba(99,102,241,.3),0 2px 4px rgba(0,0,0,.1)!important;text-shadow:0 1px 2px rgba(0,0,0,.1)!important}
+    .nav-links .btn-primary:hover{background:linear-gradient(135deg,#4338ca 0%,#7c3aed 100%)!important;color:#fff!important;transform:translateY(-2px)!important;box-shadow:0 8px 20px rgba(99,102,241,.4),0 4px 8px rgba(0,0,0,.15)!important;border-color:rgba(255,255,255,.2)!important}
+    .nav-links .btn-outline{background:rgba(255,255,255,.95)!important;color:#6366f1!important;border:2px solid #6366f1!important;backdrop-filter:blur(10px)!important;box-shadow:0 2px 8px rgba(0,0,0,.1)!important;font-weight:600!important}
+    .nav-links .btn-outline:hover{background:#6366f1!important;color:#fff!important;border-color:#6366f1!important;transform:translateY(-2px)!important;box-shadow:0 6px 16px rgba(99,102,241,.3),0 2px 4px rgba(0,0,0,.1)!important}
+    [data-theme="dark"] .nav-links .btn-primary{background:linear-gradient(135deg,#818cf8 0%,#a5b4fc 100%)!important;color:#0f172a!important;text-shadow:none!important;box-shadow:0 4px 12px rgba(129,140,248,.3),0 2px 4px rgba(0,0,0,.2)!important}
+    [data-theme="dark"] .nav-links .btn-primary:hover{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%)!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.2)!important}
+    [data-theme="dark"] .nav-links .btn-outline{background:rgba(30,41,59,.95)!important;color:#818cf8!important;border-color:#818cf8!important}
+    [data-theme="dark"] .nav-links .btn-outline:hover{background:#818cf8!important;color:#0f172a!important}
+    .nav-links .btn:focus{outline:2px solid #06b6d4!important;outline-offset:2px!important}
+    @media (max-width:768px){.nav-links .btn{min-width:100px!important;padding:.625rem 1.25rem!important;font-size:.875rem!important}}
 
-    /* Primary button - Get Started */
-    .nav-links .btn-primary {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-        color: #ffffff !important;
-        border: 2px solid transparent !important;
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3), 
-                    0 2px 4px rgba(0, 0, 0, 0.1) !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+    /* Disable all cursor interactions on SVG characters */
+    .mentor-figure, .student-figure {
+        pointer-events: none !important;
     }
-
-    .nav-links .btn-primary:hover {
-        background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%) !important;
-        color: #ffffff !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4), 
-                    0 4px 8px rgba(0, 0, 0, 0.15) !important;
-        border-color: rgba(255, 255, 255, 0.2) !important;
-    }
-
-    /* Outline button - Sign In */
-    .nav-links .btn-outline {
-        background: rgba(255, 255, 255, 0.95) !important;
-        color: #6366f1 !important;
-        border: 2px solid #6366f1 !important;
-        -webkit-backdrop-filter: blur(10px) !important;
-        backdrop-filter: blur(10px) !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-        font-weight: 600 !important;
-    }
-
-    .nav-links .btn-outline:hover {
-        background: #6366f1 !important;
-        color: #ffffff !important;
-        border-color: #6366f1 !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3), 
-                    0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    /* Dark theme adjustments */
-    [data-theme="dark"] .nav-links .btn-primary {
-        background: linear-gradient(135deg, #818cf8 0%, #a5b4fc 100%) !important;
-        color: #0f172a !important;
-        text-shadow: none !important;
-        box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3), 
-                    0 2px 4px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    [data-theme="dark"] .nav-links .btn-primary:hover {
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-        color: #ffffff !important;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    [data-theme="dark"] .nav-links .btn-outline {
-        background: rgba(30, 41, 59, 0.95) !important;
-        color: #818cf8 !important;
-        border-color: #818cf8 !important;
-    }
-
-    [data-theme="dark"] .nav-links .btn-outline:hover {
-        background: #818cf8 !important;
-        color: #0f172a !important;
-    }
-
-    /* Focus states for accessibility */
-    .nav-links .btn:focus {
-        outline: 2px solid #06b6d4 !important;
-        outline-offset: 2px !important;
-    }
-
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .nav-links .btn {
-            min-width: 100px !important;
-            padding: 0.625rem 1.25rem !important;
-            font-size: 0.875rem !important;
-        }
+    
+    .hero-svg {
+        pointer-events: none !important;
     }
     </style>
     
@@ -380,8 +317,109 @@ $currentUrl = BASE_URL . '/index.php';
                     </div>
                 </div>
                 <div class="hero-image">
-                    <div class="hero-graphic">
-                        <i class="fas fa-users"></i>
+                    <div class="hero-graphic-container">
+                        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="hero-svg">
+                            <defs>
+                                <!-- Simple gradients for characters -->
+                                <linearGradient id="mentorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#4F8EDB" />
+                                    <stop offset="100%" style="stop-color:#3B7BC8" />
+                                </linearGradient>
+                                <linearGradient id="studentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#10B981" />
+                                    <stop offset="100%" style="stop-color:#059669" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Outer Light Purple Background Circle -->
+                            <circle cx="300" cy="300" r="280" fill="#E8D5F2" opacity="0.4"/>
+                            
+                            <!-- Main Light Blue Circle -->
+                            <circle cx="300" cy="300" r="220" fill="#B8E0E8" opacity="0.7"/>
+                            
+                            <!-- Light Beige Overlapping Circle -->
+                            <circle cx="380" cy="380" r="160" fill="#E8D5C4" opacity="0.8"/>
+                            
+                            <!-- Small floating elements -->
+                            <circle cx="150" cy="120" r="5" fill="#F97316" opacity="0.8">
+                                <animate attributeName="cy" values="120;115;120" dur="3s" repeatCount="indefinite"/>
+                            </circle>
+                            
+                            <!-- Chat Bubble -->
+                            <g class="chat-bubble" transform="translate(350, 150)">
+                                <ellipse cx="0" cy="0" rx="30" ry="18" fill="#10B981"/>
+                                <polygon points="-8,12 2,12 -3,20" fill="#10B981"/>
+                                <circle cx="-10" cy="-2" r="2" fill="#ffffff"/>
+                                <circle cx="0" cy="-2" r="2" fill="#ffffff"/>
+                                <circle cx="10" cy="-2" r="2" fill="#ffffff"/>
+                                <animateTransform attributeName="transform" type="scale" values="1;1.05;1" dur="2s" repeatCount="indefinite"/>
+                            </g>
+                            
+                            <!-- Lightbulb -->
+                            <g class="lightbulb" transform="translate(300, 200)">
+                                <circle cx="0" cy="0" r="6" fill="#FBD34D"/>
+                                <rect x="-1.2" y="3.8" width="2.4" height="3.8" rx="1.2" fill="#92400E"/>
+                                <rect x="-3" y="-0.5" width="6" height="1" fill="#FBD34D"/>
+                                <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+                            </g>
+                            
+                            <!-- Small Messaging Icon near Lightbulb -->
+                            <g class="message-icon" transform="translate(320, 185)">
+                                <rect x="-9" y="-6" width="18" height="12" rx="3" fill="#10B981"/>
+                                <polygon points="-3,6 3,6 0,10" fill="#10B981"/>
+                                <circle cx="-4.5" cy="-1.5" r="1.2" fill="#ffffff"/>
+                                <circle cx="0" cy="-1.5" r="1.2" fill="#ffffff"/>
+                                <circle cx="4.5" cy="-1.5" r="1.2" fill="#ffffff"/>
+                                <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+                            </g>
+                            
+                            <!-- Connection Line -->
+                            <path d="M 220 380 Q 300 320 380 400" stroke="#10B981" stroke-width="3" fill="none" stroke-dasharray="6,3" opacity="0.8" class="connection-line">
+                                <animate attributeName="stroke-dashoffset" values="0;-18;0" dur="3s" repeatCount="indefinite"/>
+                            </path>
+                            
+                            <!-- Mentor Figure (Left) - Blue -->
+                            <g class="mentor-figure" transform="translate(200, 360)">
+                                <!-- Mentor Body (Capsule Shape) -->
+                                <ellipse cx="0" cy="10" rx="30" ry="45" fill="url(#mentorGradient)"/>
+                                <!-- Mentor Head -->
+                                <circle cx="0" cy="-35" r="20" fill="#FBD34D"/>
+                                <!-- Mentor Hair -->
+                                <path d="M -18 -50 Q -15 -55 -8 -53 Q 0 -55 8 -53 Q 15 -55 18 -50 Q 12 -52 0 -52 Q -12 -52 -18 -50" fill="#8B4513"/>
+                                <!-- Mentor Face - Happy expression -->
+                                <circle cx="-6" cy="-38" r="2" fill="#1F2937"/>
+                                <circle cx="6" cy="-38" r="2" fill="#1F2937"/>
+                                <path d="M -8 -28 Q 0 -22 8 -28" stroke="#1F2937" stroke-width="1.5" fill="none"/>
+                                <!-- Mentor Device/Laptop -->
+                                <rect x="-12" y="0" width="24" height="16" rx="2" fill="#1E293B"/>
+                                <rect x="-10" y="2" width="20" height="12" rx="1" fill="#3B82F6"/>
+                                <!-- Mentor Arms -->
+                                <circle cx="-35" cy="5" r="8" fill="#FBD34D"/>
+                                <circle cx="35" cy="8" r="8" fill="#FBD34D"/>
+                            </g>
+                            
+                            <!-- Student Figure (Right) - Green -->
+                            <g class="student-figure" transform="translate(400, 400)">
+                                <!-- Student Body (Capsule Shape) -->
+                                <ellipse cx="0" cy="10" rx="30" ry="45" fill="url(#studentGradient)"/>
+                                <!-- Student Head -->
+                                <circle cx="0" cy="-35" r="20" fill="#FBD34D"/>
+                                <!-- Student Hair -->
+                                <path d="M -20 -48 Q -18 -53 -10 -52 Q -2 -54 2 -54 Q 10 -52 18 -53 Q 20 -48 15 -50 Q 8 -51 0 -51 Q -8 -51 -15 -50 Q -20 -48 -20 -48" fill="#654321"/>
+                                <!-- Student Face - Happy expression -->
+                                <circle cx="-6" cy="-38" r="2" fill="#1F2937"/>
+                                <circle cx="6" cy="-38" r="2" fill="#1F2937"/>
+                                <path d="M -8 -28 Q 0 -22 8 -28" stroke="#1F2937" stroke-width="1.5" fill="none"/>
+                                <!-- Student Book -->
+                                <rect x="-10" y="5" width="20" height="15" rx="2" fill="#EF4444"/>
+                                <rect x="-8" y="7" width="16" height="1.5" fill="#ffffff"/>
+                                <rect x="-8" y="10" width="12" height="1" fill="#ffffff"/>
+                                <rect x="-8" y="13" width="14" height="1" fill="#ffffff"/>
+                                <!-- Student Arms -->
+                                <circle cx="-35" cy="8" r="8" fill="#FBD34D"/>
+                                <circle cx="35" cy="12" r="8" fill="#FBD34D"/>
+                            </g>
+                        </svg>
                     </div>
                 </div>
             </div>

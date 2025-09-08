@@ -1,5 +1,5 @@
 // MentorConnect Service Worker - Optimized for 100/100 Performance
-const CACHE_VERSION = '2.1.0';
+const CACHE_VERSION = '2.2.0';
 const STATIC_CACHE = `mentorconnect-static-v${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `mentorconnect-dynamic-v${CACHE_VERSION}`;
 const API_CACHE = `mentorconnect-api-v${CACHE_VERSION}`;
@@ -10,9 +10,12 @@ const STATIC_ASSETS = [
     '/index.php',
     '/auth/login.php',
     '/auth/signup.php',
+    '/assets/css/critical.css',
     '/assets/css/style.css',
     '/assets/css/landing.css',
+    '/assets/js/optimized-app.js',
     '/assets/js/app.js',
+    '/assets/js/image-optimizer.js',
     '/assets/js/landing.js',
     '/manifest.json',
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
