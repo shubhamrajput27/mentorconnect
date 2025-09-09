@@ -486,7 +486,7 @@ $currentUrl = BASE_URL . '/index.php';
                     <h2>How It Works</h2>
                     <p>Get started in just a few simple steps.</p>
                 </div>
-                <div class="steps-grid">p
+                <div class="steps-grid">
                     <div class="step">
                         <div class="step-number">1</div>
                         <h3>Create Your Profile</h3>
