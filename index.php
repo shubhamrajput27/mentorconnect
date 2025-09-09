@@ -486,7 +486,7 @@ $currentUrl = BASE_URL . '/index.php';
                     <h2>How It Works</h2>
                     <p>Get started in just a few simple steps.</p>
                 </div>
-                <div class="steps-grid">
+                <div class="steps-grid">p
                     <div class="step">
                         <div class="step-number">1</div>
                         <h3>Create Your Profile</h3>
@@ -767,7 +767,6 @@ $currentUrl = BASE_URL . '/index.php';
     // End performance monitoring and output debug info
     if (isset($performanceMonitor)) {
         $performanceMonitor->endTimer('page_load');
-        $performanceMonitor->outputHeaders();
         
         // Show performance info in debug mode
         if (DEBUG_MODE) {

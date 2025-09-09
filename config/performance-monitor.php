@@ -254,16 +254,28 @@ class PerformanceMonitor {
     }
     
     /**
-     * Output performance metrics as HTTP headers (for debugging)
+     * Output performance metrics as HTTP headers (disabled to prevent header issues)
      */
     public function outputHeaders() {
+        // Disabled to prevent "headers already sent" errors
+        // Performance info is available in HTML comments in debug mode
+        return;
+    }
+    
+    /**
+     * Get headers as array instead of sending them
+     */
+    public function getPerformanceHeaders() {
         if (defined('DEBUG_MODE') && DEBUG_MODE) {
             $report = $this->getReport();
-            header('X-Performance-Time: ' . $report['execution_time'] . 's');
-            header('X-Performance-Queries: ' . $report['database_queries']);
-            header('X-Performance-Memory: ' . $report['memory_usage']['peak']);
-            header('X-Performance-Grade: ' . $report['performance_grade']);
+            return [
+                'X-Performance-Time' => $report['execution_time'] . 's',
+                'X-Performance-Queries' => $report['database_queries'],
+                'X-Performance-Memory' => $report['memory_usage']['peak'],
+                'X-Performance-Grade' => $report['performance_grade']
+            ];
         }
+        return [];
     }
 }
 
@@ -288,5 +300,9 @@ function perf_report() {
 
 function perf_suggestions() {
     return PerformanceMonitor::getInstance()->getOptimizationSuggestions();
+}
+
+function perf_headers() {
+    return PerformanceMonitor::getInstance()->getPerformanceHeaders();
 }
 ?>
