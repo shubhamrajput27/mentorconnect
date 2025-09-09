@@ -762,5 +762,42 @@ $currentUrl = BASE_URL . '/index.php';
             initLazyLoading();
         }
     </script>
+    
+    <?php
+    // End performance monitoring and output debug info
+    if (isset($performanceMonitor)) {
+        $performanceMonitor->endTimer('page_load');
+        $performanceMonitor->outputHeaders();
+        
+        // Show performance info in debug mode
+        if (DEBUG_MODE) {
+            $report = perf_report();
+            $cacheStats = cache_stats();
+            
+            echo "<!-- Performance Debug Info\n";
+            echo "Page Load Time: {$report['execution_time']}s\n";
+            echo "Memory Usage: {$report['memory_usage']['peak']}\n";
+            echo "Database Queries: {$report['database_queries']}\n";
+            echo "Cache Hit Ratio: {$cacheStats['hit_ratio']}%\n";
+            echo "Performance Grade: {$report['performance_grade']}/100\n";
+            
+            if (!empty($report['operations'])) {
+                echo "Operations:\n";
+                foreach ($report['operations'] as $name => $op) {
+                    echo "  {$name}: {$op['duration']}s ({$op['status']})\n";
+                }
+            }
+            
+            $suggestions = perf_suggestions();
+            if (!empty($suggestions)) {
+                echo "Optimization Suggestions:\n";
+                foreach ($suggestions as $suggestion) {
+                    echo "  - {$suggestion}\n";
+                }
+            }
+            echo "-->\n";
+        }
+    }
+    ?>
 </body>
 </html>

@@ -3,6 +3,11 @@
 require_once '../config/config.php';
 // Database connection is already loaded via config.php
 
+// Start session for CSRF token
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $error = '';
 $success = '';
 

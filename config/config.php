@@ -43,6 +43,15 @@ if (DEBUG_MODE) {
     ini_set('display_errors', 0);
 }
 
+// Include optimized components
+require_once __DIR__ . '/cache-optimizer.php';
+require_once __DIR__ . '/performance-monitor.php';
+require_once __DIR__ . '/security-validator.php';
+
+// Initialize performance monitoring
+$performanceMonitor = PerformanceMonitor::getInstance();
+$performanceMonitor->startTimer('page_load');
+
 // Session configuration
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 0); // Set to 1 for HTTPS
@@ -72,22 +81,73 @@ try {
     }
 }
 
-// Database helper functions
+// Enhanced Database helper functions with caching and performance monitoring
 function executeQuery($sql, $params = []) {
     global $pdo;
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    return $stmt;
+    
+    // Start query timing
+    $startTime = microtime(true);
+    perf_start('db_query');
+    
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        
+        // Log query performance
+        $duration = microtime(true) - $startTime;
+        perf_log_query($sql, $params, $duration);
+        perf_end('db_query');
+        
+        return $stmt;
+    } catch (PDOException $e) {
+        perf_end('db_query');
+        
+        // Log database error
+        if (defined('DEBUG_MODE') && DEBUG_MODE) {
+            error_log("Database Query Error: " . $e->getMessage() . " | SQL: " . $sql);
+        }
+        throw $e;
+    }
 }
 
-function fetchOne($sql, $params = []) {
+function fetchOne($sql, $params = [], $cacheKey = null, $cacheTTL = 300) {
+    // Try cache first if cache key provided
+    if ($cacheKey && ENABLE_QUERY_CACHE) {
+        $cached = cache_get($cacheKey);
+        if ($cached !== false) {
+            return $cached;
+        }
+    }
+    
     $stmt = executeQuery($sql, $params);
-    return $stmt->fetch();
+    $result = $stmt->fetch();
+    
+    // Cache the result if cache key provided
+    if ($cacheKey && $result && ENABLE_QUERY_CACHE) {
+        cache_set($cacheKey, $result, $cacheTTL);
+    }
+    
+    return $result;
 }
 
-function fetchAll($sql, $params = []) {
+function fetchAll($sql, $params = [], $cacheKey = null, $cacheTTL = 300) {
+    // Try cache first if cache key provided
+    if ($cacheKey && ENABLE_QUERY_CACHE) {
+        $cached = cache_get($cacheKey);
+        if ($cached !== false) {
+            return $cached;
+        }
+    }
+    
     $stmt = executeQuery($sql, $params);
-    return $stmt->fetchAll();
+    $result = $stmt->fetchAll();
+    
+    // Cache the result if cache key provided
+    if ($cacheKey && $result && ENABLE_QUERY_CACHE) {
+        cache_set($cacheKey, $result, $cacheTTL);
+    }
+    
+    return $result;
 }
 
 function getLastInsertId() {
@@ -95,47 +155,117 @@ function getLastInsertId() {
     return $pdo->lastInsertId();
 }
 
-// Utility functions
-function sanitizeInput($data) {
+// New optimized query functions
+function fetchCached($sql, $params = [], $ttl = 300) {
+    $cacheKey = 'query_' . md5($sql . serialize($params));
+    return fetchAll($sql, $params, $cacheKey, $ttl);
+}
+
+function fetchOneCached($sql, $params = [], $ttl = 300) {
+    $cacheKey = 'query_one_' . md5($sql . serialize($params));
+    return fetchOne($sql, $params, $cacheKey, $ttl);
+}
+
+// Enhanced Utility functions with security validation
+function sanitizeInput($data, $type = 'general', $maxLength = null) {
     if (is_array($data)) {
-        return array_map('sanitizeInput', $data);
+        return array_map(function($item) use ($type, $maxLength) {
+            return sanitizeInput($item, $type, $maxLength);
+        }, $data);
     }
-    return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    
+    // Use enhanced security validator
+    $validation = validate_input($data, $type, $maxLength);
+    
+    if (!$validation['valid'] && defined('DEBUG_MODE') && DEBUG_MODE) {
+        error_log("Input validation issues: " . implode(', ', $validation['issues']));
+    }
+    
+    return $validation['cleaned'];
 }
 
 function validateEmail($email) {
-    return filter_var($email, FILTER_VALIDATE_EMAIL) && 
-           !preg_match('/[<>"\']/', $email) &&
-           strlen($email) <= 254;
+    $validation = validate_input($email, 'email');
+    return $validation['valid'];
 }
 
 function validatePassword($password) {
-    return strlen($password) >= PASSWORD_MIN_LENGTH &&
-           preg_match('/[A-Z]/', $password) &&
-           preg_match('/[a-z]/', $password) &&
-           preg_match('/[0-9]/', $password) &&
-           preg_match('/[^A-Za-z0-9]/', $password);
+    $validation = validate_input($password, 'password');
+    return $validation['valid'];
 }
 
-function generateCSRFToken() {
-    if (!isset($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        $_SESSION['csrf_token_time'] = time();
+// New enhanced validation functions
+function validateAndSanitize($input, $type = 'general', $required = false, $maxLength = null) {
+    if ($required && empty($input)) {
+        return ['valid' => false, 'error' => 'This field is required', 'value' => ''];
     }
-    return $_SESSION['csrf_token'];
+    
+    if (empty($input)) {
+        return ['valid' => true, 'error' => null, 'value' => ''];
+    }
+    
+    $validation = validate_input($input, $type, $maxLength);
+    
+    return [
+        'valid' => $validation['valid'],
+        'error' => $validation['valid'] ? null : implode(', ', $validation['issues']),
+        'value' => $validation['cleaned']
+    ];
 }
 
-function validateCSRFToken($token) {
-    if (!isset($_SESSION['csrf_token']) || !isset($_SESSION['csrf_token_time'])) {
-        return false;
+function secureUpload($file, $allowedTypes = [], $maxSize = 5242880) { // 5MB default
+    if (!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+        return ['success' => false, 'error' => 'No file uploaded'];
     }
     
-    if (time() - $_SESSION['csrf_token_time'] > CSRF_TOKEN_LIFETIME) {
-        unset($_SESSION['csrf_token'], $_SESSION['csrf_token_time']);
-        return false;
+    // Validate file size
+    if ($file['size'] > $maxSize) {
+        return ['success' => false, 'error' => 'File too large'];
     }
     
-    return hash_equals($_SESSION['csrf_token'], $token);
+    // Validate file type
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    
+    if (!empty($allowedTypes) && !in_array($mimeType, $allowedTypes)) {
+        return ['success' => false, 'error' => 'File type not allowed'];
+    }
+    
+    // Validate filename
+    $filenameValidation = validate_input($file['name'], 'filename');
+    if (!$filenameValidation['valid']) {
+        return ['success' => false, 'error' => 'Invalid filename'];
+    }
+    
+    return [
+        'success' => true,
+        'filename' => $filenameValidation['cleaned'],
+        'mime_type' => $mimeType,
+        'size' => $file['size']
+    ];
+}
+
+function generateCSRFToken($action = null) {
+    return generate_csrf($action);
+}
+
+function validateCSRFToken($token, $action = null) {
+    return validate_csrf($token, $action);
+}
+
+// Enhanced CSRF with action-specific tokens
+function generateActionCSRF($action) {
+    return generate_csrf($action);
+}
+
+function validateActionCSRF($token, $action) {
+    return validate_csrf($token, $action);
+}
+
+// Rate limiting helpers
+function checkRateLimit($identifier, $action = 'general', $maxAttempts = 10, $timeWindow = 300) {
+    return check_rate_limit($identifier, $action, $maxAttempts, $timeWindow);
 }
 
 function isLoggedIn() {

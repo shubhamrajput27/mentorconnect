@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         } else {
             // Check if session exists and user participated
             $session = fetchOne(
-                "SELECT * FROM sessions WHERE id = ? AND (mentor_id = ? OR student_id = ?) AND status = 'completed'",
+                "SELECT id, mentor_id, student_id, title, scheduled_at FROM sessions WHERE id = ? AND (mentor_id = ? OR student_id = ?) AND status = 'completed'",
                 [$sessionId, $user['id'], $user['id']]
             );
             

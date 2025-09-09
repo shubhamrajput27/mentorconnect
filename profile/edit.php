@@ -16,13 +16,13 @@ $userSkills = fetchAll(
 );
 
 // Get all available skills
-$allSkills = fetchAll("SELECT * FROM skills ORDER BY category, name");
+$allSkills = fetchAll("SELECT id, name, category, description FROM skills ORDER BY category, name");
 
 // Get mentor profile if user is a mentor
 $mentorProfile = null;
 if ($user['role'] === 'mentor') {
     $mentorProfile = fetchOne(
-        "SELECT * FROM mentor_profiles WHERE user_id = ?",
+        "SELECT title, company, experience_years, hourly_rate, availability, languages FROM mentor_profiles WHERE user_id = ?",
         [$user['id']]
     );
 }
