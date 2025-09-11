@@ -41,12 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if (empty($error)) {
                     $user = fetchOne(
-                        "SELECT id, username, email, password_hash, user_type, is_active FROM users WHERE email = ?",
+                        "SELECT id, username, email, password_hash, role, status FROM users WHERE email = ?",
                         [$email]
                     );
                     
                     if ($user && password_verify($password, $user['password_hash'])) {
-                        if (!$user['is_active']) {
+                        if ($user['status'] !== 'active') {
                             $error = 'Your account is not active. Please contact support.';
                         } else {
                             // Reset failed attempts on successful login
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             // Set session variables
                             $_SESSION['user_id'] = $user['id'];
-                            $_SESSION['user_role'] = $user['user_type'];
+                            $_SESSION['user_role'] = $user['role'];
                             $_SESSION['username'] = $user['username'];
                             $_SESSION['login_time'] = time();
                             $_SESSION['last_activity'] = time();
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
                             
                             // Redirect to dashboard
-                            $redirectUrl = $user['user_type'] === 'mentor' ? '/dashboard/mentor.php' : '/dashboard/student.php';
+                            $redirectUrl = $user['role'] === 'mentor' ? '/dashboard/mentor.php' : '/dashboard/student.php';
                             header('Location: ' . BASE_URL . $redirectUrl);
                             exit();
                         }
