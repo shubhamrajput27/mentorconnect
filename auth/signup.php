@@ -121,6 +121,7 @@ $csrfToken = $_SESSION['csrf_token'];
     <title>Join MentorConnect - Create Your Account</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="../assets/css/password-strength.css" rel="stylesheet">
     <style>
         /* CSS Variables for Theme Support */
         :root {
@@ -1128,27 +1129,35 @@ $csrfToken = $_SESSION['csrf_token'];
                         </div>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group password-input-container has-strength-indicator">
                         <label for="password">Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" required 
-                                   placeholder="Create a strong password">
+                                   placeholder="Create a strong password" class="form-input">
                             <i class="fas fa-lock"></i>
                             <button type="button" class="password-toggle" onclick="togglePassword('password')">
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
+                        <div id="password-strength-container"></div>
                     </div>
                     
                     <div class="form-group">
                         <label for="confirm_password">Confirm Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="confirm_password" name="confirm_password" required 
-                                   placeholder="Confirm your password">
+                                   placeholder="Confirm your password" class="form-input">
                             <i class="fas fa-lock"></i>
                             <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
                                 <i class="fas fa-eye"></i>
                             </button>
+                        </div>
+                        <div id="password-match-indicator" class="password-match-feedback" style="display: none;">
+                            <div class="match-status">
+                                <i class="fas fa-check-circle" style="color: #16a34a; display: none;"></i>
+                                <i class="fas fa-times-circle" style="color: #ef4444; display: none;"></i>
+                                <span class="match-text"></span>
+                            </div>
                         </div>
                     </div>
                     
@@ -1224,17 +1233,88 @@ $csrfToken = $_SESSION['csrf_token'];
             }
         }
         
-        // Form validation
+        // Initialize Password Strength Validator
+        let passwordValidator;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize password strength validator
+            passwordValidator = new PasswordStrengthValidator({
+                minLength: 8,
+                requireUppercase: true,
+                requireLowercase: true,
+                requireNumbers: true,
+                requireSpecialChars: true
+            });
+            
+            // Create strength indicator
+            const strengthContainer = document.getElementById('password-strength-container');
+            if (strengthContainer) {
+                passwordValidator.createStrengthIndicator(strengthContainer, 'password');
+            }
+            
+            // Setup password confirmation matching
+            setupPasswordMatching();
+        });
+        
+        // Password matching functionality
+        function setupPasswordMatching() {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm_password');
+            const matchIndicator = document.getElementById('password-match-indicator');
+            const matchIcon = matchIndicator.querySelector('.fas');
+            const matchText = matchIndicator.querySelector('.match-text');
+            
+            function checkPasswordMatch() {
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+                
+                if (confirmPassword.length === 0) {
+                    matchIndicator.style.display = 'none';
+                    return;
+                }
+                
+                matchIndicator.style.display = 'block';
+                
+                if (password === confirmPassword) {
+                    matchIndicator.querySelector('.fa-check-circle').style.display = 'inline';
+                    matchIndicator.querySelector('.fa-times-circle').style.display = 'none';
+                    matchText.textContent = 'Passwords match';
+                    matchText.style.color = '#16a34a';
+                } else {
+                    matchIndicator.querySelector('.fa-check-circle').style.display = 'none';
+                    matchIndicator.querySelector('.fa-times-circle').style.display = 'inline';
+                    matchText.textContent = 'Passwords do not match';
+                    matchText.style.color = '#ef4444';
+                }
+            }
+            
+            confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+            passwordInput.addEventListener('input', checkPasswordMatch);
+        }
+        
+        // Enhanced form validation
         document.getElementById('signupForm').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
             
+            // Check password strength
+            if (passwordValidator) {
+                const strengthAnalysis = passwordValidator.calculateStrength(password);
+                if (!strengthAnalysis.isAcceptable) {
+                    e.preventDefault();
+                    alert('Please create a stronger password. Check the requirements below the password field.');
+                    return;
+                }
+            }
+            
+            // Check password match
             if (password !== confirmPassword) {
                 e.preventDefault();
                 alert('Passwords do not match!');
                 return;
             }
             
+            // Basic length check as fallback
             if (password.length < 8) {
                 e.preventDefault();
                 alert('Password must be at least 8 characters long!');
@@ -1261,6 +1341,9 @@ $csrfToken = $_SESSION['csrf_token'];
             });
         });
     </script>
+    
+    <!-- Password Strength JavaScript -->
+    <script src="../assets/js/password-strength.js"></script>
     
     <!-- Theme Toggle Button -->
     <button class="theme-toggle" aria-label="Toggle dark mode">
