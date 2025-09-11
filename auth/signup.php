@@ -1238,13 +1238,7 @@ $csrfToken = $_SESSION['csrf_token'];
         
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize password strength validator
-            passwordValidator = new PasswordStrengthValidator({
-                minLength: 8,
-                requireUppercase: true,
-                requireLowercase: true,
-                requireNumbers: true,
-                requireSpecialChars: true
-            });
+            passwordValidator = new PasswordStrengthValidator();
             
             // Create strength indicator
             const strengthContainer = document.getElementById('password-strength-container');
@@ -1300,9 +1294,9 @@ $csrfToken = $_SESSION['csrf_token'];
             // Check password strength
             if (passwordValidator) {
                 const strengthAnalysis = passwordValidator.calculateStrength(password);
-                if (!strengthAnalysis.isAcceptable) {
+                if (strengthAnalysis.level === 'weak') {
                     e.preventDefault();
-                    alert('Please create a stronger password. Check the requirements below the password field.');
+                    alert('Please create a stronger password. It must include uppercase, lowercase, numbers, and special characters.');
                     return;
                 }
             }
