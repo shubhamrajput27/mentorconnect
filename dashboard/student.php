@@ -1,63 +1,92 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 require_once '../config/config.php';
 requireRole('student');
 
 $user = getCurrentUser();
 
-// Get student statistics
-$stats = [
-    'total_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE student_id = ?", [$user['id']])['count'],
-    'upcoming_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE student_id = ? AND scheduled_at > NOW() AND status = 'scheduled'", [$user['id']])['count'],
-    'completed_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE student_id = ? AND status = 'completed'", [$user['id']])['count'],
-    'mentors_count' => fetchOne("SELECT COUNT(DISTINCT mentor_id) as count FROM sessions WHERE student_id = ?", [$user['id']])['count']
-];
+// Get student statistics with error handling
+try {
+    $stats = [
+        'total_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE student_id = ?", [$user['id']])['count'] ?? 0,
+        'upcoming_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE student_id = ? AND scheduled_at > NOW() AND status = 'scheduled'", [$user['id']])['count'] ?? 0,
+        'completed_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE student_id = ? AND status = 'completed'", [$user['id']])['count'] ?? 0,
+        'mentors_count' => fetchOne("SELECT COUNT(DISTINCT mentor_id) as count FROM sessions WHERE student_id = ?", [$user['id']])['count'] ?? 0
+    ];
+} catch (Exception $e) {
+    $stats = ['total_sessions' => 0, 'upcoming_sessions' => 0, 'completed_sessions' => 0, 'mentors_count' => 0];
+    error_log("Student dashboard stats error: " . $e->getMessage());
+}
 
-// Get upcoming sessions
-$upcomingSessions = fetchAll(
-    "SELECT s.*, u.first_name, u.last_name, u.profile_photo, mp.title, mp.company 
-     FROM sessions s 
-     JOIN users u ON s.mentor_id = u.id 
-     LEFT JOIN mentor_profiles mp ON u.id = mp.user_id
-     WHERE s.student_id = ? AND s.scheduled_at > NOW() AND s.status = 'scheduled'
-     ORDER BY s.scheduled_at ASC 
-     LIMIT 5",
-    [$user['id']]
-);
+// Get upcoming sessions with error handling
+try {
+    $upcomingSessions = fetchAll(
+        "SELECT s.*, u.first_name, u.last_name, u.profile_photo, mp.title, mp.company 
+         FROM sessions s 
+         JOIN users u ON s.mentor_id = u.id 
+         LEFT JOIN mentor_profiles mp ON u.id = mp.user_id
+         WHERE s.student_id = ? AND s.scheduled_at > NOW() AND s.status = 'scheduled'
+         ORDER BY s.scheduled_at ASC 
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $upcomingSessions = [];
+    error_log("Student upcoming sessions error: " . $e->getMessage());
+}
 
-// Get recommended mentors
-$recommendedMentors = fetchAll(
-    "SELECT u.*, mp.title, mp.company, mp.rating, mp.hourly_rate, mp.experience_years
-     FROM users u 
-     JOIN mentor_profiles mp ON u.id = mp.user_id 
-     WHERE u.user_type = 'mentor' AND u.is_active = TRUE AND mp.is_verified = TRUE
-     ORDER BY mp.rating DESC, mp.total_sessions DESC 
-     LIMIT 6"
-);
+// Get recommended mentors with error handling
+try {
+    $recommendedMentors = fetchAll(
+        "SELECT u.*, mp.title, mp.company, mp.rating, mp.hourly_rate, mp.experience_years
+         FROM users u 
+         JOIN mentor_profiles mp ON u.id = mp.user_id 
+         WHERE u.role = 'mentor' AND u.status = 'active' AND mp.is_verified = TRUE
+         ORDER BY mp.rating DESC, mp.total_sessions DESC 
+         LIMIT 6"
+    );
+} catch (Exception $e) {
+    $recommendedMentors = [];
+    error_log("Student recommended mentors error: " . $e->getMessage());
+}
 
-// Get recent messages
-$recentMessages = fetchAll(
-    "SELECT m.*, u.first_name, u.last_name, u.profile_photo 
-     FROM messages m 
-     JOIN users u ON m.sender_id = u.id 
-     WHERE m.recipient_id = ? 
-     ORDER BY m.created_at DESC 
-     LIMIT 5",
-    [$user['id']]
-);
+// Get recent messages with error handling
+try {
+    $recentMessages = fetchAll(
+        "SELECT m.*, u.first_name, u.last_name, u.profile_photo 
+         FROM messages m 
+         JOIN users u ON m.sender_id = u.id 
+         WHERE m.recipient_id = ? 
+         ORDER BY m.created_at DESC 
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $recentMessages = [];
+    error_log("Student recent messages error: " . $e->getMessage());
+}
 
-// Get learning progress (completed sessions by skill)
-$learningProgress = fetchAll(
-    "SELECT sk.name as skill_name, COUNT(s.id) as session_count
-     FROM sessions s
-     JOIN users mentor ON s.mentor_id = mentor.id
-     JOIN user_skills us ON mentor.id = us.user_id
-     JOIN skills sk ON us.skill_id = sk.id
-     WHERE s.student_id = ? AND s.status = 'completed'
-     GROUP BY sk.id, sk.name
-     ORDER BY session_count DESC
-     LIMIT 5",
-    [$user['id']]
-);
+// Get learning progress (completed sessions by skill) with error handling
+try {
+    $learningProgress = fetchAll(
+        "SELECT sk.name as skill_name, COUNT(s.id) as session_count
+         FROM sessions s
+         JOIN users mentor ON s.mentor_id = mentor.id
+         JOIN user_skills us ON mentor.id = us.user_id
+         JOIN skills sk ON us.skill_id = sk.id
+         WHERE s.student_id = ? AND s.status = 'completed'
+         GROUP BY sk.id, sk.name
+         ORDER BY session_count DESC
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $learningProgress = [];
+    error_log("Student learning progress error: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -160,6 +160,13 @@ body {
     color: var(--primary-color);
 }
 
+/* Navigation Actions */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
 /* Buttons */
 .btn {
     display: inline-flex;
@@ -575,12 +582,14 @@ body {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    color: white !important; /* Ensure white text on gradient background */
 }
 
 .cta-content p {
     font-size: 1.125rem;
     margin-bottom: 2rem;
     opacity: 0.9;
+    color: white !important; /* Ensure white text on gradient background */
 }
 
 .cta-actions .btn {
@@ -594,11 +603,41 @@ body {
     color: white;
 }
 
+/* CTA Dark Theme Overrides */
+[data-theme="dark"] .cta {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .cta-content h2 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .cta-content p {
+    color: #d1d5db !important;
+    opacity: 0.9;
+}
+
+[data-theme="dark"] .cta-actions .btn {
+    background: var(--primary-color);
+    color: white;
+    border: 2px solid var(--primary-color);
+}
+
+[data-theme="dark"] .cta-actions .btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary-light);
+    color: white;
+}
+
 /* Footer */
 .footer {
-    background: var(--text-primary);
-    color: white;
+    background: var(--surface-color);
+    color: var(--text-primary);
     padding: 3rem 0 1rem;
+    border-top: 1px solid var(--border-color);
 }
 
 .footer-content {
@@ -610,11 +649,11 @@ body {
 
 .footer-section h3, .footer-section h4 {
     margin-bottom: 1rem;
-    color: var(--primary-light);
+    color: var(--primary-color);
 }
 
 .footer-section p {
-    color: #d1d5db;
+    color: var(--text-secondary);
     line-height: 1.6;
 }
 
@@ -627,13 +666,13 @@ body {
 }
 
 .footer-section ul li a {
-    color: #d1d5db;
+    color: var(--text-secondary);
     text-decoration: none;
     transition: all var(--transition);
 }
 
 .footer-section ul li a:hover {
-    color: var(--primary-light);
+    color: var(--primary-color);
 }
 
 .social-links {
@@ -662,16 +701,53 @@ body {
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid #4b5563;
-    color: #9ca3af;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+/* Footer Dark Theme Overrides */
+[data-theme="dark"] .footer {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border-top: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .footer-section h3,
+[data-theme="dark"] .footer-section h4 {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .footer-section p,
+[data-theme="dark"] .footer-section ul li a {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .footer-section ul li a:hover {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] .footer-bottom {
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Footer Logo Styling */
+.footer .logo {
+    color: var(--primary-color);
+}
+
+.footer .logo h3 {
+    color: var(--primary-color);
+    margin: 0;
+}
+
+[data-theme="dark"] .footer .logo,
+[data-theme="dark"] .footer .logo h3 {
+    color: var(--primary-light);
 }
 
 /* Theme Toggle */
 .theme-toggle {
-    position: fixed;
-    top: 1.5rem;
-    right: 2rem;
-    z-index: 1002;
     background: rgba(255, 255, 255, 0.1);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
@@ -774,8 +850,6 @@ body {
     }
     
     .theme-toggle {
-        top: 1rem;
-        right: 1rem;
         width: 2.25rem;
         height: 2.25rem;
     }

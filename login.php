@@ -1,32 +1,42 @@
 <?php
 session_start();
-include 'db.php';
+require_once 'config/config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email    = trim($_POST['email']);
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT id, username, password_hash, role FROM users WHERE email = ? AND status = 'active'");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
+    try {
+        // Use the global PDO connection from config
+        global $pdo;
+        
+        $stmt = $pdo->prepare("SELECT id, username, password_hash, role FROM users WHERE email = ? AND status = 'active'");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
-    if ($stmt->num_rows == 1) {
-        $stmt->bind_result($id, $username, $hash, $role);
-        $stmt->fetch();
+        if ($user && password_verify($password, $user['password_hash'])) {
+            // Regenerate session ID for security
+            session_regenerate_id(true);
+            
+            // Set session variables correctly
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['user_role'] = $user['role']; // Make sure this matches what dashboard expects
+            $_SESSION['login_time'] = time();
+            $_SESSION['last_activity'] = time();
 
-        if (password_verify($password, $hash)) {
-            $_SESSION['user_id'] = $id;
-            $_SESSION['username'] = $username;
-            $_SESSION['role'] = $role;
-
-            echo "Login successful! Welcome, " . $username;
-            // header("Location: dashboard.php"); // redirect if needed
+            echo "Login successful! Welcome, " . $user['username'];
+            
+            // Redirect to appropriate dashboard
+            $redirectUrl = $user['role'] === 'mentor' ? 'dashboard/mentor.php' : 'dashboard/student.php';
+            header("Location: " . $redirectUrl);
+            exit();
         } else {
-            echo "Invalid password.";
+            echo "Invalid email or password.";
         }
-    } else {
-        echo "User not found or inactive.";
+    } catch (Exception $e) {
+        error_log("Login error: " . $e->getMessage());
+        echo "An error occurred. Please try again.";
     }
 }
 ?>

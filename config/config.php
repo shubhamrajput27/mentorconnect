@@ -48,16 +48,18 @@ require_once __DIR__ . '/cache-optimizer.php';
 require_once __DIR__ . '/performance-monitor.php';
 require_once __DIR__ . '/security-validator.php';
 
-// Initialize performance monitoring
+// Initialize optimization components
 $performanceMonitor = PerformanceMonitor::getInstance();
 $performanceMonitor->startTimer('page_load');
 
-// Session configuration
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 0); // Set to 1 for HTTPS
-ini_set('session.use_strict_mode', 1);
-ini_set('session.cookie_samesite', 'Lax');
-ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
+// Session configuration - only set if session hasn't started yet
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', 0); // Set to 1 for HTTPS
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Lax');
+    ini_set('session.gc_maxlifetime', SESSION_LIFETIME);
+}
 
 // Start session
 if (session_status() === PHP_SESSION_NONE) {
@@ -308,11 +310,33 @@ function logActivity($userId, $activityType, $description = '', $metadata = null
     $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '';
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
     
-    executeQuery(
-        "INSERT INTO activities (user_id, activity_type, description, metadata, ip_address, user_agent) 
-         VALUES (?, ?, ?, ?, ?, ?)",
-        [$userId, $activityType, $description, json_encode($metadata), $ipAddress, $userAgent]
-    );
+    try {
+        executeQuery(
+            "INSERT INTO activities (user_id, activity_type, description, metadata, ip_address, user_agent) 
+             VALUES (?, ?, ?, ?, ?, ?)",
+            [$userId, $activityType, $description, json_encode($metadata), $ipAddress, $userAgent]
+        );
+    } catch (Exception $e) {
+        // Silently fail if activities table doesn't exist yet
+        if (DEBUG_MODE) {
+            error_log("Failed to log activity: " . $e->getMessage());
+        }
+    }
+}
+
+// Add helper function for creating notifications
+function createNotification($userId, $type, $title, $message = '', $url = '') {
+    try {
+        executeQuery(
+            "INSERT INTO notifications (user_id, type, title, message, data) VALUES (?, ?, ?, ?, ?)",
+            [$userId, $type, $title, $message, json_encode(['url' => $url])]
+        );
+    } catch (Exception $e) {
+        // Silently fail if notifications table doesn't exist yet
+        if (DEBUG_MODE) {
+            error_log("Failed to create notification: " . $e->getMessage());
+        }
+    }
 }
 
 // Set security headers

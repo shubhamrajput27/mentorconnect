@@ -77,9 +77,6 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
-    <!-- Landing Page CSS -->
-    <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>">
-    
     <!-- Optimized CSS Loading -->
     <link rel="stylesheet" href="assets/optimized.css?v=<?php echo filemtime(__DIR__ . '/assets/optimized.css'); ?>">
     
@@ -93,7 +90,7 @@ $currentUrl = BASE_URL . '/index.php';
     <!-- Theme persistence and FOUC prevention -->
     <script>
         (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
@@ -267,11 +264,6 @@ $currentUrl = BASE_URL . '/index.php';
 <body>
     <!-- Landing Page -->
     <div class="landing-page">
-        <!-- Theme Toggle -->
-        <button class="theme-toggle" aria-label="Toggle dark mode">
-            <i class="fas fa-moon" id="theme-icon"></i>
-        </button>
-        
         <!-- Navigation -->
         <nav class="landing-nav">
             <div class="nav-container">
@@ -285,9 +277,15 @@ $currentUrl = BASE_URL . '/index.php';
                     <a href="auth/login.php" class="btn btn-outline">Sign In</a>
                     <a href="auth/signup.php" class="btn btn-primary">Get Started</a>
                 </div>
-                <button class="mobile-menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
+                <div class="nav-actions">
+                    <!-- Theme Toggle -->
+                    <button class="theme-toggle" aria-label="Toggle dark mode">
+                        <i class="fas fa-moon" id="theme-icon"></i>
+                    </button>
+                    <button class="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
             </div>
         </nav>
 
@@ -575,7 +573,7 @@ $currentUrl = BASE_URL . '/index.php';
     <script>
         // Critical theme initialization to prevent FOUC
         (function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             
             // Preload critical scripts

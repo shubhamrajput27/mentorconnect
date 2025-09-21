@@ -149,6 +149,22 @@ $csrfToken = generateCSRFToken();
             --success-color: #10b981;
             --error-color: #ef4444;
             --warning-color: #f59e0b;
+            --logo-accent: #fbbf24;
+        }
+
+        /* Force visible colors for debugging */
+        body {
+            background: white !important;
+            color: black !important;
+        }
+        
+        .login-container {
+            background: white !important;
+        }
+        
+        .form-panel {
+            background: white !important;
+            color: black !important;
         }
 
         [data-theme="dark"] {
@@ -159,7 +175,7 @@ $csrfToken = generateCSRFToken();
             --text-primary: #f9fafb;
             --text-secondary: #d1d5db;
             --text-muted: #9ca3af;
-            --text-inverse: #111827;
+            --text-inverse: #f9fafb;
             --card-bg: rgba(30, 41, 59, 0.95);
             --input-bg: #374151;
             --input-border: #4b5563;
@@ -167,6 +183,7 @@ $csrfToken = generateCSRFToken();
             --border-color: #4b5563;
             --shadow-light: rgba(0, 0, 0, 0.3);
             --shadow-medium: rgba(0, 0, 0, 0.4);
+            --logo-accent: #fbbf24;
         }
 
         /* Modern Login Page Styles */
@@ -256,14 +273,21 @@ $csrfToken = generateCSRFToken();
         .logo i {
             font-size: 2rem;
             margin-right: 0.75rem;
-            color: #fbbf24;
+            color: var(--logo-accent);
         }
 
         .logo-section h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+            background: linear-gradient(135deg, #ffffff 0%, var(--logo-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        [data-theme="dark"] .logo-section h1 {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--logo-accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -289,7 +313,7 @@ $csrfToken = generateCSRFToken();
             font-size: 1.25rem;
             margin-right: 1rem;
             margin-top: 0.25rem;
-            color: #fbbf24;
+            color: var(--logo-accent);
             min-width: 24px;
         }
 
@@ -318,7 +342,7 @@ $csrfToken = generateCSRFToken();
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: #fbbf24;
+            color: var(--logo-accent);
             display: block;
         }
 
@@ -326,12 +350,14 @@ $csrfToken = generateCSRFToken();
             font-size: 0.875rem;
             opacity: 0.8;
             margin-top: 0.25rem;
+            color: inherit;
         }
 
         /* Form Panel */
         .form-panel {
             flex: 1;
             background: var(--card-bg);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -382,9 +408,9 @@ $csrfToken = generateCSRFToken();
         }
 
         .alert-success {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #16a34a;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
         }
 
         /* Form Groups */
@@ -395,7 +421,7 @@ $csrfToken = generateCSRFToken();
         .form-group label {
             display: block;
             font-weight: 500;
-            color: #374151;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
             font-size: 0.875rem;
         }
@@ -406,18 +432,19 @@ $csrfToken = generateCSRFToken();
 
         .input-wrapper input {
             width: 100%;
-            padding: 0.875rem 1rem 0.875rem 3rem;
-            border: 2px solid #e5e7eb;
+            padding: 0.875rem 2.5rem 0.875rem 3rem;
+            border: 2px solid var(--input-border);
             border-radius: 0.75rem;
             font-size: 1rem;
             transition: all 0.2s ease;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
             font-family: inherit;
         }
 
         .input-wrapper input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--input-focus);
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
@@ -426,26 +453,32 @@ $csrfToken = generateCSRFToken();
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
+            color: var(--text-muted);
             font-size: 1rem;
         }
 
         .password-toggle {
             position: absolute;
-            right: 1rem;
+            right: 0.5rem;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #9ca3af;
+            color: var(--text-muted);
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            z-index: 10;
             transition: all 0.2s ease;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .password-toggle:hover {
-            color: #667eea;
+            color: var(--primary-color);
             background: rgba(102, 126, 234, 0.1);
         }
 
@@ -463,6 +496,7 @@ $csrfToken = generateCSRFToken();
             gap: 0.75rem;
             cursor: pointer;
             font-size: 0.875rem;
+            color: var(--text-secondary);
         }
 
         .checkbox-label input[type="checkbox"] {
@@ -472,18 +506,19 @@ $csrfToken = generateCSRFToken();
         .checkmark {
             width: 20px;
             height: 20px;
-            border: 2px solid #d1d5db;
+            border: 2px solid var(--border-color);
             border-radius: 0.375rem;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
             flex-shrink: 0;
+            background: var(--input-bg);
         }
 
         .checkbox-label input[type="checkbox"]:checked + .checkmark {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: #667eea;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
         }
 
@@ -494,7 +529,7 @@ $csrfToken = generateCSRFToken();
         }
 
         .forgot-link {
-            color: #667eea;
+            color: var(--primary-color);
             text-decoration: none;
             font-size: 0.875rem;
             font-weight: 500;
@@ -546,12 +581,12 @@ $csrfToken = generateCSRFToken();
         }
 
         .form-footer p {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 0.875rem;
         }
 
         .form-footer a {
-            color: #667eea;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
         }
@@ -845,7 +880,7 @@ $csrfToken = generateCSRFToken();
     
     <!-- Theme Toggle Button -->
     <button class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-moon" id="theme-icon"></i>
+        <i class="fas fa-sun" id="theme-icon"></i>
     </button>
     
     <script>
@@ -886,7 +921,7 @@ $csrfToken = generateCSRFToken();
             }
             
             initializeTheme() {
-                const savedTheme = localStorage.getItem('theme') || 'light';
+                const savedTheme = localStorage.getItem('theme') || 'dark';
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 this.updateThemeIcon(savedTheme);
             }

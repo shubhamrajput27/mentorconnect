@@ -11,6 +11,9 @@ if (session_status() === PHP_SESSION_NONE) {
 $error = '';
 $success = '';
 
+// Pre-select role from URL parameter
+$preselectedRole = isset($_GET['role']) && in_array($_GET['role'], ['student', 'mentor']) ? $_GET['role'] : '';
+
 // Simple rate limiting check
 $clientIP = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 
@@ -41,11 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (empty($error)) {
         try {
-            $database = Database::getInstance();
-            $conn = $database->getConnection();
+            global $pdo;
             
             // Check if email already exists
-            $stmt = $conn->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1");
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1");
             $stmt->execute([$email]);
             
             if ($stmt->rowCount() > 0) {
@@ -58,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Ensure unique username
                 do {
-                    $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
+                    $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
                     $stmt->execute([$username]);
                     if ($stmt->rowCount() > 0) {
                         $username = $baseUsername . $counter;
@@ -71,12 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Hash password
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 
-                $conn->beginTransaction();
+                $pdo->beginTransaction();
                 
                 // Insert user
-                $stmt = $conn->prepare("
+                $stmt = $pdo->prepare("
                     INSERT INTO users (
-                        username, email, password_hash, first_name, last_name, user_type, 
+                        username, email, password_hash, first_name, last_name, role, 
                         phone, created_at
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
                 ");
@@ -91,15 +93,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $phone
                 ]);
                 
-                $userId = $conn->lastInsertId();
+                $userId = $pdo->lastInsertId();
                 
-                $conn->commit();
+                $pdo->commit();
                 
-                $success = 'Account created successfully! You can now sign in with your email and password.';
+                // Automatically log in the new user
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['user_role'] = $role;
+                $_SESSION['username'] = $username;
+                $_SESSION['login_time'] = time();
+                $_SESSION['last_activity'] = time();
+                
+                // Store session in database
+                executeQuery(
+                    "INSERT INTO user_sessions (id, user_id, ip_address, user_agent) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE last_activity = CURRENT_TIMESTAMP",
+                    [session_id(), $userId, $clientIP, $_SERVER['HTTP_USER_AGENT'] ?? '']
+                );
+                
+                // Log activity
+                logActivity($userId, 'register', 'User registered and logged in');
+                
+                // Redirect to appropriate dashboard
+                $redirectUrl = $role === 'mentor' ? '/dashboard/mentor.php' : '/dashboard/student.php';
+                header('Location: ' . BASE_URL . $redirectUrl);
+                exit();
             }
         } catch (Exception $e) {
-            if (isset($conn) && $conn->inTransaction()) {
-                $conn->rollback();
+            if (isset($pdo) && $pdo->inTransaction()) {
+                $pdo->rollback();
             }
             error_log("Registration error: " . $e->getMessage());
             $error = 'Registration failed. Please try again. Error: ' . $e->getMessage();
@@ -134,15 +156,18 @@ $csrfToken = $_SESSION['csrf_token'];
             --text-muted: #9ca3af;
             --text-inverse: #ffffff;
             --card-bg: rgba(255, 255, 255, 0.95);
+            --surface-color: #f9fafb;
             --input-bg: #ffffff;
             --input-border: #e5e7eb;
             --input-focus: #667eea;
             --border-color: #e5e7eb;
             --shadow-light: rgba(0, 0, 0, 0.1);
             --shadow-medium: rgba(0, 0, 0, 0.15);
+            --shadow-color: rgba(102, 126, 234, 0.3);
             --success-color: #10b981;
             --error-color: #ef4444;
             --warning-color: #f59e0b;
+            --logo-accent: #fbbf24;
         }
 
         [data-theme="dark"] {
@@ -155,12 +180,18 @@ $csrfToken = $_SESSION['csrf_token'];
             --text-muted: #9ca3af;
             --text-inverse: #111827;
             --card-bg: rgba(30, 41, 59, 0.95);
+            --surface-color: #1e293b;
             --input-bg: #374151;
             --input-border: #4b5563;
             --input-focus: #8b5cf6;
             --border-color: #4b5563;
             --shadow-light: rgba(0, 0, 0, 0.3);
             --shadow-medium: rgba(0, 0, 0, 0.4);
+            --shadow-color: rgba(139, 92, 246, 0.4);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --logo-accent: #fbbf24;
         }
 
         /* Modern Signup Page Styles */
@@ -200,6 +231,11 @@ $csrfToken = $_SESSION['csrf_token'];
             transition: all 0.3s ease;
         }
 
+        /* Dark theme brand panel */
+        [data-theme="dark"] .brand-panel {
+            color: var(--text-primary);
+        }
+
         .brand-panel::before {
             content: '';
             position: absolute;
@@ -211,6 +247,12 @@ $csrfToken = $_SESSION['csrf_token'];
                 radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
             pointer-events: none;
+        }
+
+        [data-theme="dark"] .brand-panel::before {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
         }
 
         .brand-content {
@@ -251,14 +293,21 @@ $csrfToken = $_SESSION['csrf_token'];
         .logo i {
             font-size: 2rem;
             margin-right: 0.75rem;
-            color: #fbbf24;
+            color: var(--logo-accent);
         }
 
         .logo-section h1 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 0%, #fbbf24 100%);
+            background: linear-gradient(135deg, #ffffff 0%, var(--logo-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        [data-theme="dark"] .logo-section h1 {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--logo-accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -268,6 +317,11 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 1.1rem;
             opacity: 0.9;
             line-height: 1.8;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .logo-section p {
+            color: var(--text-secondary);
         }
 
         .features-list {
@@ -284,7 +338,7 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 1.25rem;
             margin-right: 1rem;
             margin-top: 0.25rem;
-            color: #fbbf24;
+            color: var(--logo-accent);
             min-width: 24px;
         }
 
@@ -292,9 +346,22 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .feature-item h3 {
+            color: var(--text-primary);
         }
 
         .feature-item p {
+            opacity: 0.8;
+            font-size: 0.95rem;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .feature-item p {
+            color: var(--text-secondary);
+        }
             opacity: 0.8;
             font-size: 0.9rem;
         }
@@ -314,12 +381,22 @@ $csrfToken = $_SESSION['csrf_token'];
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        [data-theme="dark"] .testimonial-card {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .testimonial-text {
             font-style: italic;
             margin-bottom: 1rem;
             font-size: 0.95rem;
             line-height: 1.6;
             opacity: 0.9;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .testimonial-text {
+            color: var(--text-secondary);
         }
 
         .testimonial-author {
@@ -332,7 +409,7 @@ $csrfToken = $_SESSION['csrf_token'];
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            background: linear-gradient(135deg, var(--logo-accent) 0%, var(--warning-color) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -344,11 +421,21 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .author-info h4 {
+            color: var(--text-primary);
         }
 
         .author-info p {
             font-size: 0.8rem;
             opacity: 0.7;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .author-info p {
+            color: var(--text-muted);
         }
 
         /* Statistics Section */
@@ -364,6 +451,11 @@ $csrfToken = $_SESSION['csrf_token'];
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
+        [data-theme="dark"] .stats-section {
+            background: rgba(30, 41, 59, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         .stat-item {
             text-align: center;
         }
@@ -372,13 +464,18 @@ $csrfToken = $_SESSION['csrf_token'];
             display: block;
             font-size: 1.5rem;
             font-weight: 700;
-            color: #fbbf24;
+            color: var(--logo-accent);
             margin-bottom: 0.25rem;
         }
 
         .stat-label {
             font-size: 0.8rem;
             opacity: 0.8;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .stat-label {
+            color: var(--text-secondary);
         }
 
         /* Success Stories */
@@ -390,7 +487,7 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #fbbf24;
+            color: var(--logo-accent);
         }
 
         .story-list {
@@ -405,10 +502,15 @@ $csrfToken = $_SESSION['csrf_token'];
             gap: 0.75rem;
             font-size: 0.85rem;
             opacity: 0.9;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .story-item {
+            color: var(--text-secondary);
         }
 
         .story-item i {
-            color: #fbbf24;
+            color: var(--logo-accent);
             min-width: 16px;
         }
 
@@ -439,12 +541,12 @@ $csrfToken = $_SESSION['csrf_token'];
         .form-header h2 {
             font-size: 2rem;
             font-weight: 700;
-            color: #1f2937;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
 
         .form-header p {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 1rem;
         }
 
@@ -459,17 +561,29 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         .alert-error {
-            background-color: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error-color);
+        }
+
+        [data-theme="dark"] .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
         }
 
         .alert-success {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #16a34a;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
             flex-direction: column;
             align-items: flex-start;
+        }
+
+        [data-theme="dark"] .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #4ade80;
         }
 
         .success-link {
@@ -504,7 +618,7 @@ $csrfToken = $_SESSION['csrf_token'];
         .form-group label {
             display: block;
             font-weight: 500;
-            color: #374151;
+            color: var(--text-primary);
             margin-bottom: 0.5rem;
             font-size: 0.875rem;
         }
@@ -517,11 +631,12 @@ $csrfToken = $_SESSION['csrf_token'];
         .input-wrapper textarea {
             width: 100%;
             padding: 0.875rem 1rem 0.875rem 3rem;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--input-border);
             border-radius: 0.75rem;
             font-size: 1rem;
             transition: all 0.2s ease;
-            background: white;
+            background: var(--input-bg);
+            color: var(--text-primary);
             font-family: inherit;
         }
 
@@ -534,8 +649,13 @@ $csrfToken = $_SESSION['csrf_token'];
         .input-wrapper input:focus,
         .input-wrapper textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--input-focus);
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        [data-theme="dark"] .input-wrapper input:focus,
+        [data-theme="dark"] .input-wrapper textarea:focus {
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
         }
 
         .input-wrapper i {
@@ -543,7 +663,7 @@ $csrfToken = $_SESSION['csrf_token'];
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #9ca3af;
+            color: var(--text-muted);
             font-size: 1rem;
         }
 
@@ -559,7 +679,7 @@ $csrfToken = $_SESSION['csrf_token'];
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #9ca3af;
+            color: var(--text-muted);
             cursor: pointer;
             padding: 0.5rem;
             border-radius: 0.5rem;
@@ -567,7 +687,17 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         .password-toggle:hover {
-            color: #667eea;
+            color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        [data-theme="dark"] .password-toggle:hover {
+            background: rgba(139, 92, 246, 0.2);
+        }
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
             background: rgba(102, 126, 234, 0.1);
         }
 
@@ -581,20 +711,24 @@ $csrfToken = $_SESSION['csrf_token'];
 
         .role-card {
             cursor: pointer;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--input-border);
             border-radius: 1rem;
             padding: 1.5rem;
             transition: all 0.3s ease;
-            background: white;
+            background: var(--input-bg);
             position: relative;
             overflow: hidden;
             text-align: center;
         }
 
         .role-card:hover {
-            border-color: #667eea;
+            border-color: var(--primary-color);
             transform: translateY(-4px);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
+        }
+
+        [data-theme="dark"] .role-card:hover {
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.25);
         }
 
         .role-card input[type="radio"] {
@@ -602,11 +736,11 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         .role-card input[type="radio"]:checked + .role-content {
-            color: #667eea;
+            color: var(--primary-color);
         }
 
         .role-card input[type="radio"]:checked + .role-content .role-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
             transform: scale(1.1);
         }
@@ -626,19 +760,19 @@ $csrfToken = $_SESSION['csrf_token'];
             margin: 0 auto 1rem;
             font-size: 1.5rem;
             transition: all 0.3s ease;
-            background: #f3f4f6;
-            color: #6b7280;
+            background: var(--surface-color);
+            color: var(--text-muted);
         }
 
         .role-content h4 {
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #1f2937;
+            color: var(--text-primary);
         }
 
         .role-content p {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 0.875rem;
             line-height: 1.6;
         }
@@ -651,6 +785,7 @@ $csrfToken = $_SESSION['csrf_token'];
             cursor: pointer;
             font-size: 0.875rem;
             line-height: 1.6;
+            color: var(--text-secondary);
         }
 
         .checkbox-label input[type="checkbox"] {
@@ -660,7 +795,7 @@ $csrfToken = $_SESSION['csrf_token'];
         .checkmark {
             width: 20px;
             height: 20px;
-            border: 2px solid #d1d5db;
+            border: 2px solid var(--border-color);
             border-radius: 0.375rem;
             display: flex;
             align-items: center;
@@ -668,11 +803,12 @@ $csrfToken = $_SESSION['csrf_token'];
             transition: all 0.2s ease;
             flex-shrink: 0;
             margin-top: 0.125rem;
+            background: var(--input-bg);
         }
 
         .checkbox-label input[type="checkbox"]:checked + .checkmark {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: #667eea;
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
         }
 
@@ -683,7 +819,7 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         .checkbox-text a {
-            color: #667eea;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
         }
@@ -710,13 +846,13 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 25px var(--shadow-color);
         }
 
         .btn-full {
@@ -730,16 +866,16 @@ $csrfToken = $_SESSION['csrf_token'];
             text-align: center;
             margin-top: 2rem;
             padding-top: 2rem;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid var(--border-color);
         }
 
         .form-footer p {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 0.875rem;
         }
 
         .form-footer a {
-            color: #667eea;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
         }
@@ -1130,7 +1266,6 @@ $csrfToken = $_SESSION['csrf_token'];
                     </div>
                     
                     <div class="form-group password-input-container has-strength-indicator">
-                        <label for="password">Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" required 
                                    placeholder="Create a strong password" class="form-input">
@@ -1143,7 +1278,6 @@ $csrfToken = $_SESSION['csrf_token'];
                     </div>
                     
                     <div class="form-group">
-                        <label for="confirm_password">Confirm Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="confirm_password" name="confirm_password" required 
                                    placeholder="Confirm your password" class="form-input">
@@ -1165,7 +1299,7 @@ $csrfToken = $_SESSION['csrf_token'];
                         <label>Choose Your Role</label>
                         <div class="role-selection">
                             <label class="role-card">
-                                <input type="radio" name="role" value="student" required>
+                                <input type="radio" name="role" value="student" required <?php echo $preselectedRole === 'student' ? 'checked' : ''; ?>>
                                 <div class="role-content">
                                     <div class="role-icon">
                                         <i class="fas fa-user-graduate"></i>
@@ -1176,7 +1310,7 @@ $csrfToken = $_SESSION['csrf_token'];
                             </label>
                             
                             <label class="role-card">
-                                <input type="radio" name="role" value="mentor" required>
+                                <input type="radio" name="role" value="mentor" required <?php echo $preselectedRole === 'mentor' ? 'checked' : ''; ?>>
                                 <div class="role-content">
                                     <div class="role-icon">
                                         <i class="fas fa-chalkboard-teacher"></i>
@@ -1341,7 +1475,7 @@ $csrfToken = $_SESSION['csrf_token'];
     
     <!-- Theme Toggle Button -->
     <button class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-moon" id="theme-icon"></i>
+        <i class="fas fa-sun" id="theme-icon"></i>
     </button>
 
     <script>
@@ -1357,7 +1491,7 @@ $csrfToken = $_SESSION['csrf_token'];
             }
             
             initializeTheme() {
-                const savedTheme = localStorage.getItem('theme') || 'light';
+                const savedTheme = localStorage.getItem('theme') || 'dark';
                 document.documentElement.setAttribute('data-theme', savedTheme);
                 this.updateThemeIcon(savedTheme);
             }

@@ -78,7 +78,7 @@ class PasswordStrengthValidator {
         indicator.className = 'password-strength-line';
         indicator.innerHTML = `
             <div class="strength-line"></div>
-            <span class="strength-text">Enter password</span>
+            <span class="strength-text"></span>
         `;
         
         container.appendChild(indicator);

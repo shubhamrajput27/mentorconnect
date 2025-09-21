@@ -1,58 +1,88 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 require_once '../config/config.php';
 requireRole('mentor');
 
 $user = getCurrentUser();
 
-// Get mentor statistics
-$stats = [
-    'total_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE mentor_id = ?", [$user['id']])['count'],
-    'upcoming_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE mentor_id = ? AND scheduled_at > NOW() AND status = 'scheduled'", [$user['id']])['count'],
-    'total_students' => fetchOne("SELECT COUNT(DISTINCT student_id) as count FROM sessions WHERE mentor_id = ?", [$user['id']])['count'],
-    'avg_rating' => fetchOne("SELECT AVG(rating) as avg FROM reviews WHERE reviewee_id = ?", [$user['id']])['avg'] ?? 0
-];
+// Get mentor statistics with error handling
+try {
+    $stats = [
+        'total_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE mentor_id = ?", [$user['id']])['count'] ?? 0,
+        'upcoming_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE mentor_id = ? AND scheduled_at > NOW() AND status = 'scheduled'", [$user['id']])['count'] ?? 0,
+        'total_students' => fetchOne("SELECT COUNT(DISTINCT student_id) as count FROM sessions WHERE mentor_id = ?", [$user['id']])['count'] ?? 0,
+        'avg_rating' => fetchOne("SELECT AVG(rating) as avg FROM reviews WHERE reviewee_id = ?", [$user['id']])['avg'] ?? 0
+    ];
+} catch (Exception $e) {
+    // If database queries fail, use default values
+    $stats = ['total_sessions' => 0, 'upcoming_sessions' => 0, 'total_students' => 0, 'avg_rating' => 0];
+    error_log("Dashboard stats error: " . $e->getMessage());
+}
 
-// Get recent sessions
-$recentSessions = fetchAll(
-    "SELECT s.*, u.first_name, u.last_name, u.profile_photo 
-     FROM sessions s 
-     JOIN users u ON s.student_id = u.id 
-     WHERE s.mentor_id = ? 
-     ORDER BY s.scheduled_at DESC 
-     LIMIT 5",
-    [$user['id']]
-);
+// Get recent sessions with error handling
+try {
+    $recentSessions = fetchAll(
+        "SELECT s.*, u.first_name, u.last_name, u.profile_photo 
+         FROM sessions s 
+         JOIN users u ON s.student_id = u.id 
+         WHERE s.mentor_id = ? 
+         ORDER BY s.scheduled_at DESC 
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $recentSessions = [];
+    error_log("Recent sessions error: " . $e->getMessage());
+}
 
-// Get upcoming sessions
-$upcomingSessions = fetchAll(
-    "SELECT s.*, u.first_name, u.last_name, u.profile_photo 
-     FROM sessions s 
-     JOIN users u ON s.student_id = u.id 
-     WHERE s.mentor_id = ? AND s.scheduled_at > NOW() AND s.status = 'scheduled'
-     ORDER BY s.scheduled_at ASC 
-     LIMIT 5",
-    [$user['id']]
-);
+// Get upcoming sessions with error handling
+try {
+    $upcomingSessions = fetchAll(
+        "SELECT s.*, u.first_name, u.last_name, u.profile_photo 
+         FROM sessions s 
+         JOIN users u ON s.student_id = u.id 
+         WHERE s.mentor_id = ? AND s.scheduled_at > NOW() AND s.status = 'scheduled'
+         ORDER BY s.scheduled_at ASC 
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $upcomingSessions = [];
+    error_log("Upcoming sessions error: " . $e->getMessage());
+}
 
-// Get recent messages
-$recentMessages = fetchAll(
-    "SELECT m.*, u.first_name, u.last_name, u.profile_photo 
-     FROM messages m 
-     JOIN users u ON m.sender_id = u.id 
-     WHERE m.receiver_id = ? 
-     ORDER BY m.created_at DESC 
-     LIMIT 5",
-    [$user['id']]
-);
+// Get recent messages with error handling
+try {
+    $recentMessages = fetchAll(
+        "SELECT m.*, u.first_name, u.last_name, u.profile_photo 
+         FROM messages m 
+         JOIN users u ON m.sender_id = u.id 
+         WHERE m.receiver_id = ? 
+         ORDER BY m.created_at DESC 
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $recentMessages = [];
+    error_log("Recent messages error: " . $e->getMessage());
+}
 
-// Get notifications
-$notifications = fetchAll(
-    "SELECT * FROM notifications 
-     WHERE user_id = ? AND is_read = FALSE 
-     ORDER BY created_at DESC 
-     LIMIT 5",
-    [$user['id']]
-);
+// Get notifications with error handling
+try {
+    $notifications = fetchAll(
+        "SELECT * FROM notifications 
+         WHERE user_id = ? AND is_read = FALSE 
+         ORDER BY created_at DESC 
+         LIMIT 5",
+        [$user['id']]
+    );
+} catch (Exception $e) {
+    $notifications = [];
+    error_log("Notifications error: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
