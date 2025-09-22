@@ -418,7 +418,7 @@ $csrfToken = generateCSRFToken();
                 <button type="submit" class="btn btn-primary" style="flex: 2;">
                     <i class="fas fa-save"></i> Update Password
                 </button>
-                <a href="../dashboard/<?php echo $_SESSION['user_role'] === 'mentor' ? 'mentor' : 'student'; ?>.php" 
+                <a href="../dashboard/" 
                    class="btn btn-secondary" style="flex: 1;">
                     <i class="fas fa-arrow-left"></i> Back
                 </a>

@@ -85,8 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
                             
                             // Redirect to dashboard
-                            $redirectUrl = $user['role'] === 'mentor' ? '/dashboard/mentor.php' : '/dashboard/student.php';
-                            header('Location: ' . BASE_URL . $redirectUrl);
+                            header('Location: ' . BASE_URL . '/dashboard/');
                             exit();
                         }
                     } else {

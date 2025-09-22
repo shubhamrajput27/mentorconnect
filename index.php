@@ -3,9 +3,7 @@ require_once 'config/config.php';
 
 // Redirect to appropriate dashboard if already logged in
 if (isLoggedIn()) {
-    $user = getCurrentUser();
-    $redirectUrl = $user['role'] === 'mentor' ? '/dashboard/mentor.php' : '/dashboard/student.php';
-    header('Location: ' . BASE_URL . $redirectUrl);
+    header('Location: ' . BASE_URL . '/dashboard/');
     exit();
 }
 
@@ -758,6 +756,95 @@ $currentUrl = BASE_URL . '/index.php';
             document.addEventListener('DOMContentLoaded', initLazyLoading);
         } else {
             initLazyLoading();
+        }
+    </script>
+
+    <!-- Smooth Scrolling Navigation -->
+    <script>
+        // Smooth scrolling for navigation links
+        function initSmoothScrolling() {
+            // Get all navigation links that point to sections on the same page
+            const navLinks = document.querySelectorAll('a[href^="#"]');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetElement = document.getElementById(targetId);
+                    
+                    if (targetElement) {
+                        // Calculate offset to account for fixed navigation
+                        const navHeight = document.querySelector('nav')?.offsetHeight || 80;
+                        const targetPosition = targetElement.offsetTop - navHeight - 20; // 20px extra padding
+                        
+                        // Smooth scroll to target with custom animation
+                        const startPosition = window.pageYOffset;
+                        const distance = targetPosition - startPosition;
+                        const duration = 400; // 400ms for faster animation
+                        let start = null;
+                        
+                        function smoothScrollAnimation(timestamp) {
+                            if (!start) start = timestamp;
+                            const progress = timestamp - start;
+                            const percentage = Math.min(progress / duration, 1);
+                            
+                            // Easing function for smooth acceleration/deceleration
+                            const easeInOutCubic = percentage < 0.5 
+                                ? 4 * percentage * percentage * percentage 
+                                : (percentage - 1) * (2 * percentage - 2) * (2 * percentage - 2) + 1;
+                            
+                            window.scrollTo(0, startPosition + distance * easeInOutCubic);
+                            
+                            if (progress < duration) {
+                                requestAnimationFrame(smoothScrollAnimation);
+                            } else {
+                                // Update URL hash after animation completes
+                                history.pushState(null, null, `#${targetId}`);
+                            }
+                        }
+                        
+                        requestAnimationFrame(smoothScrollAnimation);
+                    }
+                });
+            });
+            
+            // Highlight active section in navigation
+            function updateActiveNavLink() {
+                const sections = document.querySelectorAll('section[id]');
+                const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+                
+                let currentSection = '';
+                const scrollPosition = window.pageYOffset + 100; // Offset for better detection
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    
+                    if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+                
+                // Update active link
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${currentSection}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // Update active link on scroll
+            window.addEventListener('scroll', updateActiveNavLink);
+            updateActiveNavLink(); // Initial call
+        }
+        
+        // Initialize smooth scrolling when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSmoothScrolling);
+        } else {
+            initSmoothScrolling();
         }
     </script>
     

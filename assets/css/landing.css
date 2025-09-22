@@ -7,6 +7,11 @@
     box-sizing: border-box;
 }
 
+/* Smooth scrolling for the entire page */
+html {
+    scroll-behavior: smooth;
+}
+
 :root {
     --primary-color: #6366f1;
     --primary-dark: #4338ca;
@@ -98,6 +103,10 @@ body {
     color: #ffffff;
 }
 
+[data-theme="dark"] .nav-links a.active {
+    color: var(--primary-color);
+}
+
 [data-theme="dark"] .cta-button {
     color: #ffffff;
     background: var(--primary-color);
@@ -158,6 +167,23 @@ body {
 
 .nav-links a:hover {
     color: var(--primary-color);
+}
+
+.nav-links a.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    position: relative;
+}
+
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary-color);
+    border-radius: 2px;
 }
 
 /* Navigation Actions */

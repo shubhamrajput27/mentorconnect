@@ -84,11 +84,9 @@ function searchMentors($query, $limit, $offset) {
     $cacheKey = "mentor_search_" . md5($query . $limit . $offset);
     
     // Check cache first (if available)
-    if (function_exists('apcu_fetch')) {
-        $cached = apcu_fetch($cacheKey);
-        if ($cached !== false) {
-            return $cached;
-        }
+    $cached = cache_get($cacheKey);
+    if ($cached !== null) {
+        return $cached;
     }
     
     // Use FULLTEXT search if available, otherwise fallback to LIKE
@@ -122,8 +120,8 @@ function searchMentors($query, $limit, $offset) {
     }
     
     // Cache results for 5 minutes (if available)
-    if (function_exists('apcu_store') && !empty($results)) {
-        apcu_store($cacheKey, $results, 300);
+    if (!empty($results)) {
+        cache_set($cacheKey, $results, 300);
     }
     
     return $results;

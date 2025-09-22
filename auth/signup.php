@@ -115,8 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 logActivity($userId, 'register', 'User registered and logged in');
                 
                 // Redirect to appropriate dashboard
-                $redirectUrl = $role === 'mentor' ? '/dashboard/mentor.php' : '/dashboard/student.php';
-                header('Location: ' . BASE_URL . $redirectUrl);
+                header('Location: ' . BASE_URL . '/dashboard/');
                 exit();
             }
         } catch (Exception $e) {
@@ -361,7 +360,6 @@ $csrfToken = $_SESSION['csrf_token'];
 
         [data-theme="dark"] .feature-item p {
             color: var(--text-secondary);
-        }
             opacity: 0.8;
             font-size: 0.9rem;
         }
@@ -693,7 +691,6 @@ $csrfToken = $_SESSION['csrf_token'];
 
         [data-theme="dark"] .password-toggle:hover {
             background: rgba(139, 92, 246, 0.2);
-        }
         }
 
         .password-toggle:hover {
