@@ -29,8 +29,8 @@ try {
             
             // Insert message
             executeQuery(
-                "INSERT INTO messages (sender_id, recipient_id, subject, message) VALUES (?, ?, ?, ?)",
-                [$user['id'], $receiverId, $subject, $message]
+                "INSERT INTO messages (sender_id, recipient_id, subject, content, message) VALUES (?, ?, ?, ?, ?)",
+                [$user['id'], $receiverId, $subject, $message, $message]
             );
             
             $messageId = fetchOne("SELECT LAST_INSERT_ID() as id")['id'];
@@ -91,7 +91,7 @@ try {
             $conversations = fetchAll(
                 "SELECT DISTINCT
                     CASE WHEN m.sender_id = ? THEN m.recipient_id ELSE m.sender_id END as contact_id,
-                    u.first_name, u.last_name, u.profile_picture,
+                    u.first_name, u.last_name, u.profile_photo,
                     m.created_at as last_message_time,
                     m.message as last_message,
                     COALESCE(unread.unread_count, 0) as unread_count

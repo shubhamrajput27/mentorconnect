@@ -16,14 +16,19 @@ CREATE TABLE users (
     last_name VARCHAR(50) NOT NULL,
     role ENUM('student', 'mentor', 'admin') DEFAULT 'student',
     status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
-    email_verified BOOLEAN DEFAULT TRUE,
+    email_verified BOOLEAN DEFAULT FALSE, -- Changed to FALSE for better security
     bio TEXT,
     profile_photo VARCHAR(255),
     phone VARCHAR(20),
     location VARCHAR(200),
     timezone VARCHAR(50) DEFAULT 'UTC',
+    remember_token VARCHAR(255) NULL, -- Added for remember me functionality
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_username (username),
+    INDEX idx_role_status (role, status),
+    INDEX idx_remember_token (remember_token)
 );
 
 -- Skills table
@@ -73,10 +78,14 @@ CREATE TABLE messages (
     recipient_id INT NOT NULL,
     subject VARCHAR(200),
     content TEXT NOT NULL,
+    message TEXT NOT NULL, -- Added for compatibility with existing API
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_sender_recipient (sender_id, recipient_id),
+    INDEX idx_recipient_read (recipient_id, is_read),
+    INDEX idx_created_at (created_at)
 );
 
 -- Reviews table

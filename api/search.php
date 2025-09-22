@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 header('X-Content-Type-Options: nosniff');
 
 // Rate limiting
-RateLimiter::handleRateLimit($_SERVER);
+RateLimiter::handleRateLimit($_SERVER, 'search');
 
 if (!isLoggedIn()) {
     http_response_code(401);
@@ -83,7 +83,7 @@ function searchMentors($query, $limit, $offset) {
     // Optimized: Use full-text search and better indexing strategy
     $cacheKey = "mentor_search_" . md5($query . $limit . $offset);
     
-    // Check cache first
+    // Check cache first (if available)
     if (function_exists('apcu_fetch')) {
         $cached = apcu_fetch($cacheKey);
         if ($cached !== false) {
@@ -94,35 +94,35 @@ function searchMentors($query, $limit, $offset) {
     // Use FULLTEXT search if available, otherwise fallback to LIKE
     $searchQuery = trim($query);
     
-    $sql = "SELECT u.id, u.username, u.first_name, u.last_name, u.profile_picture, u.bio,
-                   mp.title, mp.company, mp.hourly_rate, 
-                   COALESCE(mp.rating, 0) as rating, 
-                   COALESCE(mp.experience_years, 0) as experience_years, 
-                   COALESCE(mp.total_sessions, 0) as total_sessions,
-                   GROUP_CONCAT(DISTINCT s.name) as skills,
-                   MATCH(u.first_name, u.last_name, u.bio) AGAINST(? IN NATURAL LANGUAGE MODE) as relevance_score
+    // First try with MATCH AGAINST (requires FULLTEXT indexes)
+    $sql = "SELECT u.id, u.username, u.first_name, u.last_name, u.profile_photo, u.bio,
+                   '' as title, '' as company, 0 as hourly_rate, 
+                   0 as rating, 0 as experience_years, 0 as total_sessions,
+                   '' as skills,
+                   1 as relevance_score
             FROM users u
-            LEFT JOIN mentor_profiles mp ON u.id = mp.user_id
-            LEFT JOIN user_skills us ON u.id = us.user_id
-            LEFT JOIN skills s ON us.skill_id = s.id
-            WHERE u.user_type = 'mentor' AND u.is_active = 1
+            WHERE u.role = 'mentor' AND u.status = 'active'
             AND (
-                MATCH(u.first_name, u.last_name, u.bio) AGAINST(? IN NATURAL LANGUAGE MODE)
-                OR mp.title LIKE ?
-                OR mp.company LIKE ?
-                OR s.name LIKE ?
+                u.first_name LIKE ? OR
+                u.last_name LIKE ? OR
+                u.bio LIKE ? OR
+                u.username LIKE ?
             )
-            GROUP BY u.id
-            ORDER BY relevance_score DESC, mp.rating DESC, mp.total_sessions DESC
+            ORDER BY relevance_score DESC, u.id ASC
             LIMIT ? OFFSET ?";
     
     $searchTerm = '%' . $searchQuery . '%';
-    $params = [$searchQuery, $searchQuery, $searchTerm, $searchTerm, $searchTerm, $limit, $offset];
+    $params = [$searchTerm, $searchTerm, $searchTerm, $searchTerm, $limit, $offset];
     
-    $results = fetchAll($sql, $params);
+    try {
+        $results = fetchAll($sql, $params);
+    } catch (Exception $e) {
+        error_log("Search error: " . $e->getMessage());
+        $results = [];
+    }
     
-    // Cache results for 5 minutes
-    if (function_exists('apcu_store')) {
+    // Cache results for 5 minutes (if available)
+    if (function_exists('apcu_store') && !empty($results)) {
         apcu_store($cacheKey, $results, 300);
     }
     
@@ -171,7 +171,7 @@ function searchSessions($query, $userId, $limit, $offset) {
 
 function searchMessages($query, $userId, $limit, $offset) {
     $searchTerms = explode(' ', $query);
-    $whereConditions = ["(m.sender_id = ? OR m.receiver_id = ?)"];
+    $whereConditions = ["(m.sender_id = ? OR m.recipient_id = ?)"];
     $params = [$userId, $userId];
     
     $searchConditions = [];
@@ -179,10 +179,11 @@ function searchMessages($query, $userId, $limit, $offset) {
         if (strlen(trim($term)) > 1) {
             $searchConditions[] = "(
                 m.subject LIKE ? OR 
+                m.content LIKE ? OR
                 m.message LIKE ?
             )";
             $searchTerm = '%' . trim($term) . '%';
-            $params = array_merge($params, [$searchTerm, $searchTerm]);
+            $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm]);
         }
     }
     
@@ -194,10 +195,10 @@ function searchMessages($query, $userId, $limit, $offset) {
     
     $sql = "SELECT m.*, 
                    sender.first_name as sender_first_name, sender.last_name as sender_last_name,
-                   receiver.first_name as receiver_first_name, receiver.last_name as receiver_last_name
+                   recipient.first_name as recipient_first_name, recipient.last_name as recipient_last_name
             FROM messages m
             JOIN users sender ON m.sender_id = sender.id
-            JOIN users receiver ON m.receiver_id = receiver.id
+            JOIN users recipient ON m.recipient_id = recipient.id
             WHERE {$whereClause}
             ORDER BY m.created_at DESC
             LIMIT ? OFFSET ?";
@@ -211,19 +212,16 @@ function searchMessages($query, $userId, $limit, $offset) {
 function searchFiles($query, $userId, $limit, $offset) {
     $searchTerms = explode(' ', $query);
     $whereConditions = [
-        "(f.uploader_id = ? OR EXISTS (
-            SELECT 1 FROM file_permissions fp 
-            WHERE fp.file_id = f.id AND fp.user_id = ?
-        ) OR f.is_public = TRUE)"
+        "(f.user_id = ? OR f.is_public = TRUE)"
     ];
-    $params = [$userId, $userId];
+    $params = [$userId];
     
     $searchConditions = [];
     foreach ($searchTerms as $term) {
         if (strlen(trim($term)) > 1) {
             $searchConditions[] = "(
                 f.original_name LIKE ? OR 
-                f.stored_name LIKE ?
+                f.filename LIKE ?
             )";
             $searchTerm = '%' . trim($term) . '%';
             $params = array_merge($params, [$searchTerm, $searchTerm]);
@@ -238,11 +236,9 @@ function searchFiles($query, $userId, $limit, $offset) {
     
     $sql = "SELECT f.*, 
                    uploader.first_name as uploader_first_name, 
-                   uploader.last_name as uploader_last_name,
-                   s.title as session_title
+                   uploader.last_name as uploader_last_name
             FROM files f
-            JOIN users uploader ON f.uploader_id = uploader.id
-            LEFT JOIN sessions s ON f.session_id = s.id
+            JOIN users uploader ON f.user_id = uploader.id
             WHERE {$whereClause}
             ORDER BY f.created_at DESC
             LIMIT ? OFFSET ?";

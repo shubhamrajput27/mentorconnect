@@ -219,6 +219,21 @@ body {
     min-width: 150px;
 }
 
+/* Dark theme button styles */
+[data-theme="dark"] .btn-outline {
+    background: rgba(30, 41, 59, 0.95);
+    color: #e2e8f0;
+    border: 2px solid var(--primary-color);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+[data-theme="dark"] .btn-outline:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
 /* Mobile Menu */
 .mobile-menu-toggle {
     display: none;

@@ -126,6 +126,21 @@ $csrfToken = generateCSRFToken();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In to MentorConnect</title>
+    
+    <!-- Immediate theme initialization to prevent FOUC -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                console.log('Theme initialized:', savedTheme);
+            } catch (e) {
+                console.log('Theme initialization error:', e);
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -150,21 +165,6 @@ $csrfToken = generateCSRFToken();
             --error-color: #ef4444;
             --warning-color: #f59e0b;
             --logo-accent: #fbbf24;
-        }
-
-        /* Force visible colors for debugging */
-        body {
-            background: white !important;
-            color: black !important;
-        }
-        
-        .login-container {
-            background: white !important;
-        }
-        
-        .form-panel {
-            background: white !important;
-            color: black !important;
         }
 
         [data-theme="dark"] {
@@ -236,6 +236,12 @@ $csrfToken = generateCSRFToken();
             pointer-events: none;
         }
 
+        [data-theme="dark"] .brand-panel::before {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
+        }
+
         .brand-content {
             position: relative;
             z-index: 1;
@@ -299,6 +305,15 @@ $csrfToken = generateCSRFToken();
             line-height: 1.8;
         }
 
+        [data-theme="dark"] .brand-panel {
+            color: var(--text-primary);
+        }
+
+        [data-theme="dark"] .logo-section p {
+            color: var(--text-secondary);
+            opacity: 0.95;
+        }
+
         .features-list {
             margin-bottom: 3rem;
         }
@@ -323,9 +338,18 @@ $csrfToken = generateCSRFToken();
             margin-bottom: 0.25rem;
         }
 
+        [data-theme="dark"] .feature-item h3 {
+            color: var(--text-primary);
+        }
+
         .feature-item p {
             opacity: 0.8;
             font-size: 0.9rem;
+        }
+
+        [data-theme="dark"] .feature-item p {
+            color: var(--text-secondary);
+            opacity: 0.9;
         }
 
         .stats-section {
@@ -351,6 +375,11 @@ $csrfToken = generateCSRFToken();
             opacity: 0.8;
             margin-top: 0.25rem;
             color: inherit;
+        }
+
+        [data-theme="dark"] .stat-label {
+            color: var(--text-secondary);
+            opacity: 0.9;
         }
 
         /* Form Panel */
@@ -921,9 +950,16 @@ $csrfToken = generateCSRFToken();
             }
             
             initializeTheme() {
-                const savedTheme = localStorage.getItem('theme') || 'dark';
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                this.updateThemeIcon(savedTheme);
+                try {
+                    const savedTheme = localStorage.getItem('theme') || 'dark';
+                    document.documentElement.setAttribute('data-theme', savedTheme);
+                    this.updateThemeIcon(savedTheme);
+                    console.log('Theme manager initialized with theme:', savedTheme);
+                } catch (e) {
+                    console.error('Theme initialization error:', e);
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    this.updateThemeIcon('dark');
+                }
             }
             
             updateThemeIcon(theme) {
@@ -934,21 +970,27 @@ $csrfToken = generateCSRFToken();
             }
             
             toggleTheme() {
-                const html = document.documentElement;
-                const currentTheme = html.getAttribute('data-theme') || 'light';
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                this.updateThemeIcon(newTheme);
-                
-                // Add animation effect
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    themeToggle.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        themeToggle.style.transform = '';
-                    }, 150);
+                try {
+                    const html = document.documentElement;
+                    const currentTheme = html.getAttribute('data-theme') || 'light';
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    this.updateThemeIcon(newTheme);
+                    
+                    console.log('Theme toggled to:', newTheme);
+                    
+                    // Add animation effect
+                    const themeToggle = document.querySelector('.theme-toggle');
+                    if (themeToggle) {
+                        themeToggle.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            themeToggle.style.transform = '';
+                        }, 150);
+                    }
+                } catch (e) {
+                    console.error('Theme toggle error:', e);
                 }
             }
             
