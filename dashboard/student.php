@@ -305,46 +305,7 @@ try {
             border-color: var(--primary-solid);
         }
 
-        .profile-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 0.75rem;
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            font-weight: 500;
-            box-shadow: var(--shadow);
-            min-width: 0; /* Allow text to truncate */
-        }
 
-        .profile-btn:hover {
-            background: var(--primary-solid);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
-            border-color: var(--primary-solid);
-        }
-
-        .profile-btn span {
-            font-size: 0.9rem;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100px;
-        }
-
-        .profile-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
 
         /* Dashboard Content */
         .dashboard-content {
@@ -778,11 +739,6 @@ try {
                     <button class="header-btn">
                         <i class="fas fa-bell"></i>
                     </button>
-                    <a href="../profile/edit.php" class="profile-btn">
-                        <img src="<?php echo htmlspecialchars($user['profile_photo'] ?: 'https://via.placeholder.com/32x32/667eea/ffffff?text=' . strtoupper(substr($user['first_name'], 0, 1))); ?>" 
-                             alt="Profile" class="profile-avatar">
-                        <span><?php echo htmlspecialchars($user['first_name']); ?></span>
-                    </a>
                 </div>
             </div>
         </header>

@@ -75,13 +75,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             // Set remember me cookie if requested
                             if ($remember) {
-                                $token = bin2hex(random_bytes(32));
-                                setcookie('remember_token', $token, time() + (30 * 24 * 3600), '/', '', false, true);
-                                // Store token in database for validation
-                                executeQuery(
-                                    "UPDATE users SET remember_token = ? WHERE id = ?",
-                                    [hash('sha256', $token), $user['id']]
-                                );
+                                try {
+                                    $token = bin2hex(random_bytes(32));
+                                    $hashedToken = hash('sha256', $token);
+                                    
+                                    if (DEBUG_MODE) {
+                                        error_log("Attempting to set remember token for user " . $user['id']);
+                                    }
+                                    
+                                    // Check if remember_token column exists first
+                                    $columnCheck = fetchOne("SHOW COLUMNS FROM users LIKE 'remember_token'");
+                                    if (!$columnCheck) {
+                                        // Column doesn't exist, add it
+                                        executeQuery("ALTER TABLE users ADD COLUMN remember_token VARCHAR(255) NULL");
+                                        executeQuery("ALTER TABLE users ADD INDEX idx_remember_token (remember_token)");
+                                        
+                                        if (DEBUG_MODE) {
+                                            error_log("Added remember_token column to users table");
+                                        }
+                                    }
+                                    
+                                    // Store token in database
+                                    executeQuery(
+                                        "UPDATE users SET remember_token = ? WHERE id = ?",
+                                        [$hashedToken, $user['id']]
+                                    );
+                                    
+                                    // Set cookie (30 days)
+                                    $cookieSet = setcookie('remember_token', $token, time() + (30 * 24 * 3600), '/', '', false, true);
+                                    
+                                    if (DEBUG_MODE) {
+                                        error_log("Remember token set for user " . $user['id'] . ": " . ($cookieSet ? 'Success' : 'Failed'));
+                                        error_log("Token: " . substr($token, 0, 10) . "...");
+                                        error_log("Hashed: " . substr($hashedToken, 0, 20) . "...");
+                                    }
+                                } catch (Exception $rememberError) {
+                                    if (DEBUG_MODE) {
+                                        error_log("Remember token error: " . $rememberError->getMessage());
+                                    }
+                                    // Don't fail the entire login if remember me fails
+                                    // Just log the error and continue
+                                }
                             }
                             
                             // Redirect to dashboard
@@ -110,8 +144,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             } catch (Exception $e) {
-                error_log($e->getMessage());
-                $error = 'An error occurred. Please try again.';
+                error_log("Login error: " . $e->getMessage());
+                error_log("Stack trace: " . $e->getTraceAsString());
+                if (DEBUG_MODE) {
+                    $error = 'Debug Error: ' . $e->getMessage() . ' (Line: ' . $e->getLine() . ')';
+                } else {
+                    $error = 'An error occurred. Please try again.';
+                }
             }
         }
     }

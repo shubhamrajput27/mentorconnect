@@ -270,8 +270,117 @@ function checkRateLimit($identifier, $action = 'general', $maxAttempts = 10, $ti
     return check_rate_limit($identifier, $action, $maxAttempts, $timeWindow);
 }
 
+function checkRememberToken() {
+    // Don't check remember token if already logged in via session
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+        return true;
+    }
+    
+    // Check if remember token exists
+    if (!isset($_COOKIE['remember_token'])) {
+        return false;
+    }
+    
+    try {
+        $token = $_COOKIE['remember_token'];
+        $hashedToken = hash('sha256', $token);
+        
+        // Check if remember_token column exists first
+        $columnCheck = fetchOne("SHOW COLUMNS FROM users LIKE 'remember_token'");
+        if (!$columnCheck) {
+            if (DEBUG_MODE) {
+                error_log("remember_token column doesn't exist, clearing cookie");
+            }
+            setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+            return false;
+        }
+        
+        // Find user with matching remember token
+        $user = fetchOne(
+            "SELECT id, username, email, role, status FROM users WHERE remember_token = ? AND status = 'active'",
+            [$hashedToken]
+        );
+        
+        if ($user) {
+            // Regenerate session ID for security
+            session_regenerate_id(true);
+            
+            // Set session variables for auto-login
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_role'] = $user['role'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['login_time'] = time();
+            $_SESSION['last_activity'] = time();
+            $_SESSION['auto_login'] = true;
+            
+            // Try to store session in database (optional)
+            try {
+                $clientIP = $_SERVER['REMOTE_ADDR'] ?? '';
+                executeQuery(
+                    "INSERT INTO user_sessions (id, user_id, ip_address, user_agent) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE last_activity = CURRENT_TIMESTAMP",
+                    [session_id(), $user['id'], $clientIP, $_SERVER['HTTP_USER_AGENT'] ?? '']
+                );
+            } catch (Exception $e) {
+                // Ignore if session table doesn't exist
+            }
+            
+            // Try to log activity (optional)
+            try {
+                logActivity($user['id'], 'auto_login', 'User automatically logged in via remember token');
+            } catch (Exception $e) {
+                // Ignore if activities table doesn't exist
+            }
+            
+            // Generate new token for security (rotate tokens)
+            try {
+                $newToken = bin2hex(random_bytes(32));
+                $newHashedToken = hash('sha256', $newToken);
+                
+                executeQuery(
+                    "UPDATE users SET remember_token = ? WHERE id = ?",
+                    [$newHashedToken, $user['id']]
+                );
+                
+                setcookie('remember_token', $newToken, time() + (30 * 24 * 3600), '/', '', false, true);
+            } catch (Exception $e) {
+                // If token rotation fails, user is still logged in, just log the error
+                if (DEBUG_MODE) {
+                    error_log("Token rotation failed: " . $e->getMessage());
+                }
+            }
+            
+            return true;
+        } else {
+            // Invalid or expired token, clear cookie
+            setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+            return false;
+        }
+    } catch (Exception $e) {
+        if (DEBUG_MODE) {
+            error_log("Remember token check error: " . $e->getMessage());
+        }
+        // Clear potentially corrupted cookie
+        setcookie('remember_token', '', time() - 3600, '/', '', false, true);
+        return false;
+    }
+}
+
 function isLoggedIn() {
-    return isset($_SESSION['user_id']) && isset($_SESSION['user_role']);
+    // First check if already logged in via session
+    if (isset($_SESSION['user_id']) && isset($_SESSION['user_role'])) {
+        // Update last activity time
+        $_SESSION['last_activity'] = time();
+        return true;
+    }
+    
+    // If not logged in via session, check remember token (only once per request)
+    static $rememberChecked = false;
+    if (!$rememberChecked) {
+        $rememberChecked = true;
+        return checkRememberToken();
+    }
+    
+    return false;
 }
 
 function requireLogin() {
