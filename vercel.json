@@ -1,0 +1,52 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.php",
+      "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "api/**/*.php",
+      "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "auth/**/*.php",
+      "use": "vercel-php@0.6.0"
+    },
+    {
+      "src": "dashboard/**/*.php",
+      "use": "vercel-php@0.6.0"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/assets/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*\\.php)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.php"
+    }
+  ],
+  "functions": {
+    "index.php": {
+      "runtime": "vercel-php@0.6.0"
+    },
+    "api/**/*.php": {
+      "runtime": "vercel-php@0.6.0"
+    },
+    "auth/**/*.php": {
+      "runtime": "vercel-php@0.6.0"
+    }
+  },
+  "env": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false"
+  }
+}
