@@ -3,7 +3,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 requireRole('mentor');
 
 $user = getCurrentUser();
@@ -14,10 +14,12 @@ try {
         'total_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE mentor_id = ?", [$user['id']])['count'] ?? 0,
         'upcoming_sessions' => fetchOne("SELECT COUNT(*) as count FROM sessions WHERE mentor_id = ? AND scheduled_at > NOW() AND status = 'scheduled'", [$user['id']])['count'] ?? 0,
         'total_students' => fetchOne("SELECT COUNT(DISTINCT student_id) as count FROM sessions WHERE mentor_id = ?", [$user['id']])['count'] ?? 0,
-        'avg_rating' => fetchOne("SELECT AVG(rating) as avg FROM reviews WHERE reviewee_id = ?", [$user['id']])['avg'] ?? 0
+        'avg_rating' => fetchOne("SELECT AVG(rating) as avg FROM reviews WHERE reviewee_id = ?", [$user['id']])['avg'] ?? 0,
+        'active_connections' => fetchOne("SELECT COUNT(*) as count FROM mentor_mentee_connections WHERE mentor_id = ? AND status = 'active'", [$user['id']])['count'] ?? 0,
+        'pending_requests' => fetchOne("SELECT COUNT(*) as count FROM mentor_mentee_connections WHERE mentor_id = ? AND status = 'pending'", [$user['id']])['count'] ?? 0
     ];
 } catch (Exception $e) {
-    $stats = ['total_sessions' => 0, 'upcoming_sessions' => 0, 'total_students' => 0, 'avg_rating' => 0];
+    $stats = ['total_sessions' => 0, 'upcoming_sessions' => 0, 'total_students' => 0, 'avg_rating' => 0, 'active_connections' => 0, 'pending_requests' => 0];
     error_log("Mentor dashboard stats error: " . $e->getMessage());
 }
 
@@ -76,6 +78,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentor Dashboard - MentorConnect</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/connections-optimized.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -225,6 +228,18 @@ try {
             width: 20px;
             text-align: center;
             font-size: 1.1rem;
+        }
+
+        .nav-badge {
+            background: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            margin-left: auto;
+            min-width: 20px;
+            text-align: center;
         }
 
         /* Main Content */
@@ -811,6 +826,15 @@ try {
                 </a>
             </div>
             <div class="nav-item">
+                <a href="../connections/index.php" class="nav-link">
+                    <i class="fas fa-handshake"></i>
+                    <span>My Connections</span>
+                    <?php if ($stats['pending_requests'] > 0): ?>
+                        <span class="nav-badge"><?php echo $stats['pending_requests']; ?></span>
+                    <?php endif; ?>
+                </a>
+            </div>
+            <div class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fas fa-calendar-alt"></i>
                     <span>My Sessions</span>
@@ -820,12 +844,6 @@ try {
                 <a href="../messages/" class="nav-link">
                     <i class="fas fa-comments"></i>
                     <span>Messages</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-users"></i>
-                    <span>My Students</span>
                 </a>
             </div>
             <div class="nav-item">

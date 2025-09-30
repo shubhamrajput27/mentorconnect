@@ -9,7 +9,7 @@ header('Location: auth/login.php');
 exit();
 
 // Legacy code below (secured but deprecated)
-require_once 'config/config.php';
+require_once 'config/optimized-config.php';
 
 $error = '';
 $success = '';

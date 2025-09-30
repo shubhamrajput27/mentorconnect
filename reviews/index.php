@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 requireLogin();
 
 $user = getCurrentUser();
@@ -207,7 +207,7 @@ $csrfToken = generateCSRFToken();
                     </button>
                     
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>
@@ -265,7 +265,7 @@ $csrfToken = generateCSRFToken();
                                         <div class="session-card">
                                             <div class="session-info">
                                                 <div class="participant-info">
-                                                    <img src="<?php echo $session['other_photo'] ? '../uploads/' . $session['other_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                                                    <img src="<?php echo $session['other_photo'] ? '../uploads/' . $session['other_photo'] : '../assets/images/default-profile.svg'; ?>" 
                                                          alt="Profile" class="participant-avatar">
                                                     <div>
                                                         <h4><?php echo htmlspecialchars($session['other_participant']); ?></h4>
@@ -319,7 +319,7 @@ $csrfToken = generateCSRFToken();
                                         <div class="review-card">
                                             <div class="review-header">
                                                 <div class="reviewer-info">
-                                                    <img src="<?php echo $review['reviewee_photo'] ? '../uploads/' . $review['reviewee_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                                                    <img src="<?php echo $review['reviewee_photo'] ? '../uploads/' . $review['reviewee_photo'] : '../assets/images/default-profile.svg'; ?>" 
                                                          alt="Profile" class="reviewer-avatar">
                                                     <div>
                                                         <h4><?php echo htmlspecialchars($review['reviewee_name']); ?></h4>
@@ -369,7 +369,7 @@ $csrfToken = generateCSRFToken();
                                         <div class="review-card">
                                             <div class="review-header">
                                                 <div class="reviewer-info">
-                                                    <img src="<?php echo $review['reviewer_photo'] ? '../uploads/' . $review['reviewer_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                                                    <img src="<?php echo $review['reviewer_photo'] ? '../uploads/' . $review['reviewer_photo'] : '../assets/images/default-profile.svg'; ?>" 
                                                          alt="Profile" class="reviewer-avatar">
                                                     <div>
                                                         <h4><?php echo htmlspecialchars($review['reviewer_name']); ?></h4>

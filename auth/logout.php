@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 
 if (isLoggedIn()) {
     $userId = $_SESSION['user_id'];

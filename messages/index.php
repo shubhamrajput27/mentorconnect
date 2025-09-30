@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 requireLogin();
 
 $user = getCurrentUser();
@@ -149,7 +149,7 @@ if ($selectedContactId > 0) {
                     </button>
                     
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>
@@ -179,7 +179,7 @@ if ($selectedContactId > 0) {
                                 <?php foreach ($conversations as $conversation): ?>
                                     <div class="conversation-item <?php echo $selectedContactId == $conversation['contact_id'] ? 'active' : ''; ?>"
                                          onclick="selectConversation(<?php echo $conversation['contact_id']; ?>)">
-                                        <img src="<?php echo $conversation['profile_photo'] ? '../uploads/' . $conversation['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                                        <img src="<?php echo $conversation['profile_photo'] ? '../uploads/' . $conversation['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                                              alt="Contact" class="conversation-avatar">
                                         <div class="conversation-info">
                                             <div class="conversation-header">
@@ -205,7 +205,7 @@ if ($selectedContactId > 0) {
                         <?php if ($selectedContact): ?>
                             <!-- Chat Header -->
                             <div class="chat-header">
-                                <img src="<?php echo $selectedContact['profile_photo'] ? '../uploads/' . $selectedContact['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                                <img src="<?php echo $selectedContact['profile_photo'] ? '../uploads/' . $selectedContact['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                                      alt="Contact" class="chat-avatar">
                                 <div class="chat-contact-info">
                                     <h4><?php echo htmlspecialchars($selectedContact['first_name'] . ' ' . $selectedContact['last_name']); ?></h4>

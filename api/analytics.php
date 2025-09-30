@@ -1,6 +1,6 @@
 <?php
 // Advanced Analytics and Reporting System
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 require_once '../config/cache-manager.php';
 
 class AnalyticsEngine {

@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 requireLogin();
 
 $user = getCurrentUser();
@@ -171,7 +171,7 @@ $csrfToken = generateCSRFToken();
                     </button>
                     
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>

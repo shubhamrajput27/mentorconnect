@@ -1,6 +1,6 @@
 <?php
 // Advanced Search Engine for MentorConnect
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 require_once '../config/rate-limiter.php';
 
 header('Content-Type: application/json');

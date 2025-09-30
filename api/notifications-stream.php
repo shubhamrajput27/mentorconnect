@@ -1,6 +1,6 @@
 <?php
 // Real-time Notification Stream using Server-Sent Events
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 require_once '../config/rate-limiter.php';
 
 // Handle preflight OPTIONS request for CORS

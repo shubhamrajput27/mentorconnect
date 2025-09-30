@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 requireRole('student');
 
 $user = getCurrentUser();
@@ -56,36 +56,67 @@ $orderBy = $sortOptions[$sortBy] ?? 'mp.rating DESC';
 
 $whereClause = implode(' AND ', $whereConditions);
 
-// Get mentors
+// Get mentors with optimized query and pagination
+$limit = min(intval($_GET['limit'] ?? 20), 50);
+$offset = max(0, intval($_GET['page'] ?? 0)) * $limit;
+
 $mentors = fetchAll(
-    "SELECT u.*, mp.title, mp.company, mp.rating, mp.hourly_rate, mp.experience_years, mp.total_sessions, mp.availability, mp.languages
+    "SELECT u.id, u.first_name, u.last_name, u.profile_photo, u.bio,
+            mp.title, mp.company, mp.rating, mp.hourly_rate, mp.experience_years, 
+            mp.total_sessions, mp.is_available
      FROM users u 
-     JOIN mentor_profiles mp ON u.id = mp.user_id 
-     WHERE $whereClause
+     INNER JOIN mentor_profiles mp ON u.id = mp.user_id 
+     WHERE $whereClause AND mp.is_available = 1
      ORDER BY $orderBy
-     LIMIT 50",
+     LIMIT $limit OFFSET $offset",
     $params
 );
 
-// Get all skills for filter
-$skills = fetchAll("SELECT * FROM skills ORDER BY category, name");
+// Get all skills for filter with caching
+$cacheKey = 'skills_list_' . md5('all_skills');
+$skills = null;
 
-// Get mentor skills for each mentor
+if (function_exists('apcu_fetch')) {
+    $skills = apcu_fetch($cacheKey);
+}
+
+if ($skills === false || $skills === null) {
+    $skills = fetchAll(
+        "SELECT id, name, category 
+         FROM skills 
+         WHERE id IN (SELECT DISTINCT skill_id FROM user_skills WHERE skill_type IN ('teaching', 'both'))
+         ORDER BY category, name"
+    );
+    
+    if (function_exists('apcu_store')) {
+        apcu_store($cacheKey, $skills, 300); // Cache for 5 minutes
+    }
+}
+
+// Optimize mentor skills with caching and single query
 $mentorSkills = [];
 if (!empty($mentors)) {
     $mentorIds = array_column($mentors, 'id');
-    $placeholders = str_repeat('?,', count($mentorIds) - 1) . '?';
-    $allMentorSkills = fetchAll(
-        "SELECT us.user_id, s.name, s.category, us.proficiency_level
-         FROM user_skills us 
-         JOIN skills s ON us.skill_id = s.id 
-         WHERE us.user_id IN ($placeholders)
-         ORDER BY s.category, s.name",
-        $mentorIds
-    );
-    
-    foreach ($allMentorSkills as $skill) {
-        $mentorSkills[$skill['user_id']][] = $skill;
+    if (!empty($mentorIds)) {
+        $placeholders = str_repeat('?,', count($mentorIds) - 1) . '?';
+        $allMentorSkills = fetchAll(
+            "SELECT us.user_id, s.name, s.category, us.proficiency_level,
+                    us.skill_type
+             FROM user_skills us 
+             INNER JOIN skills s ON us.skill_id = s.id 
+             WHERE us.user_id IN ($placeholders) 
+               AND (us.skill_type = 'teaching' OR us.skill_type = 'both')
+             ORDER BY us.proficiency_level DESC, s.name
+             LIMIT " . (count($mentorIds) * 6),
+            $mentorIds
+        );
+        
+        // Group skills by mentor with limit
+        foreach ($allMentorSkills as $skill) {
+            if (!isset($mentorSkills[$skill['user_id']]) || count($mentorSkills[$skill['user_id']]) < 5) {
+                $mentorSkills[$skill['user_id']][] = $skill;
+            }
+        }
     }
 }
 ?>
@@ -96,6 +127,7 @@ if (!empty($mentors)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Mentors - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/connections-optimized.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -167,7 +199,7 @@ if (!empty($mentors)) {
                     </button>
                     
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>
@@ -282,7 +314,7 @@ if (!empty($mentors)) {
                             <?php foreach ($mentors as $mentor): ?>
                                 <div class="mentor-card">
                                     <div class="mentor-header">
-                                        <img src="<?php echo $mentor['profile_photo'] ? '../uploads/' . $mentor['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
+                                        <img src="<?php echo $mentor['profile_photo'] ? '../uploads/' . $mentor['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
                                              alt="<?php echo htmlspecialchars($mentor['first_name']); ?>" class="mentor-avatar">
                                         <div class="mentor-basic-info">
                                             <h4><?php echo htmlspecialchars($mentor['first_name'] . ' ' . $mentor['last_name']); ?></h4>
@@ -341,17 +373,17 @@ if (!empty($mentors)) {
                                     </div>
                                     
                                     <div class="mentor-actions">
-                                        <button class="btn btn-primary" onclick="bookSession(<?php echo $mentor['id']; ?>)">
+                                        <button class="btn btn-primary" onclick="connectWithMentor(<?php echo $mentor['id']; ?>)">
+                                            <i class="fas fa-handshake"></i>
+                                            Connect
+                                        </button>
+                                        <button class="btn btn-outline" onclick="bookSession(<?php echo $mentor['id']; ?>)">
                                             <i class="fas fa-calendar-plus"></i>
                                             Book Session
                                         </button>
-                                        <button class="btn btn-outline" onclick="sendMessage(<?php echo $mentor['id']; ?>)">
+                                        <button class="btn btn-ghost" onclick="sendMessage(<?php echo $mentor['id']; ?>)">
                                             <i class="fas fa-envelope"></i>
                                             Message
-                                        </button>
-                                        <button class="btn btn-ghost" onclick="viewProfile(<?php echo $mentor['id']; ?>)">
-                                            <i class="fas fa-user"></i>
-                                            View Profile
                                         </button>
                                     </div>
                                 </div>
@@ -593,6 +625,8 @@ if (!empty($mentors)) {
     }
     </style>
 
+
+
     <script>
     // Auto-submit form when filters change
     document.querySelectorAll('#searchForm select').forEach(select => {
@@ -600,6 +634,12 @@ if (!empty($mentors)) {
             document.getElementById('searchForm').submit();
         });
     });
+
+    function connectWithMentor(mentorId) {
+        window.location.href = `connect.php?mentor_id=${mentorId}`;
+    }
+
+
 
     function bookSession(mentorId) {
         window.location.href = `/sessions/book.php?mentor_id=${mentorId}`;
@@ -612,6 +652,8 @@ if (!empty($mentors)) {
     function viewProfile(mentorId) {
         window.location.href = `/mentors/profile.php?id=${mentorId}`;
     }
+
+
     </script>
 
     <script src="../assets/js/app.js"></script>

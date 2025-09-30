@@ -1,5 +1,5 @@
 <?php
-require_once 'config/config.php';
+require_once 'config/optimized-config.php';
 
 // Redirect to appropriate dashboard if already logged in
 if (isLoggedIn()) {

@@ -1,6 +1,6 @@
 <?php
 // AI-Powered Mentor Matching System
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 
 class MentorMatcher {
     private $db;
