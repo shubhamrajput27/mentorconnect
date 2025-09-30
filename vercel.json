@@ -1,31 +1,16 @@
 {
   "version": 2,
   "functions": {
-    "api/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "auth/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "dashboard/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "mentors/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "messages/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "profile/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "sessions/**/*.php": {
-      "runtime": "vercel-php@0.7.0"
-    },
-    "*.php": {
+    "api/*.php": {
       "runtime": "vercel-php@0.7.0"
     }
   },
+  "builds": [
+    {
+      "src": "**/*.php",
+      "use": "vercel-php@0.7.0"
+    }
+  ],
   "routes": [
     {
       "src": "/assets/(.*)",
