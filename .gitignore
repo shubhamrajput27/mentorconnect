@@ -49,3 +49,4 @@ composer.lock
 # Session files
 sessions/
 *.sess
+.vercel

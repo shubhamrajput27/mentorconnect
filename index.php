@@ -1,5 +1,10 @@
 <?php
-require_once 'config/optimized-config.php';
+// Use Vercel configuration if available, otherwise use optimized config
+if (file_exists('config/vercel-config.php') && (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']))) {
+    require_once 'config/vercel-config.php';
+} else {
+    require_once 'config/optimized-config.php';
+}
 
 // Redirect to appropriate dashboard if already logged in
 if (isLoggedIn()) {

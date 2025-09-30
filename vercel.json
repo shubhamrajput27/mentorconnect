@@ -1,23 +1,31 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "index.php",
-      "use": "vercel-php@0.6.0"
+  "functions": {
+    "api/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
     },
-    {
-      "src": "api/**/*.php",
-      "use": "vercel-php@0.6.0"
+    "auth/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
     },
-    {
-      "src": "auth/**/*.php",
-      "use": "vercel-php@0.6.0"
+    "dashboard/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
     },
-    {
-      "src": "dashboard/**/*.php",
-      "use": "vercel-php@0.6.0"
+    "mentors/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
+    },
+    "messages/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
+    },
+    "profile/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
+    },
+    "sessions/**/*.php": {
+      "runtime": "vercel-php@0.7.0"
+    },
+    "*.php": {
+      "runtime": "vercel-php@0.7.0"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/assets/(.*)",
@@ -26,7 +34,35 @@
       }
     },
     {
-      "src": "/(.*\\.php)",
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/auth/(.*)",
+      "dest": "/auth/$1"
+    },
+    {
+      "src": "/dashboard/(.*)",
+      "dest": "/dashboard/$1"
+    },
+    {
+      "src": "/mentors/(.*)",
+      "dest": "/mentors/$1"
+    },
+    {
+      "src": "/messages/(.*)",
+      "dest": "/messages/$1"
+    },
+    {
+      "src": "/profile/(.*)",
+      "dest": "/profile/$1"
+    },
+    {
+      "src": "/sessions/(.*)",
+      "dest": "/sessions/$1"
+    },
+    {
+      "src": "/(.*\\.php)$",
       "dest": "/$1"
     },
     {
@@ -34,17 +70,6 @@
       "dest": "/index.php"
     }
   ],
-  "functions": {
-    "index.php": {
-      "runtime": "vercel-php@0.6.0"
-    },
-    "api/**/*.php": {
-      "runtime": "vercel-php@0.6.0"
-    },
-    "auth/**/*.php": {
-      "runtime": "vercel-php@0.6.0"
-    }
-  },
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false"
