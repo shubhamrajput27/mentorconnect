@@ -1,0 +1,19 @@
+{
+  "name": "shubhamrajput27/mentorconnect",
+  "description": "MentorConnect - Professional Mentorship Platform",
+  "version": "1.0.0",
+  "engines": {
+    "php": "8.1.*"
+  },
+  "require": {
+    "php": "^8.1.0",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-mbstring": "*",
+    "ext-curl": "*",
+    "ext-gd": "*"
+  },
+  "scripts": {
+    "start": "php -S 0.0.0.0:$PORT -t ."
+  }
+}
