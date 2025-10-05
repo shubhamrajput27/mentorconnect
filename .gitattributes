@@ -1,0 +1,20 @@
+# Override GitHub language detection
+*.php linguist-language=PHP
+*.md linguist-documentation
+api/notifications-stream.php linguist-language=PHP
+
+# Exclude documentation from language statistics  
+*.md linguist-documentation
+DEPLOYMENT_FIX.md linguist-documentation
+COMPLETE_OPTIMIZATION_REPORT.md linguist-documentation
+HUMANIZATION_SUMMARY.md linguist-documentation
+README.md linguist-documentation
+
+# Mark assets as vendored (not part of main codebase)
+assets/css/*.css linguist-vendored
+assets/js/*.js linguist-vendored
+
+# Ensure proper language classification
+*.php linguist-detectable=true
+*.css linguist-detectable=true
+*.js linguist-detectable=true

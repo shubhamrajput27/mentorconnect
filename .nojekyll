@@ -1,0 +1,3 @@
+# This file prevents GitHub Pages from trying to deploy this repository
+# MentorConnect is a PHP application that requires server-side processing
+# It cannot be deployed as a static site
