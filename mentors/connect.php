@@ -1,5 +1,5 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/config.php';
 requireRole('student');
 
 $user = getCurrentUser();
@@ -35,130 +35,74 @@ if (!$mentorData) {
 }
 
 $mentor = $mentorData;
-$hasExistingConnection = $mentorData['existing_connection'] > 0;
-
-// If there's an existing connection, fetch its details
-$existingConnection = null;
-if ($hasExistingConnection) {
-    $existingConnection = fetchOne(
-        "SELECT * FROM mentor_mentee_connections 
-         WHERE mentor_id = ? AND mentee_id = ? 
-         AND status IN ('pending', 'active') 
-         ORDER BY created_at DESC LIMIT 1",
-        [$mentorId, $user['id']]
-    );
-}
+$existingConnection = $mentorData['existing_connection'] > 0;
 
 $message = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Log the POST attempt for debugging
-    error_log("Connection request POST received for mentor_id: $mentorId");
-    
-    // Validate CSRF token (optional for now)
+    // Validate CSRF token (if implemented)
     if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'] ?? '')) {
+        // For now, just log the attempt
         error_log('CSRF token validation failed for connection request');
-        // Continue anyway for debugging
     }
     
-    if ($hasExistingConnection) {
+    if ($existingConnection) {
         $error = 'You already have a pending or active connection with this mentor.';
-        error_log("Existing connection found for user {$user['id']} and mentor $mentorId");
     } else {
-        // Enhanced validation with better error reporting
+        // Enhanced validation
         $connectionType = sanitizeInput($_POST['connection_type'] ?? '');
         $requestMessage = sanitizeInput($_POST['message'] ?? '');
         $goals = sanitizeInput($_POST['goals'] ?? '');
         
-        error_log("Form data - Type: $connectionType, Message length: " . strlen($requestMessage) . ", Goals length: " . strlen($goals));
-        
         $validTypes = ['ongoing', 'one-time', 'project-based'];
         if (!in_array($connectionType, $validTypes)) {
             $error = 'Please select a valid connection type.';
-            error_log("Invalid connection type: $connectionType");
         } elseif (strlen($requestMessage) > 1000) {
             $error = 'Message is too long (maximum 1000 characters).';
         } elseif (strlen($goals) > 500) {
             $error = 'Goals description is too long (maximum 500 characters).';
         } else {
             try {
-                error_log("Starting database transaction for connection request");
+                $db = Database::getInstance()->getConnection();
+                $db->beginTransaction();
                 
-                global $pdo;
-                $pdo->beginTransaction();
-                
-                // Insert connection request using global helper function
+                // Insert connection request
                 $sql = "INSERT INTO mentor_mentee_connections 
                         (mentor_id, mentee_id, status, connection_type, requested_by, request_message, goals) 
                         VALUES (?, ?, 'pending', ?, 'mentee', ?, ?)";
                 
-                $stmt = executeQuery($sql, [$mentorId, $user['id'], $connectionType, $requestMessage, $goals]);
+                $stmt = $db->prepare($sql);
+                $stmt->execute([$mentorId, $user['id'], $connectionType, $requestMessage, $goals]);
+                $connectionId = $db->lastInsertId();
                 
-                if (!$stmt) {
-                    throw new Exception("Failed to insert connection");
-                }
+                // Create notification for mentor
+                $notificationSql = "INSERT INTO notifications (user_id, type, title, message, data) 
+                                   VALUES (?, 'connection_request', 'New Connection Request', ?, ?)";
                 
-                $connectionId = getLastInsertId();
-                error_log("Connection request inserted with ID: $connectionId");
+                $notificationMsg = "You have a new connection request from {$user['first_name']} {$user['last_name']}";
+                $notificationData = json_encode([
+                    'connection_id' => $connectionId, 
+                    'sender_id' => $user['id'],
+                    'connection_type' => $connectionType
+                ]);
                 
-                // Create notification for mentor (with error checking)
-                try {
-                    $notificationSql = "INSERT INTO notifications (user_id, type, title, message, data) 
-                                       VALUES (?, 'connection_request', 'New Connection Request', ?, ?)";
-                    
-                    $notificationMsg = "You have a new connection request from {$user['first_name']} {$user['last_name']}";
-                    $notificationData = json_encode([
-                        'connection_id' => $connectionId, 
-                        'sender_id' => $user['id'],
-                        'connection_type' => $connectionType
-                    ]);
-                    
-                    $notifStmt = executeQuery($notificationSql, [$mentorId, $notificationMsg, $notificationData]);
-                    
-                    if ($notifStmt) {
-                        error_log("Notification created successfully");
-                    } else {
-                        error_log("Notification creation failed");
-                    }
-                } catch (Exception $notifError) {
-                    error_log("Notification error (non-critical): " . $notifError->getMessage());
-                    // Don't fail the whole transaction for notification issues
-                }
+                $notifStmt = $db->prepare($notificationSql);
+                $notifStmt->execute([$mentorId, $notificationMsg, $notificationData]);
                 
-                $pdo->commit();
-                error_log("Transaction committed successfully");
+                $db->commit();
                 
                 $message = 'Connection request sent successfully! The mentor will be notified and can respond through their dashboard.';
                 
-                // Redirect to prevent resubmission
-                header("Location: connect.php?mentor_id=$mentorId&success=1");
-                exit;
-                
             } catch (Exception $e) {
-                if (isset($pdo) && $pdo->inTransaction()) {
-                    $pdo->rollback();
+                if ($db->inTransaction()) {
+                    $db->rollback();
                 }
-                $error = 'Failed to send connection request: ' . $e->getMessage();
+                $error = 'Failed to send connection request. Please try again later.';
                 error_log("Connection request error: " . $e->getMessage());
-                error_log("Error trace: " . $e->getTraceAsString());
             }
         }
     }
-}
-
-// Check for success redirect
-if (isset($_GET['success']) && $_GET['success'] == '1') {
-    $message = 'Connection request sent successfully! The mentor will be notified and can respond through their dashboard.';
-    // Refresh the existing connection check after successful submission
-    $hasExistingConnection = true;
-    $existingConnection = fetchOne(
-        "SELECT * FROM mentor_mentee_connections 
-         WHERE mentor_id = ? AND mentee_id = ? 
-         AND status IN ('pending', 'active') 
-         ORDER BY created_at DESC LIMIT 1",
-        [$mentorId, $user['id']]
-    );
 }
 ?>
 <!DOCTYPE html>
@@ -168,7 +112,6 @@ if (isset($_GET['success']) && $_GET['success'] == '1') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connect with <?php echo htmlspecialchars($mentor['first_name'] . ' ' . $mentor['last_name']); ?> - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/connections-optimized.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -224,7 +167,7 @@ if (isset($_GET['success']) && $_GET['success'] == '1') {
                 
                 <div class="header-right">
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>
@@ -253,7 +196,7 @@ if (isset($_GET['success']) && $_GET['success'] == '1') {
                 <?php if ($existingConnection): ?>
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i>
-                        You already have a <?php echo htmlspecialchars($existingConnection['status']); ?> connection with this mentor.
+                        You already have a <?php echo $existingConnection['status']; ?> connection with this mentor.
                         <div style="margin-top: 1rem;">
                             <a href="../connections/index.php" class="btn btn-primary">View Connection</a>
                             <a href="browse.php" class="btn btn-outline">Find Other Mentors</a>
@@ -263,7 +206,7 @@ if (isset($_GET['success']) && $_GET['success'] == '1') {
                     <!-- Mentor Card -->
                     <div class="mentor-card" style="margin-bottom: 2rem;">
                         <div class="mentor-header">
-                            <img src="<?php echo $mentor['profile_photo'] ? '../uploads/' . $mentor['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
+                            <img src="<?php echo $mentor['profile_photo'] ? '../uploads/' . $mentor['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
                                  alt="<?php echo htmlspecialchars($mentor['first_name']); ?>" class="mentor-avatar">
                             <div class="mentor-info">
                                 <h3><?php echo htmlspecialchars($mentor['first_name'] . ' ' . $mentor['last_name']); ?></h3>

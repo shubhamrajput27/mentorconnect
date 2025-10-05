@@ -1,5 +1,5 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/config.php';
 requireRole('student');
 
 $user = getCurrentUser();
@@ -199,7 +199,7 @@ if (!empty($mentors)) {
                     </button>
                     
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>
@@ -314,7 +314,7 @@ if (!empty($mentors)) {
                             <?php foreach ($mentors as $mentor): ?>
                                 <div class="mentor-card">
                                     <div class="mentor-header">
-                                        <img src="<?php echo $mentor['profile_photo'] ? '../uploads/' . $mentor['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
+                                        <img src="<?php echo $mentor['profile_photo'] ? '../uploads/' . $mentor['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
                                              alt="<?php echo htmlspecialchars($mentor['first_name']); ?>" class="mentor-avatar">
                                         <div class="mentor-basic-info">
                                             <h4><?php echo htmlspecialchars($mentor['first_name'] . ' ' . $mentor['last_name']); ?></h4>

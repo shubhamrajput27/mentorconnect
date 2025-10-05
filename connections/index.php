@@ -1,5 +1,5 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/config.php';
 requireLogin();
 
 $user = getCurrentUser();
@@ -8,11 +8,8 @@ $pageTitle = 'My Connections';
 // Optimized connections data retrieval
 try {
     $userColumn = ($user['role'] === 'mentor') ? 'mentor_id' : 'mentee_id';
-                                                };
-                                            ?>
-                                            <div class="user-info">
-                                                <img src="<?php echo $otherUser['photo'] ? '../uploads/' . $otherUser['photo'] : '../assets/images/default-profile.svg'; ?>" 
-                                                     alt="<?php echo htmlspecialchars($otherUser['name']); ?>" class="user-avatar">// Single optimized query for connections
+    
+    // Single optimized query for connections
     $connections = fetchAll(
         "SELECT c.id, c.status, c.connection_type, c.request_message, c.goals, 
                 c.created_at, c.start_date, c.requested_by, c.response_message,
@@ -158,7 +155,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
                     </button>
                     
                     <div class="user-menu">
-                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-profile.svg'; ?>" 
+                        <img src="<?php echo $user['profile_photo'] ? '../uploads/' . $user['profile_photo'] : '../assets/images/default-avatar.png'; ?>" 
                              alt="Profile" class="user-avatar">
                     </div>
                 </div>
@@ -259,7 +256,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
                                             }
                                             ?>
                                             <div class="user-info">
-                                                <img src="<?php echo $otherUser['photo'] ? '../uploads/' . $otherUser['photo'] : '../assets/images/default-profile.svg'; ?>" 
+                                                <img src="<?php echo $otherUser['photo'] ? '../uploads/' . $otherUser['photo'] : '../assets/images/default-avatar.png'; ?>" 
                                                      alt="<?php echo htmlspecialchars($otherUser['name']); ?>" class="user-avatar">
                                                 <div class="user-details">
                                                     <h4><?php echo htmlspecialchars($otherUser['name']); ?></h4>
@@ -360,7 +357,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
                                             }
                                             ?>
                                             <div class="user-info">
-                                                <img src="<?php echo $otherUser['photo'] ? '../uploads/' . $otherUser['photo'] : '../assets/images/default-profile.svg'; ?>" 
+                                                <img src="<?php echo $otherUser['photo'] ? '../uploads/' . $otherUser['photo'] : '../assets/images/default-avatar.png'; ?>" 
                                                      alt="<?php echo htmlspecialchars($otherUser['name']); ?>" class="user-avatar">
                                                 <div class="user-details">
                                                     <h4><?php echo htmlspecialchars($otherUser['name']); ?></h4>
@@ -785,7 +782,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         
-        fetch('api-debug.php?action=respond', {
+        fetch('../api/connections.php?action=respond', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

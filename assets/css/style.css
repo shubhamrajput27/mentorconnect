@@ -584,18 +584,11 @@ a:hover {
     border-radius: 50%;
     border: 2px solid var(--border-color);
     transition: all var(--transition-normal);
-    background: #f8f9fa;
-    object-fit: cover;
 }
 
 .user-avatar:hover {
     border-color: var(--primary-color);
     transform: scale(1.05);
-}
-
-/* Ensure SVG avatars display properly */
-.user-avatar[src$=".svg"] {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 /* Search Bar */

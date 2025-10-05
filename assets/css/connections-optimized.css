@@ -236,17 +236,6 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--border);
-    background: #f8f9fa;
-    transition: transform 0.2s ease;
-}
-
-.user-avatar:hover {
-    transform: scale(1.05);
-}
-
-/* Ensure SVG avatars display properly */
-.user-avatar[src$=".svg"] {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .user-details h4 {

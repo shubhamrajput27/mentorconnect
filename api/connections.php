@@ -1,13 +1,12 @@
 <?php
 // Mentor-Mentee Connection Management API
-require_once '../config/optimized-config.php';
+require_once '../config/config.php';
 
 class ConnectionManager {
     private $db;
     
     public function __construct() {
-        global $pdo;
-        $this->db = $pdo;
+        $this->db = Database::getInstance()->getConnection();
     }
     
     /**
@@ -50,8 +49,10 @@ class ConnectionManager {
                 (mentor_id, mentee_id, status, connection_type, requested_by, request_message, goals) 
                 VALUES (?, ?, 'pending', ?, ?, ?, ?)";
         
-        executeQuery($sql, [$mentorId, $menteeId, $connectionType, $requestedBy, $message, $goals]);
-        $connectionId = getLastInsertId();
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$mentorId, $menteeId, $connectionType, $requestedBy, $message, $goals]);
+        
+        $connectionId = $this->db->lastInsertId();
         
         // Log activity
         $this->logConnectionActivity($connectionId, 'status_changed', $senderId, 
@@ -92,7 +93,8 @@ class ConnectionManager {
                 SET status = ?, response_message = ?, responded_at = NOW(), start_date = ?
                 WHERE id = ?";
         
-        executeQuery($sql, [$newStatus, $responseMessage, $startDate, $connectionId]);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$newStatus, $responseMessage, $startDate, $connectionId]);
         
         // Log activity
         $user = $this->getUser($userId);
@@ -171,7 +173,9 @@ class ConnectionManager {
         $params[] = $limit;
         $params[] = $offset;
         
-        return fetchAll($sql, $params);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     /**
@@ -207,7 +211,8 @@ class ConnectionManager {
         $params[] = $connectionId;
         
         $sql = "UPDATE mentor_mentee_connections SET " . implode(', ', $setClauses) . " WHERE id = ?";
-        executeQuery($sql, $params);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         
         // Log activity if status changed
         if (isset($updates['status'])) {
@@ -250,7 +255,9 @@ class ConnectionManager {
                 FROM mentor_mentee_connections 
                 WHERE " . ($user['role'] === 'mentor' ? 'mentor_id = ?' : 'mentee_id = ?');
         
-        $stats = fetchOne($sql, [$userId]);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
+        $stats = $stmt->fetch(PDO::FETCH_ASSOC);
         
         // Cache the result
         file_put_contents($cacheFile, json_encode($stats));
@@ -269,47 +276,52 @@ class ConnectionManager {
                 ORDER BY ca.created_at DESC
                 LIMIT ?";
         
-        return fetchAll($sql, [$connectionId, $limit]);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$connectionId, $limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
     // Helper methods
     private function getUser($userId) {
-        return fetchOne("SELECT * FROM users WHERE id = ?", [$userId]);
+        $sql = "SELECT * FROM users WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     private function getConnection($connectionId) {
-        return fetchOne("SELECT * FROM mentor_mentee_connections WHERE id = ?", [$connectionId]);
+        $sql = "SELECT * FROM mentor_mentee_connections WHERE id = ?";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$connectionId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     private function getExistingConnection($mentorId, $menteeId) {
-        return fetchOne("SELECT * FROM mentor_mentee_connections 
+        $sql = "SELECT * FROM mentor_mentee_connections 
                 WHERE mentor_id = ? AND mentee_id = ? 
-                AND status IN ('pending', 'active', 'paused')", [$mentorId, $menteeId]);
+                AND status IN ('pending', 'active', 'paused')";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$mentorId, $menteeId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
     private function logConnectionActivity($connectionId, $activityType, $actorId, $description, $metadata = null) {
-        try {
-            executeQuery("INSERT INTO connection_activities 
+        $sql = "INSERT INTO connection_activities 
                 (connection_id, activity_type, actor_id, description, metadata) 
-                VALUES (?, ?, ?, ?, ?)", 
-                [$connectionId, $activityType, $actorId, $description, 
-                 $metadata ? json_encode($metadata) : null]);
-        } catch (Exception $e) {
-            // Ignore if table doesn't exist
-            error_log("Activity logging failed: " . $e->getMessage());
-        }
+                VALUES (?, ?, ?, ?, ?)";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$connectionId, $activityType, $actorId, $description, 
+                       $metadata ? json_encode($metadata) : null]);
     }
     
     private function createNotification($userId, $type, $title, $message, $data = null) {
-        try {
-            executeQuery("INSERT INTO notifications (user_id, type, title, message, data) 
-                VALUES (?, ?, ?, ?, ?)", 
-                [$userId, $type, $title, $message, 
-                 $data ? json_encode($data) : null]);
-        } catch (Exception $e) {
-            // Ignore if table doesn't exist
-            error_log("Notification creation failed: " . $e->getMessage());
-        }
+        $sql = "INSERT INTO notifications (user_id, type, title, message, data) 
+                VALUES (?, ?, ?, ?, ?)";
+        
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([$userId, $type, $title, $message, 
+                       $data ? json_encode($data) : null]);
     }
 }
 
