@@ -76,7 +76,9 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
     <!-- Optimized CSS Loading -->
-    <link rel="stylesheet" href="assets/optimized.css?v=<?php echo filemtime(__DIR__ . '/assets/optimized.css'); ?>">
+    <?php if (file_exists(__DIR__ . '/assets/css/optimized-critical.css')): ?>
+    <link rel="stylesheet" href="assets/css/optimized-critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimized-critical.css'); ?>">
+    <?php endif; ?>
     
     <!-- Performance & Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -98,8 +100,8 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" crossorigin>
     
     <!-- Advanced CSS Features (if available) -->
-    <?php if (file_exists(__DIR__ . '/assets/css/advanced.css')): ?>
-    <link rel="stylesheet" href="assets/css/advanced.css?v=<?php echo filemtime(__DIR__ . '/assets/css/advanced.css'); ?>" media="print" onload="this.media='all'">
+    <?php if (file_exists(__DIR__ . '/assets/css/theme.css')): ?>
+    <link rel="stylesheet" href="assets/css/theme.css?v=<?php echo filemtime(__DIR__ . '/assets/css/theme.css'); ?>" media="print" onload="this.media='all'">
     <?php endif; ?>
     
     <!-- External CSS with Async Loading -->
@@ -108,19 +110,28 @@ $currentUrl = BASE_URL . '/index.php';
     
     <!-- Fallback for disabled JavaScript -->
     <noscript>
-        <link rel="stylesheet" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>">
+        <?php if (file_exists(__DIR__ . '/assets/css/style.css')): ?>
         <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>">
+        <?php endif; ?>
+        <?php if (file_exists(__DIR__ . '/assets/css/landing.css')): ?>
         <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>">
+        <?php endif; ?>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" crossorigin>
     </noscript>
     
     <!-- Critical CSS Inline -->
-    <link rel="stylesheet" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>">
+    <?php if (file_exists(__DIR__ . '/assets/css/optimized-critical.css')): ?>
+    <link rel="stylesheet" href="assets/css/optimized-critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimized-critical.css'); ?>">
+    <?php endif; ?>
     
     <!-- Main CSS with Async Loading -->
+    <?php if (file_exists(__DIR__ . '/assets/css/style.css')): ?>
     <link rel="stylesheet" href="assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>" media="print" onload="this.media='all'">
+    <?php endif; ?>
+    <?php if (file_exists(__DIR__ . '/assets/css/landing.css')): ?>
     <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>" media="print" onload="this.media='all'">
+    <?php endif; ?>
     
     <!-- Optimized Button Styles -->
     <style>
@@ -143,6 +154,144 @@ $currentUrl = BASE_URL . '/index.php';
     
     .hero-svg {
         pointer-events: none !important;
+    }
+    
+    /* Theme Toggle Enhancements */
+    .theme-toggle {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    
+    .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Light Mode - Moon Icon (Dark) */
+    [data-theme="light"] .theme-toggle {
+        background: rgba(30, 41, 59, 0.1) !important;
+        border: 1px solid rgba(30, 41, 59, 0.2) !important;
+        box-shadow: 0 2px 8px rgba(30, 41, 59, 0.1) !important;
+    }
+    
+    [data-theme="light"] .theme-toggle:hover {
+        background: rgba(30, 41, 59, 0.15) !important;
+        box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2) !important;
+        border-color: rgba(30, 41, 59, 0.3) !important;
+    }
+    
+    [data-theme="light"] .theme-toggle i {
+        color: #1e293b !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+    }
+    
+    [data-theme="light"] .theme-toggle:hover i {
+        color: #0f172a !important;
+        transform: scale(1.1) !important;
+        text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Dark Mode - Sun Icon (Light) */
+    [data-theme="dark"] .theme-toggle {
+        background: rgba(129, 140, 248, 0.1) !important;
+        border-color: rgba(129, 140, 248, 0.2) !important;
+        box-shadow: 0 2px 8px rgba(129, 140, 248, 0.1) !important;
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover {
+        background: rgba(129, 140, 248, 0.2) !important;
+        box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3) !important;
+        border-color: rgba(129, 140, 248, 0.4) !important;
+    }
+    
+    [data-theme="dark"] .theme-toggle i {
+        color: #fbbf24 !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        text-shadow: 0 0 8px rgba(251, 191, 36, 0.3) !important;
+    }
+    
+    [data-theme="dark"] .theme-toggle:hover i {
+        color: #f59e0b !important;
+        transform: scale(1.1) rotate(15deg) !important;
+        text-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
+    }
+    
+    /* Default fallback for theme toggle icon */
+    .theme-toggle i {
+        color: #1e293b !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Theme Transition Animation */
+    .theme-transitioning * {
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+    }
+    
+    /* Mobile Menu Styles */
+    @media (max-width: 768px) {
+        .nav-links {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            flex-direction: column;
+            padding: 1rem;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transform: translateY(-20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links.mobile-open {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .nav-links a {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-links a:last-child {
+            border-bottom: none;
+        }
+        
+        .mobile-menu-toggle {
+            display: block !important;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 8px;
+            margin-left: 1rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+    }
+    
+    @media (min-width: 769px) {
+        .mobile-menu-toggle {
+            display: none !important;
+        }
     }
     </style>
     
@@ -286,6 +435,71 @@ $currentUrl = BASE_URL . '/index.php';
                 </div>
             </div>
         </nav>
+
+        <!-- Theme Toggle JavaScript -->
+        <script>
+            // Theme toggle functionality for landing page
+            document.addEventListener('DOMContentLoaded', function() {
+                const themeToggle = document.querySelector('.theme-toggle');
+                const themeIcon = document.getElementById('theme-icon');
+                
+                // Get current theme
+                function getCurrentTheme() {
+                    return document.documentElement.getAttribute('data-theme') || 'light';
+                }
+                
+                // Update theme icon
+                function updateThemeIcon(theme) {
+                    if (themeIcon) {
+                        themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                    }
+                }
+                
+                // Set initial icon based on current theme
+                updateThemeIcon(getCurrentTheme());
+                
+                // Handle theme toggle click
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', function() {
+                        const currentTheme = getCurrentTheme();
+                        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                        
+                        // Add transition class for smooth animation
+                        document.documentElement.classList.add('theme-transitioning');
+                        
+                        // Update theme
+                        document.documentElement.setAttribute('data-theme', newTheme);
+                        localStorage.setItem('theme', newTheme);
+                        
+                        // Update icon
+                        updateThemeIcon(newTheme);
+                        
+                        // Add button animation
+                        themeToggle.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            themeToggle.style.transform = '';
+                        }, 150);
+                        
+                        // Remove transition class after animation
+                        setTimeout(() => {
+                            document.documentElement.classList.remove('theme-transitioning');
+                        }, 300);
+                    });
+                }
+                
+                // Handle mobile menu toggle
+                const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+                const navLinks = document.querySelector('.nav-links');
+                
+                if (mobileMenuToggle && navLinks) {
+                    mobileMenuToggle.addEventListener('click', function() {
+                        navLinks.classList.toggle('mobile-open');
+                        const icon = mobileMenuToggle.querySelector('i');
+                        icon.className = navLinks.classList.contains('mobile-open') ? 'fas fa-times' : 'fas fa-bars';
+                    });
+                }
+            });
+        </script>
 
         <!-- Hero Section -->
         <section class="hero">
@@ -576,9 +790,10 @@ $currentUrl = BASE_URL . '/index.php';
             
             // Preload critical scripts
             const scripts = [
-                'assets/js/landing.js?v=<?php echo filemtime(__DIR__ . '/assets/js/landing.js'); ?>',
+                <?php if (file_exists(__DIR__ . '/assets/js/app.js')): ?>
                 'assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>'
-            ];
+                <?php endif; ?>
+            ].filter(Boolean);
             
             scripts.forEach(src => {
                 const link = document.createElement('link');
@@ -591,20 +806,18 @@ $currentUrl = BASE_URL . '/index.php';
     </script>
     
     <!-- Optimized JavaScript -->
-    <script src="assets/optimized.js?v=<?php echo filemtime(__DIR__ . '/assets/optimized.js'); ?>" defer></script>
-    
-    <!-- Performance Enhancements -->
-    <script src="assets/js/performance-enhancements.js?v=<?php echo filemtime(__DIR__ . '/assets/js/performance-enhancements.js'); ?>" defer></script>
-    <script src="assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>" defer></script>
-    
-    <!-- Advanced Features (if available) -->
-    <?php if (file_exists(__DIR__ . '/assets/js/advanced-features.js')): ?>
-    <script src="assets/js/advanced-features.js?v=<?php echo filemtime(__DIR__ . '/assets/js/advanced-features.js'); ?>" defer></script>
+    <?php if (file_exists(__DIR__ . '/assets/js/optimized-app.js')): ?>
+    <script src="assets/js/optimized-app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/optimized-app.js'); ?>" defer></script>
     <?php endif; ?>
     
-    <!-- Performance Optimizer (if available) -->
-    <?php if (file_exists(__DIR__ . '/assets/js/performance-optimizer.js')): ?>
-    <script src="assets/js/performance-optimizer.js?v=<?php echo filemtime(__DIR__ . '/assets/js/performance-optimizer.js'); ?>" defer></script>
+    <!-- Performance Enhancements -->
+    <?php if (file_exists(__DIR__ . '/assets/js/app.js')): ?>
+    <script src="assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>" defer></script>
+    <?php endif; ?>
+    
+    <!-- Advanced Features (if available) -->
+    <?php if (file_exists(__DIR__ . '/assets/js/theme.js')): ?>
+    <script src="assets/js/theme.js?v=<?php echo filemtime(__DIR__ . '/assets/js/theme.js'); ?>" defer></script>
     <?php endif; ?>
     
     <!-- Load non-critical CSS asynchronously -->
@@ -640,12 +853,16 @@ $currentUrl = BASE_URL . '/index.php';
                 if (!document.querySelector('link[href*="fonts.googleapis"][media="all"]')) {
                     loadCSS('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap', null, 'all', {crossorigin: 'anonymous'});
                 }
+                <?php if (file_exists(__DIR__ . '/assets/css/style.css')): ?>
                 if (!document.querySelector('link[href*="style.css"][media="all"]')) {
                     loadCSS('assets/css/style.css?v=<?php echo filemtime(__DIR__ . '/assets/css/style.css'); ?>');
                 }
+                <?php endif; ?>
+                <?php if (file_exists(__DIR__ . '/assets/css/landing.css')): ?>
                 if (!document.querySelector('link[href*="landing.css"][media="all"]')) {
                     loadCSS('assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>');
                 }
+                <?php endif; ?>
             });
         }
     </script>

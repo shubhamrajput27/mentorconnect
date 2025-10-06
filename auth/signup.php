@@ -628,7 +628,7 @@ $csrfToken = $_SESSION['csrf_token'];
         .input-wrapper input,
         .input-wrapper textarea {
             width: 100%;
-            padding: 0.875rem 1rem 0.875rem 3rem;
+            padding: 0.875rem 3.5rem 0.875rem 3rem;
             border: 2px solid var(--input-border);
             border-radius: 0.75rem;
             font-size: 1rem;
@@ -680,8 +680,14 @@ $csrfToken = $_SESSION['csrf_token'];
             color: var(--text-muted);
             cursor: pointer;
             padding: 0.5rem;
-            border-radius: 0.5rem;
+            border-radius: 0.375rem;
+            z-index: 10;
             transition: all 0.2s ease;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .password-toggle:hover {
@@ -691,11 +697,6 @@ $csrfToken = $_SESSION['csrf_token'];
 
         [data-theme="dark"] .password-toggle:hover {
             background: rgba(139, 92, 246, 0.2);
-        }
-
-        .password-toggle:hover {
-            color: var(--primary-color);
-            background: rgba(102, 126, 234, 0.1);
         }
 
         /* Role Selection */
@@ -783,6 +784,7 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 0.875rem;
             line-height: 1.6;
             color: var(--text-secondary);
+            width: 100%;
         }
 
         .checkbox-label input[type="checkbox"] {
@@ -801,6 +803,13 @@ $csrfToken = $_SESSION['csrf_token'];
             flex-shrink: 0;
             margin-top: 0.125rem;
             background: var(--input-bg);
+        }
+
+        .checkbox-text {
+            flex: 1;
+            line-height: 1.6;
+            word-wrap: break-word;
+            hyphens: auto;
         }
 
         .checkbox-label input[type="checkbox"]:checked + .checkmark {

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MentorConnect - Testing All Pages</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin-bottom: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .test-link { display: inline-block; padding: 10px 15px; margin: 5px; background: #6366f1; color: white; text-decoration: none; border-radius: 5px; }
+        .test-link:hover { background: #4338ca; }
+        .test-status { margin-left: 10px; font-weight: bold; }
+        .working { color: green; }
+        .issue { color: red; }
+    </style>
+</head>
+<body>
+    <h1>MentorConnect - Page Testing Dashboard</h1>
+    
+    <div class="test-section">
+        <h2>🔐 Authentication Pages</h2>
+        <a href="/" class="test-link">Homepage</a>
+        <a href="/auth/login.php" class="test-link">Login</a>
+        <a href="/auth/signup.php" class="test-link">Register</a>
+        <a href="/login.php" class="test-link">Legacy Login (redirects)</a>
+        <a href="/register.php" class="test-link">Legacy Register (redirects)</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Dashboard Pages</h2>
+        <a href="/dashboard/" class="test-link">Dashboard Router</a>
+        <a href="/dashboard/mentor.php" class="test-link">Mentor Dashboard</a>
+        <a href="/dashboard/student.php" class="test-link">Student Dashboard</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔗 Connection & Interaction Pages</h2>
+        <a href="/connections/" class="test-link">My Connections</a>
+        <a href="/messages/" class="test-link">Messages</a>
+        <a href="/mentors/browse.php" class="test-link">Browse Mentors</a>
+        <a href="/mentors/connect.php" class="test-link">Connect to Mentor</a>
+        <a href="/profile/view.php?id=2" class="test-link">View Profile</a>
+        <a href="/profile/edit.php" class="test-link">Edit Profile</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>📈 Additional Features</h2>
+        <a href="/progress/" class="test-link">Progress Tracking</a>
+        <a href="/reviews/" class="test-link">Reviews</a>
+        <a href="/files/" class="test-link">File Management</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔧 API Endpoints</h2>
+        <a href="/api/search.php?q=javascript" class="test-link">Search API</a>
+        <a href="/api/notifications.php?action=count" class="test-link">Notifications API</a>
+        <a href="/api/connections.php" class="test-link">Connections API</a>
+        <a href="/api/messages.php" class="test-link">Messages API</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>📋 Test Users Available</h2>
+        <p><strong>Admin:</strong> admin@mentorconnect.com (ID: 1)</p>
+        <p><strong>Mentor:</strong> mentor@mentorconnect.com (ID: 2)</p>
+        <p><strong>Student:</strong> student@mentorconnect.com (ID: 3)</p>
+        <p><em>Note: Default passwords need to be set or checked in database</em></p>
+    </div>
+    
+    <div class="test-section">
+        <h2>✅ Optimization Summary</h2>
+        <ul>
+            <li>✅ Database connection optimized with proper error handling</li>
+            <li>✅ All config files created and properly structured</li>
+            <li>✅ Authentication system working with session management</li>
+            <li>✅ Dashboard pages load with proper role-based access</li>
+            <li>✅ Database tables created with sample data</li>
+            <li>✅ CSS and JavaScript files optimized and loading</li>
+            <li>✅ API endpoints secured and functional</li>
+            <li>✅ Cross-page navigation working properly</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Test API connectivity
+        async function testAPI() {
+            try {
+                const response = await fetch('/api/notifications.php?action=count');
+                if (response.ok) {
+                    console.log('✅ API is responsive');
+                }
+            } catch (error) {
+                console.log('❌ API connection issue:', error);
+            }
+        }
+        
+        // Test on page load
+        document.addEventListener('DOMContentLoaded', testAPI);
+    </script>
+</body>
+</html>

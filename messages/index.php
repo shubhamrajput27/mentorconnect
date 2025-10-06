@@ -1,5 +1,5 @@
 <?php
-require_once '../config/config.php';
+require_once '../config/optimized-config.php';
 requireLogin();
 
 $user = getCurrentUser();
@@ -8,20 +8,20 @@ $user = getCurrentUser();
 $conversations = fetchAll(
     "SELECT 
         CASE 
-            WHEN m.sender_id = ? THEN m.receiver_id 
+            WHEN m.sender_id = ? THEN m.recipient_id 
             ELSE m.sender_id 
         END as contact_id,
         u.first_name, u.last_name, u.profile_photo,
         MAX(m.created_at) as last_message_time,
         (SELECT message FROM messages m2 
-         WHERE (m2.sender_id = ? AND m2.receiver_id = contact_id) 
-            OR (m2.sender_id = contact_id AND m2.receiver_id = ?)
+         WHERE (m2.sender_id = ? AND m2.recipient_id = contact_id) 
+            OR (m2.sender_id = contact_id AND m2.recipient_id = ?)
          ORDER BY m2.created_at DESC LIMIT 1) as last_message,
         (SELECT COUNT(*) FROM messages m3 
-         WHERE m3.sender_id = contact_id AND m3.receiver_id = ? AND m3.is_read = FALSE) as unread_count
+         WHERE m3.sender_id = contact_id AND m3.recipient_id = ? AND m3.is_read = FALSE) as unread_count
      FROM messages m
-     JOIN users u ON (CASE WHEN m.sender_id = ? THEN m.receiver_id ELSE m.sender_id END) = u.id
-     WHERE m.sender_id = ? OR m.receiver_id = ?
+     JOIN users u ON (CASE WHEN m.sender_id = ? THEN m.recipient_id ELSE m.sender_id END) = u.id
+     WHERE m.sender_id = ? OR m.recipient_id = ?
      GROUP BY contact_id, u.first_name, u.last_name, u.profile_photo
      ORDER BY last_message_time DESC",
     [$user['id'], $user['id'], $user['id'], $user['id'], $user['id'], $user['id'], $user['id']]

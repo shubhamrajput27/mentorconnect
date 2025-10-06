@@ -1,10 +1,23 @@
--- MentorConnect Database Schema
--- Simple database setup for the mentorship platform
+-- MentorConnect Database - Complete Schema and Data
+-- This is the single comprehensive database file for the MentorConnect application
 
--- Drop and recreate database to avoid conflicts
-DROP DATABASE IF EXISTS mentorconnect;
-CREATE DATABASE mentorconnect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS mentorconnect CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE mentorconnect;
+
+-- Drop tables if they exist (in reverse order due to foreign key constraints)
+DROP TABLE IF EXISTS activities;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS user_sessions;
+DROP TABLE IF EXISTS user_preferences;
+DROP TABLE IF EXISTS files;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS user_skills;
+DROP TABLE IF EXISTS skills;
+DROP TABLE IF EXISTS mentor_mentee_connections;
+DROP TABLE IF EXISTS mentor_profiles;
+DROP TABLE IF EXISTS users;
 
 -- Users table
 CREATE TABLE users (
@@ -16,51 +29,91 @@ CREATE TABLE users (
     last_name VARCHAR(50) NOT NULL,
     role ENUM('student', 'mentor', 'admin') DEFAULT 'student',
     status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
-    email_verified BOOLEAN DEFAULT FALSE, -- Changed to FALSE for better security
+    email_verified BOOLEAN DEFAULT FALSE,
     bio TEXT,
     profile_photo VARCHAR(255),
     phone VARCHAR(20),
     location VARCHAR(200),
     timezone VARCHAR(50) DEFAULT 'UTC',
-    remember_token VARCHAR(255) NULL, -- Added for remember me functionality
+    remember_token VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Mentor profiles table
+CREATE TABLE mentor_profiles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNIQUE NOT NULL,
+    title VARCHAR(200),
+    company VARCHAR(200),
+    experience_years INT,
+    hourly_rate DECIMAL(10,2),
+    rating DECIMAL(3,2) DEFAULT 0.00,
+    bio TEXT,
+    specialties TEXT,
+    availability JSON,
+    is_verified BOOLEAN DEFAULT TRUE,
+    total_sessions INT DEFAULT 0,
+    languages VARCHAR(255),
+    education TEXT,
+    certifications TEXT,
+    linkedin_url VARCHAR(255),
+    github_url VARCHAR(255),
+    portfolio_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_email (email),
-    INDEX idx_username (username),
-    INDEX idx_role_status (role, status),
-    INDEX idx_remember_token (remember_token)
-);
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Mentor-mentee connections table
+CREATE TABLE mentor_mentee_connections (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    mentor_id INT NOT NULL,
+    mentee_id INT NOT NULL,
+    status ENUM('pending', 'active', 'inactive', 'rejected') DEFAULT 'pending',
+    connection_type VARCHAR(50) DEFAULT 'mentorship',
+    request_message TEXT,
+    response_message TEXT,
+    goals TEXT,
+    start_date DATE,
+    requested_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_connection (mentor_id, mentee_id),
+    FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (mentee_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- Skills table
 CREATE TABLE skills (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL,
-    category VARCHAR(50) NOT NULL,
+    name VARCHAR(100) UNIQUE NOT NULL,
     description TEXT,
+    category VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) ENGINE=InnoDB;
 
--- User skills junction table
+-- User skills table
 CREATE TABLE user_skills (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     skill_id INT NOT NULL,
-    proficiency_level TINYINT DEFAULT 1,
-    skill_type ENUM('learning', 'teaching', 'both') DEFAULT 'both',
+    proficiency_level ENUM('beginner', 'intermediate', 'advanced', 'expert') DEFAULT 'beginner',
+    years_experience INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY user_skill (user_id, skill_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (skill_id) REFERENCES skills(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_skill (user_id, skill_id)
-);
+    FOREIGN KEY (skill_id) REFERENCES skills(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- Sessions table
 CREATE TABLE sessions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     mentor_id INT NOT NULL,
-    student_id INT NOT NULL,
+    mentee_id INT NOT NULL,
     title VARCHAR(200) NOT NULL,
     description TEXT,
-    scheduled_at DATETIME NOT NULL,
+    session_date DATETIME NOT NULL,
     duration_minutes INT DEFAULT 60,
     status ENUM('scheduled', 'completed', 'cancelled', 'no_show') DEFAULT 'scheduled',
     meeting_link VARCHAR(500),
@@ -68,25 +121,22 @@ CREATE TABLE sessions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (mentor_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
-);
+    FOREIGN KEY (mentee_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- Messages table
 CREATE TABLE messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
-    recipient_id INT NOT NULL,
+    receiver_id INT NOT NULL,
     subject VARCHAR(200),
-    content TEXT NOT NULL,
-    message TEXT NOT NULL, -- Added for compatibility with existing API
+    message TEXT NOT NULL,
     is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP NULL,
     FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (recipient_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_sender_recipient (sender_id, recipient_id),
-    INDEX idx_recipient_read (recipient_id, is_read),
-    INDEX idx_created_at (created_at)
-);
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- Reviews table
 CREATE TABLE reviews (
@@ -94,13 +144,13 @@ CREATE TABLE reviews (
     reviewer_id INT NOT NULL,
     reviewee_id INT NOT NULL,
     session_id INT,
-    rating TINYINT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (reviewee_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE SET NULL
-);
+) ENGINE=InnoDB;
 
 -- Files table
 CREATE TABLE files (
@@ -113,35 +163,33 @@ CREATE TABLE files (
     mime_type VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
 
 -- User preferences table
 CREATE TABLE user_preferences (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    theme ENUM('light', 'dark') DEFAULT 'light',
-    language VARCHAR(10) DEFAULT 'en',
-    timezone VARCHAR(50) DEFAULT 'UTC',
-    email_notifications BOOLEAN DEFAULT TRUE,
-    push_notifications BOOLEAN DEFAULT TRUE,
+    preference_key VARCHAR(100) NOT NULL,
+    preference_value TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_preferences (user_id)
-);
+    UNIQUE KEY user_preference (user_id, preference_key),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
--- User sessions table for tracking active sessions
+-- User sessions table
 CREATE TABLE user_sessions (
     id VARCHAR(128) PRIMARY KEY,
-    user_id INT NOT NULL,
+    user_id INT,
     ip_address VARCHAR(45),
     user_agent TEXT,
+    payload LONGTEXT NOT NULL,
+    last_activity INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
 
--- Activities table for logging user actions
+-- Activities table
 CREATE TABLE activities (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -152,50 +200,87 @@ CREATE TABLE activities (
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
 
 -- Notifications table
 CREATE TABLE notifications (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    title VARCHAR(200) NOT NULL,
-    message TEXT,
-    data JSON,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) DEFAULT 'info',
     is_read BOOLEAN DEFAULT FALSE,
+    action_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     read_at TIMESTAMP NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
+
+-- Insert sample data
+INSERT INTO users (username, email, password_hash, first_name, last_name, role, status, email_verified) VALUES
+('admin', 'admin@mentorconnect.com', '.PV.rH7j0/kdvLQcTjX13Ba', 'Admin', 'User', 'admin', 'active', 1),
+('mentor1', 'mentor@mentorconnect.com', '.rBsyfjJHNOW24/IdWFo9M3uT0NjPXrFUI2LYnz5Gq', 'John', 'Mentor', 'mentor', 'active', 1),
+('student1', 'student@mentorconnect.com', '/LS/aTMR911uuYh7aobbnPyxFe5HnW', 'Jane', 'Student', 'student', 'active', 1);
 
 -- Insert sample skills
-INSERT IGNORE INTO skills (name, category, description) VALUES
-('JavaScript', 'Programming', 'Modern JavaScript programming language'),
-('Python', 'Programming', 'Python programming language'),
-('React', 'Frontend', 'React JavaScript library'),
-('Node.js', 'Backend', 'Node.js runtime environment'),
-('MySQL', 'Database', 'MySQL database management'),
-('Project Management', 'Business', 'Project management skills'),
-('UI/UX Design', 'Design', 'User interface and experience design'),
-('Data Science', 'Analytics', 'Data analysis and machine learning'),
-('Digital Marketing', 'Marketing', 'Online marketing strategies'),
-('Leadership', 'Soft Skills', 'Team leadership and management');
+INSERT INTO skills (name, description, category) VALUES
+('JavaScript', 'Programming language for web development', 'Programming'),
+('Python', 'High-level programming language', 'Programming'),
+('React', 'JavaScript library for building user interfaces', 'Frontend'),
+('Node.js', 'JavaScript runtime for server-side development', 'Backend'),
+('PHP', 'Server-side scripting language', 'Backend'),
+('MySQL', 'Relational database management system', 'Database'),
+('HTML/CSS', 'Markup and styling for web pages', 'Frontend'),
+('Git', 'Version control system', 'Tools'),
+('Docker', 'Containerization platform', 'DevOps'),
+('AWS', 'Amazon Web Services cloud platform', 'Cloud'),
+('Machine Learning', 'Artificial intelligence and data science', 'Data Science'),
+('UI/UX Design', 'User interface and experience design', 'Design'),
+('Project Management', 'Managing projects and teams', 'Management'),
+('Digital Marketing', 'Online marketing strategies', 'Marketing'),
+('Data Analysis', 'Analyzing and interpreting data', 'Data Science'),
+('Mobile Development', 'iOS and Android app development', 'Mobile'),
+('Cybersecurity', 'Information security and protection', 'Security'),
+('Blockchain', 'Distributed ledger technology', 'Technology'),
+('DevOps', 'Development and operations practices', 'DevOps'),
+('API Development', 'Building and integrating APIs', 'Backend');
 
--- Insert default admin user
--- Password: admin123
-INSERT IGNORE INTO users (username, email, password_hash, first_name, last_name, role, status, email_verified) VALUES
-('admin', 'admin@mentorconnect.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Admin', 'User', 'admin', 'active', TRUE);
+-- Performance indexes
+CREATE INDEX idx_users_role_status ON users(role, status);
+CREATE INDEX idx_users_email_verified ON users(email_verified);
+CREATE INDEX idx_users_created_at ON users(created_at);
+CREATE INDEX idx_users_remember_token ON users(remember_token);
 
--- Insert sample mentor user
--- Password: mentor123
-INSERT IGNORE INTO users (username, email, password_hash, first_name, last_name, role, status, email_verified) VALUES
-('mentor1', 'mentor@mentorconnect.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'John', 'Mentor', 'mentor', 'active', TRUE);
+CREATE INDEX idx_connections_mentor ON mentor_mentee_connections(mentor_id);
+CREATE INDEX idx_connections_mentee ON mentor_mentee_connections(mentee_id);
+CREATE INDEX idx_connections_status ON mentor_mentee_connections(status);
 
--- Insert sample student user
--- Password: student123
-INSERT IGNORE INTO users (username, email, password_hash, first_name, last_name, role, status, email_verified) VALUES
-('student1', 'student@mentorconnect.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Jane', 'Student', 'student', 'active', TRUE);
+CREATE INDEX idx_sessions_mentor_date ON sessions(mentor_id, session_date);
+CREATE INDEX idx_sessions_mentee_date ON sessions(mentee_id, session_date);
+CREATE INDEX idx_sessions_status_date ON sessions(status, session_date);
 
--- Create user preferences for all users
-INSERT IGNORE INTO user_preferences (user_id) 
-SELECT id FROM users WHERE id NOT IN (SELECT user_id FROM user_preferences);
+CREATE INDEX idx_messages_conversation ON messages(sender_id, receiver_id, created_at);
+CREATE INDEX idx_messages_unread ON messages(receiver_id, is_read, created_at);
+
+CREATE INDEX idx_reviews_reviewee_rating ON reviews(reviewee_id, rating);
+CREATE INDEX idx_reviews_session ON reviews(session_id);
+
+CREATE INDEX idx_files_user_created ON files(user_id, created_at);
+CREATE INDEX idx_files_mime_type ON files(mime_type);
+
+CREATE INDEX idx_user_skills_skill_proficiency ON user_skills(skill_id, proficiency_level);
+CREATE INDEX idx_user_skills_user_proficiency ON user_skills(user_id, proficiency_level);
+
+CREATE INDEX idx_activities_user_type_date ON activities(user_id, activity_type, created_at);
+
+CREATE INDEX idx_notifications_user_read_date ON notifications(user_id, is_read, created_at);
+
+CREATE INDEX idx_user_sessions_user ON user_sessions(user_id);
+CREATE INDEX idx_user_sessions_activity ON user_sessions(last_activity);
+
+-- Full-text search indexes
+ALTER TABLE users ADD FULLTEXT(first_name, last_name, bio);
+ALTER TABLE sessions ADD FULLTEXT(title, description);
+ALTER TABLE skills ADD FULLTEXT(name, description);
+
+-- Database setup completed successfully!

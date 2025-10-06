@@ -499,7 +499,7 @@ $csrfToken = generateCSRFToken();
 
         .input-wrapper input {
             width: 100%;
-            padding: 0.875rem 2.5rem 0.875rem 3rem;
+            padding: 0.875rem 3.5rem 0.875rem 3rem;
             border: 2px solid var(--input-border);
             border-radius: 0.75rem;
             font-size: 1rem;
@@ -526,19 +526,19 @@ $csrfToken = generateCSRFToken();
 
         .password-toggle {
             position: absolute;
-            right: 0.5rem;
+            right: 1rem;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            padding: 0.25rem;
+            padding: 0.5rem;
             border-radius: 0.375rem;
             z-index: 10;
             transition: all 0.2s ease;
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 2rem;
+            height: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
