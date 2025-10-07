@@ -39,3 +39,7 @@ The README.md will automatically display these images once they're added to this
 ### Landing Page
 ![Landing Page](landing-page.png)
 *Main landing page showing the MentorConnect platform overview*
+
+### Admin Dashboard
+![Admin Dashboard](dashboard.png)
+*Admin dashboard with comprehensive analytics and user management interface*

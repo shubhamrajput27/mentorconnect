@@ -25,7 +25,6 @@ switch ($user['role']) {
         exit;
     
     case 'admin':
-        // Future admin dashboard
         header('Location: admin.php');
         exit;
     
