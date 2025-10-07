@@ -2,12 +2,7 @@
 
 **A modern mentorship platform connecting students with expert mentors worldwide**
 
-[![Live Demo](https://img.shields.io/badge/Dem<td width="50%">
-
-### 🔒 **S- 📈 Analytics dashboard
-- 🏆 Achievement system
-- 📋 Session managementrity & Performance**  
-- 🛡️ Advanced security measuresve%20Site-brightgreen?style=for-the-badge)](http://localhost/mentorconnect)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-brightgreen?style=for-the-badge)](http://localhost/mentorconnect)
 [![PHP Version](https://img.shields.io/badge/PHP-8.4+-blue?style=for-the-badge)](https://php.net/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![PWA Ready](https://img.shields.io/badge/PWA-Ready-purple?style=for-the-badge)](https://web.dev/progressive-web-apps/)
