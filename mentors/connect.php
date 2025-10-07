@@ -15,7 +15,7 @@ if (!$mentorId) {
     exit;
 }
 
-// Optimized mentor and connection check with single query
+// Check mentor and connection status
 $mentorData = fetchOne(
     "SELECT u.id, u.first_name, u.last_name, u.profile_photo, u.bio, u.status,
             mp.title, mp.company, mp.rating, mp.experience_years, mp.hourly_rate, mp.is_available,

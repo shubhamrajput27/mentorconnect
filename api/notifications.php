@@ -1,5 +1,5 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/database.php';
 require_once '../config/database-optimizer.php';
 require_once '../config/performance-monitor.php';
 

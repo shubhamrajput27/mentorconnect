@@ -1,82 +1,175 @@
 <?php
-// Advanced Analytics and Reporting System
-require_once '../config/optimized-config.php';
-require_once '../config/cache-manager.php';
+/**
+ * Analytics system for MentorConnect platform
+ */
+
+require_once '../config/database.php';
+require_once '../includes/functions.php';
 
 class AnalyticsEngine {
     private $db;
-    private $cache;
+    private $cachePrefix = 'analytics_';
+    private $defaultCacheTTL = 900; // 15 minutes
     
     public function __construct() {
-        $this->db = Database::getInstance()->getConnection();
-        $this->cache = Cache::getInstance();
+        try {
+            $this->db = getDB();
+        } catch (Exception $e) {
+            error_log('Analytics Engine DB Connection Error: ' . $e->getMessage());
+            throw new Exception('Database connection failed');
+        }
     }
     
     /**
-     * Get comprehensive dashboard analytics
+     * Get comprehensive dashboard analytics with improved caching
+     * 
+     * @param string $dateRange Date range filter (7_days, 30_days, 90_days, 1_year)
+     * @return array Analytics data array
+     * @throws Exception If data retrieval fails
      */
     public function getDashboardAnalytics($dateRange = '30_days') {
-        $cacheKey = "dashboard_analytics_{$dateRange}";
+        $cacheKey = $this->cachePrefix . "dashboard_{$dateRange}";
         
-        return $this->cache->remember($cacheKey, function() use ($dateRange) {
+        // Try to get cached data first
+        $cachedData = $this->getCachedData($cacheKey);
+        if ($cachedData !== null) {
+            return $cachedData;
+        }
+        
+        try {
             $dateFilter = $this->getDateFilter($dateRange);
             
-            return [
+            $analytics = [
                 'overview' => $this->getOverviewMetrics($dateFilter),
                 'user_growth' => $this->getUserGrowthMetrics($dateFilter),
                 'session_analytics' => $this->getSessionAnalytics($dateFilter),
-                'revenue_metrics' => $this->getRevenueMetrics($dateFilter),
                 'engagement_metrics' => $this->getEngagementMetrics($dateFilter),
-                'performance_metrics' => $this->getPerformanceMetrics($dateFilter),
-                'geographic_data' => $this->getGeographicData($dateFilter),
-                'top_skills' => $this->getTopSkills($dateFilter),
-                'mentor_performance' => $this->getMentorPerformance($dateFilter),
-                'completion_rates' => $this->getCompletionRates($dateFilter)
+                'completion_rates' => $this->getCompletionRates($dateFilter),
+                'generated_at' => date('c'),
+                'cache_ttl' => $this->defaultCacheTTL
             ];
-        }, 900); // Cache for 15 minutes
+            
+            // Cache the results
+            $this->setCachedData($cacheKey, $analytics, $this->defaultCacheTTL);
+            
+            return $analytics;
+            
+        } catch (Exception $e) {
+            error_log('Dashboard Analytics Error: ' . $e->getMessage());
+            throw new Exception('Failed to retrieve dashboard analytics');
+        }
     }
     
     /**
-     * Get overview metrics
+     * Simple file-based caching for analytics data
+     */
+    private function getCachedData($key) {
+        $cacheFile = sys_get_temp_dir() . '/mc_' . md5($key) . '.cache';
+        
+        if (file_exists($cacheFile)) {
+            $data = file_get_contents($cacheFile);
+            $cacheData = json_decode($data, true);
+            
+            if ($cacheData && isset($cacheData['expires']) && $cacheData['expires'] > time()) {
+                return $cacheData['data'];
+            }
+            
+            // Clean up expired cache
+            @unlink($cacheFile);
+        }
+        
+        return null;
+    }
+    
+    private function setCachedData($key, $data, $ttl = 900) {
+        $cacheFile = sys_get_temp_dir() . '/mc_' . md5($key) . '.cache';
+        
+        $cacheData = [
+            'data' => $data,
+            'expires' => time() + $ttl,
+            'created' => time()
+        ];
+        
+        @file_put_contents($cacheFile, json_encode($cacheData));
+    }
+
+    /**
+     * Get overview metrics with improved error handling
      */
     private function getOverviewMetrics($dateFilter) {
-        // Optimized: Use separate queries instead of complex JOINs for better performance
-        $cacheKey = "overview_metrics_" . md5($dateFilter['start_date']);
+        $cacheKey = $this->cachePrefix . "overview_" . md5($dateFilter['start_date']);
         
-        return $this->cache->remember($cacheKey, function() use ($dateFilter) {
-            // Users count
+        $cached = $this->getCachedData($cacheKey);
+        if ($cached !== null) {
+            return $cached;
+        }
+        
+        try {
+            // Check if users table exists and has the expected columns
+            $tableCheck = $this->db->query("SHOW TABLES LIKE 'users'");
+            if (!$tableCheck->fetch()) {
+                throw new Exception('Users table not found');
+            }
+            
+            // Users count with safe column handling
             $usersSql = "SELECT 
-                COUNT(CASE WHEN user_type = 'student' THEN 1 END) as total_students,
-                COUNT(CASE WHEN user_type = 'mentor' THEN 1 END) as total_mentors
-                FROM users WHERE created_at >= ? AND is_active = 1";
+                COUNT(CASE WHEN role = 'student' THEN 1 END) as total_students,
+                COUNT(CASE WHEN role = 'mentor' THEN 1 END) as total_mentors,
+                COUNT(*) as total_users
+                FROM users WHERE created_at >= ? AND (status = 'active' OR status IS NULL)";
             $stmt = $this->db->prepare($usersSql);
             $stmt->execute([$dateFilter['start_date']]);
-            $users = $stmt->fetch(PDO::FETCH_ASSOC);
+            $users = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['total_students' => 0, 'total_mentors' => 0, 'total_users' => 0];
             
-            // Sessions count
-            $sessionsSql = "SELECT 
-                COUNT(*) as total_sessions,
-                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_sessions,
-                SUM(CASE WHEN status = 'completed' THEN duration_minutes ELSE 0 END) as total_session_hours
-                FROM sessions WHERE scheduled_at >= ?";
-            $stmt = $this->db->prepare($sessionsSql);
-            $stmt->execute([$dateFilter['start_date']]);
-            $sessions = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Sessions count with table existence check
+            $sessions = ['total_sessions' => 0, 'completed_sessions' => 0, 'total_session_hours' => 0];
+            $sessionTableCheck = $this->db->query("SHOW TABLES LIKE 'sessions'");
+            if ($sessionTableCheck->fetch()) {
+                $sessionsSql = "SELECT 
+                    COUNT(*) as total_sessions,
+                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_sessions,
+                    SUM(CASE WHEN status = 'completed' THEN COALESCE(duration, 60) ELSE 0 END) as total_session_minutes
+                    FROM sessions WHERE created_at >= ?";
+                $stmt = $this->db->prepare($sessionsSql);
+                $stmt->execute([$dateFilter['start_date']]);
+                $sessions = $stmt->fetch(PDO::FETCH_ASSOC) ?: $sessions;
+                $sessions['total_session_hours'] = round(($sessions['total_session_minutes'] ?? 0) / 60, 2);
+            }
             
-            // Messages count
-            $messagesSql = "SELECT COUNT(*) as total_messages FROM messages WHERE created_at >= ?";
-            $stmt = $this->db->prepare($messagesSql);
-            $stmt->execute([$dateFilter['start_date']]);
-            $messages = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Messages count with table existence check
+            $messages = ['total_messages' => 0];
+            $messageTableCheck = $this->db->query("SHOW TABLES LIKE 'messages'");
+            if ($messageTableCheck->fetch()) {
+                $messagesSql = "SELECT COUNT(*) as total_messages FROM messages WHERE created_at >= ?";
+                $stmt = $this->db->prepare($messagesSql);
+                $stmt->execute([$dateFilter['start_date']]);
+                $messages = $stmt->fetch(PDO::FETCH_ASSOC) ?: $messages;
+            }
             
-            // Reviews count and average
-            $reviewsSql = "SELECT COUNT(*) as total_reviews, AVG(rating) as average_rating FROM reviews WHERE created_at >= ?";
-            $stmt = $this->db->prepare($reviewsSql);
-            $stmt->execute([$dateFilter['start_date']]);
-            $reviews = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Reviews count and average with table existence check
+            $reviews = ['total_reviews' => 0, 'average_rating' => 0];
+            $reviewTableCheck = $this->db->query("SHOW TABLES LIKE 'reviews'");
+            if ($reviewTableCheck->fetch()) {
+                $reviewsSql = "SELECT COUNT(*) as total_reviews, COALESCE(AVG(rating), 0) as average_rating FROM reviews WHERE created_at >= ?";
+                $stmt = $this->db->prepare($reviewsSql);
+                $stmt->execute([$dateFilter['start_date']]);
+                $reviews = $stmt->fetch(PDO::FETCH_ASSOC) ?: $reviews;
+                $reviews['average_rating'] = round($reviews['average_rating'], 2);
+            }
             
-            return array_merge($users, $sessions, $messages, $reviews);
-        }, 600); // Cache for 10 minutes
+            $result = array_merge($users, $sessions, $messages, $reviews);
+            $this->setCachedData($cacheKey, $result, 600);
+            return $result;
+            
+        } catch (Exception $e) {
+            error_log('Overview Metrics Error: ' . $e->getMessage());
+            // Return default values on error
+            return [
+                'total_students' => 0, 'total_mentors' => 0, 'total_users' => 0,
+                'total_sessions' => 0, 'completed_sessions' => 0, 'total_session_hours' => 0,
+                'total_messages' => 0, 'total_reviews' => 0, 'average_rating' => 0
+            ];
+        }
     }
     
     /**
@@ -322,7 +415,7 @@ class AnalyticsEngine {
     }
     
     /**
-     * Generate custom report
+     * Generate custom report with basic metrics
      */
     public function generateCustomReport($reportConfig) {
         $reportId = uniqid('report_');
@@ -333,32 +426,45 @@ class AnalyticsEngine {
             'data' => []
         ];
         
-        // Process each metric in the report config
-        foreach ($reportConfig['metrics'] as $metric) {
-            $reportData['data'][$metric] = $this->getMetricData($metric, $reportConfig);
+        try {
+            $dateFilter = $this->getDateFilter($reportConfig['date_range'] ?? '30_days');
+            
+            // Process basic metrics only
+            $reportData['data'] = [
+                'overview' => $this->getOverviewMetrics($dateFilter),
+                'user_growth' => $this->getUserGrowthMetrics($dateFilter),
+                'completion_rates' => $this->getCompletionRates($dateFilter)
+            ];
+            
+            // Save report to cache
+            $this->setCachedData($this->cachePrefix . "report_{$reportId}", $reportData, 3600);
+            
+            return $reportData;
+            
+        } catch (Exception $e) {
+            error_log('Custom Report Error: ' . $e->getMessage());
+            throw new Exception('Failed to generate custom report');
         }
-        
-        // Save report to cache for later retrieval
-        $this->cache->set("report_{$reportId}", $reportData, 3600); // 1 hour
-        
-        return $reportData;
     }
     
     /**
-     * Export analytics data
+     * Export analytics data in supported formats
      */
     public function exportAnalytics($format = 'csv', $dateRange = '30_days') {
-        $data = $this->getDashboardAnalytics($dateRange);
-        
-        switch ($format) {
-            case 'csv':
-                return $this->exportToCSV($data);
-            case 'json':
-                return json_encode($data, JSON_PRETTY_PRINT);
-            case 'xlsx':
-                return $this->exportToExcel($data);
-            default:
-                throw new Exception("Unsupported export format: {$format}");
+        try {
+            $data = $this->getDashboardAnalytics($dateRange);
+            
+            switch ($format) {
+                case 'csv':
+                    return $this->exportToCSV($data);
+                case 'json':
+                    return json_encode($data, JSON_PRETTY_PRINT);
+                default:
+                    throw new Exception("Unsupported export format: {$format}. Supported formats: csv, json");
+            }
+        } catch (Exception $e) {
+            error_log('Export Analytics Error: ' . $e->getMessage());
+            throw new Exception('Failed to export analytics data');
         }
     }
     
@@ -376,18 +482,51 @@ class AnalyticsEngine {
     }
     
     /**
-     * Predictive analytics using simple trend analysis
+     * Basic trend analysis and insights
      */
     public function getPredictiveInsights($dateRange = '90_days') {
-        $historicalData = $this->getDashboardAnalytics($dateRange);
+        try {
+            $historicalData = $this->getDashboardAnalytics($dateRange);
+            
+            return [
+                'user_growth_trend' => $this->calculateBasicTrend($historicalData['user_growth'] ?? []),
+                'completion_trend' => $this->calculateBasicTrend($historicalData['completion_rates'] ?? []),
+                'insights_generated_at' => date('c')
+            ];
+        } catch (Exception $e) {
+            error_log('Predictive Insights Error: ' . $e->getMessage());
+            return [
+                'user_growth_trend' => 'stable',
+                'completion_trend' => 'stable',
+                'error' => 'Unable to calculate trends'
+            ];
+        }
+    }
+    
+    /**
+     * Calculate basic trend from data array
+     */
+    private function calculateBasicTrend($data) {
+        if (empty($data) || !is_array($data)) {
+            return 'stable';
+        }
         
-        return [
-            'user_growth_trend' => $this->calculateGrowthTrend($historicalData['user_growth']),
-            'revenue_projection' => $this->projectRevenue($historicalData['revenue_metrics']),
-            'session_demand_forecast' => $this->forecastSessionDemand($historicalData['session_analytics']),
-            'churn_prediction' => $this->predictChurn(),
-            'capacity_planning' => $this->analyzeCapacity($historicalData)
-        ];
+        $values = array_column($data, 'total_new_users');
+        if (empty($values)) {
+            return 'stable';
+        }
+        
+        $firstHalf = array_slice($values, 0, floor(count($values) / 2));
+        $secondHalf = array_slice($values, floor(count($values) / 2));
+        
+        $firstAvg = array_sum($firstHalf) / count($firstHalf);
+        $secondAvg = array_sum($secondHalf) / count($secondHalf);
+        
+        $change = ($secondAvg - $firstAvg) / max($firstAvg, 1) * 100;
+        
+        if ($change > 10) return 'increasing';
+        if ($change < -10) return 'decreasing';
+        return 'stable';
     }
     
     // Helper methods
@@ -469,8 +608,13 @@ class AnalyticsEngine {
     
     private function checkCacheHealth() {
         try {
-            $this->cache->set('health_check', 'ok', 10);
-            return $this->cache->get('health_check') === 'ok' ? 'healthy' : 'error';
+            $testKey = $this->cachePrefix . 'health_check';
+            $testData = 'ok';
+            
+            $this->setCachedData($testKey, $testData, 10);
+            $result = $this->getCachedData($testKey);
+            
+            return $result === $testData ? 'healthy' : 'error';
         } catch (Exception $e) {
             return 'error';
         }

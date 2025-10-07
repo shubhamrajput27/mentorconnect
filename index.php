@@ -1,5 +1,5 @@
 <?php
-require_once 'config/optimized-config.php';
+require_once 'config/database.php';
 
 // Redirect to appropriate dashboard if already logged in
 if (isLoggedIn()) {
@@ -75,9 +75,9 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     
-    <!-- Optimized CSS Loading -->
-    <?php if (file_exists(__DIR__ . '/assets/css/optimized-critical.css')): ?>
-    <link rel="stylesheet" href="assets/css/optimized-critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimized-critical.css'); ?>">
+    <!-- Critical CSS Loading -->
+    <?php if (file_exists(__DIR__ . '/assets/css/critical.css')): ?>
+    <link rel="stylesheet" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>">
     <?php endif; ?>
     
     <!-- Performance & Security Headers -->
@@ -120,9 +120,9 @@ $currentUrl = BASE_URL . '/index.php';
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" crossorigin>
     </noscript>
     
-    <!-- Critical CSS Inline -->
-    <?php if (file_exists(__DIR__ . '/assets/css/optimized-critical.css')): ?>
-    <link rel="stylesheet" href="assets/css/optimized-critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/optimized-critical.css'); ?>">
+    <!-- Critical CSS -->
+    <?php if (file_exists(__DIR__ . '/assets/css/critical.css')): ?>
+    <link rel="stylesheet" href="assets/css/critical.css?v=<?php echo filemtime(__DIR__ . '/assets/css/critical.css'); ?>">
     <?php endif; ?>
     
     <!-- Main CSS with Async Loading -->
@@ -133,7 +133,7 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="stylesheet" href="assets/css/landing.css?v=<?php echo filemtime(__DIR__ . '/assets/css/landing.css'); ?>" media="print" onload="this.media='all'">
     <?php endif; ?>
     
-    <!-- Optimized Button Styles -->
+    <!-- Button Styles -->
     <style>
     .nav-links .btn{font-size:.9rem!important;padding:.75rem 1.5rem!important;font-weight:600!important;border-radius:25px!important;transition:all .3s cubic-bezier(.4,0,.2,1)!important;text-decoration:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:120px!important;position:relative!important;overflow:hidden!important}
     .nav-links .btn-primary{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%)!important;color:#fff!important;border:2px solid transparent!important;box-shadow:0 4px 12px rgba(99,102,241,.3),0 2px 4px rgba(0,0,0,.1)!important;text-shadow:0 1px 2px rgba(0,0,0,.1)!important}
@@ -780,7 +780,7 @@ $currentUrl = BASE_URL . '/index.php';
         </footer>
     </div>
 
-    <!-- JavaScript - Optimized Loading Strategy -->
+    <!-- JavaScript -->
     <!-- Critical JavaScript for above-the-fold functionality -->
     <script>
         // Critical theme initialization to prevent FOUC
@@ -805,14 +805,19 @@ $currentUrl = BASE_URL . '/index.php';
         })();
     </script>
     
-    <!-- Optimized JavaScript -->
-    <?php if (file_exists(__DIR__ . '/assets/js/optimized-app.js')): ?>
-    <script src="assets/js/optimized-app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/optimized-app.js'); ?>" defer></script>
+    <!-- Main Application JavaScript -->
+    <?php if (file_exists(__DIR__ . '/assets/js/main.js')): ?>
+    <script src="assets/js/main.js?v=<?php echo filemtime(__DIR__ . '/assets/js/main.js'); ?>" defer></script>
     <?php endif; ?>
     
     <!-- Performance Enhancements -->
     <?php if (file_exists(__DIR__ . '/assets/js/app.js')): ?>
     <script src="assets/js/app.js?v=<?php echo filemtime(__DIR__ . '/assets/js/app.js'); ?>" defer></script>
+    <?php endif; ?>
+    
+    <!-- Performance Enhancements -->
+    <?php if (file_exists(__DIR__ . '/assets/js/performance.js')): ?>
+    <script src="assets/js/performance.js?v=<?php echo filemtime(__DIR__ . '/assets/js/performance.js'); ?>" defer></script>
     <?php endif; ?>
     
     <!-- Advanced Features (if available) -->

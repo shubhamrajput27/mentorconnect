@@ -4,7 +4,7 @@
  * Automatically routes users to their appropriate dashboard based on role
  */
 
-require_once '../config/optimized-config.php';
+require_once '../config/database.php';
 
 // Check if user is logged in
 if (!isLoggedIn()) {

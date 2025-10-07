@@ -56,7 +56,7 @@ $orderBy = $sortOptions[$sortBy] ?? 'mp.rating DESC';
 
 $whereClause = implode(' AND ', $whereConditions);
 
-// Get mentors with optimized query and pagination
+// Get mentors with pagination
 $limit = min(intval($_GET['limit'] ?? 20), 50);
 $offset = max(0, intval($_GET['page'] ?? 0)) * $limit;
 
@@ -93,7 +93,7 @@ if ($skills === false || $skills === null) {
     }
 }
 
-// Optimize mentor skills with caching and single query
+// Get mentor skills
 $mentorSkills = [];
 if (!empty($mentors)) {
     $mentorIds = array_column($mentors, 'id');
@@ -127,7 +127,7 @@ if (!empty($mentors)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Mentors - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/connections-optimized.css">
+    <link rel="stylesheet" href="../assets/css/connections.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>

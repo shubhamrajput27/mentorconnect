@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - MentorConnect</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --background-color: #fafbfc;
+            --surface-color: #f1f5f9;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #ffffff;
+            --text-secondary: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--background-color) 0%, var(--surface-color) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="dark"] .offline-container {
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        .offline-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .offline-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .offline-message {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .retry-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .retry-button:hover {
+            background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .features-list {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .features-list h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .features-list i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .network-status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .status-online {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: #10b981;
+        }
+
+        .status-offline {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .checking {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .offline-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .offline-title {
+                font-size: 1.5rem;
+            }
+
+            .offline-message {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash" id="statusIcon"></i>
+        </div>
+        
+        <h1 class="offline-title">You're Offline</h1>
+        
+        <p class="offline-message">
+            It looks like you've lost your internet connection. Don't worry - you can still browse cached content and we'll reconnect you automatically when your connection is restored.
+        </p>
+        
+        <button class="retry-button" onclick="checkConnection()">
+            <i class="fas fa-refresh"></i>
+            Try Again
+        </button>
+        
+        <div class="network-status" id="networkStatus">
+            <div id="statusText">
+                <i class="fas fa-circle" style="color: #ef4444;"></i>
+                <strong>Connection Status:</strong> Offline
+            </div>
+        </div>
+        
+        <div class="features-list">
+            <h3>What you can still do:</h3>
+            <ul>
+                <li>
+                    <i class="fas fa-eye"></i>
+                    View previously loaded pages
+                </li>
+                <li>
+                    <i class="fas fa-bookmark"></i>
+                    Access cached mentor profiles
+                </li>
+                <li>
+                    <i class="fas fa-edit"></i>
+                    Draft messages (will send when online)
+                </li>
+                <li>
+                    <i class="fas fa-calendar"></i>
+                    View your schedule
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Font Awesome (from cache or CDN fallback) -->
+    <script>
+        // Load Font Awesome
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+
+        // Theme detection
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Connection monitoring
+        let isChecking = false;
+
+        function updateConnectionStatus(online) {
+            const statusIcon = document.getElementById('statusIcon');
+            const networkStatus = document.getElementById('networkStatus');
+            const statusText = document.getElementById('statusText');
+            
+            if (online) {
+                statusIcon.className = 'fas fa-wifi';
+                networkStatus.className = 'network-status status-online';
+                statusText.innerHTML = '<i class="fas fa-circle" style="color: #10b981;"></i> <strong>Connection Status:</strong> Online';
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                statusIcon.className = 'fas fa-wifi-slash';
+                networkStatus.className = 'network-status status-offline';
+                statusText.innerHTML = '<i class="fas fa-circle" style="color: #ef4444;"></i> <strong>Connection Status:</strong> Offline';
+            }
+        }
+
+        function checkConnection() {
+            if (isChecking) return;
+            
+            isChecking = true;
+            const statusIcon = document.getElementById('statusIcon');
+            const retryButton = document.querySelector('.retry-button');
+            
+            statusIcon.className = 'fas fa-spinner fa-spin';
+            retryButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            retryButton.disabled = true;
+            
+            // Try to fetch a small resource
+            fetch('/mentorconnect/assets/images/default-profile.svg', { 
+                method: 'HEAD',
+                cache: 'no-cache'
+            })
+            .then(response => {
+                if (response.ok) {
+                    updateConnectionStatus(true);
+                } else {
+                    throw new Error('Network response was not ok');
+                }
+            })
+            .catch(() => {
+                updateConnectionStatus(false);
+                retryButton.innerHTML = '<i class="fas fa-refresh"></i> Try Again';
+                retryButton.disabled = false;
+                statusIcon.className = 'fas fa-wifi-slash';
+            })
+            .finally(() => {
+                isChecking = false;
+            });
+        }
+
+        // Auto-check connection every 10 seconds
+        setInterval(() => {
+            if (!isChecking) {
+                fetch('/mentorconnect/assets/images/default-profile.svg', { 
+                    method: 'HEAD',
+                    cache: 'no-cache'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        updateConnectionStatus(true);
+                    }
+                })
+                .catch(() => {
+                    // Still offline
+                });
+            }
+        }, 10000);
+
+        // Listen for online/offline events
+        window.addEventListener('online', () => updateConnectionStatus(true));
+        window.addEventListener('offline', () => updateConnectionStatus(false));
+
+        // Initial connection check
+        setTimeout(checkConnection, 2000);
+    </script>
+</body>
+</html>

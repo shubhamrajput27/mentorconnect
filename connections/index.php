@@ -1,15 +1,15 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/database.php';
 requireLogin();
 
 $user = getCurrentUser();
 $pageTitle = 'My Connections';
 
-// Optimized connections data retrieval
+// Get connections data
 try {
     $userColumn = ($user['role'] === 'mentor') ? 'mentor_id' : 'mentee_id';
     
-    // Single optimized query for connections
+    // Get all connections
     $connections = fetchAll(
         "SELECT c.id, c.status, c.connection_type, c.request_message, c.goals, 
                 c.created_at, c.start_date, c.requested_by, c.response_message,
@@ -37,7 +37,7 @@ try {
         [$user['id']]
     );
     
-    // Single optimized query for stats
+    // Get connection statistics
     $statsResult = fetchOne(
         "SELECT 
             COUNT(*) as total_connections,
@@ -69,7 +69,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?> - <?php echo APP_NAME; ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/connections-optimized.css">
+    <link rel="stylesheet" href="../assets/css/connections.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -729,7 +729,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
     </style>
 
     <script>
-    // Optimized tab functionality with event delegation
+    // Tab functionality
     const tabsHeader = document.querySelector('.tabs-header');
     const tabContents = document.querySelectorAll('.tab-content');
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -771,7 +771,7 @@ $completedConnections = array_filter($connections, fn($c) => $c['status'] === 'c
         document.getElementById('responseForm').reset();
     }
 
-    // Optimized response submission with better UX
+    // Handle response submission
     function submitResponse() {
         const form = document.getElementById('responseForm');
         const submitButton = document.querySelector('.modal-footer .btn-primary');

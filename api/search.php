@@ -1,6 +1,6 @@
 <?php
 // Advanced Search Engine for MentorConnect
-require_once '../config/optimized-config.php';
+require_once '../config/database.php';
 require_once '../config/rate-limiter.php';
 
 header('Content-Type: application/json');
@@ -80,7 +80,7 @@ try {
 }
 
 function searchMentors($query, $limit, $offset) {
-    // Optimized: Use full-text search and better indexing strategy
+    // Perform search query
     $cacheKey = "mentor_search_" . md5($query . $limit . $offset);
     
     // Check cache first (if available)

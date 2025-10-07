@@ -1,5 +1,5 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/database.php';
 requireLogin();
 
 header('Content-Type: application/json');
@@ -87,7 +87,7 @@ try {
             ]);
             
         } elseif ($action === 'conversations') {
-            // Optimized: Use a more efficient query with proper indexing
+            // Get conversation messages
             $conversations = fetchAll(
                 "SELECT DISTINCT
                     CASE WHEN m.sender_id = ? THEN m.recipient_id ELSE m.sender_id END as contact_id,

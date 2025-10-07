@@ -1,0 +1,174 @@
+{
+  "name": "MentorConnect - Professional Mentorship Platform",
+  "short_name": "MentorConnect",
+  "description": "Connect with expert mentors and accelerate your career growth through personalized mentorship sessions.",
+  "start_url": "/mentorconnect/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "categories": ["education", "business", "productivity"],
+  "lang": "en",
+  "scope": "/mentorconnect/",
+  
+  "icons": [
+    {
+      "src": "assets/images/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "assets/images/screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "MentorConnect Desktop View"
+    },
+    {
+      "src": "assets/images/screenshot-narrow.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "MentorConnect Mobile View"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Find Mentors",
+      "short_name": "Find Mentors",
+      "description": "Browse and connect with expert mentors",
+      "url": "/mentorconnect/mentors/browse.php",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-search.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "My Dashboard",
+      "short_name": "Dashboard",
+      "description": "Access your mentorship dashboard",
+      "url": "/mentorconnect/dashboard/",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-dashboard.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "short_name": "Messages",
+      "description": "Check your messages",
+      "url": "/mentorconnect/messages/",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-messages.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  
+  "related_applications": [
+    {
+      "platform": "web",
+      "url": "https://mentorconnect.com"
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+mentorconnect",
+      "url": "/mentorconnect/connect?mentor=%s"
+    }
+  ],
+  
+  "file_handlers": [
+    {
+      "action": "/mentorconnect/files/",
+      "accept": {
+        "application/pdf": [".pdf"],
+        "text/plain": [".txt"],
+        "image/*": [".jpg", ".jpeg", ".png", ".gif"]
+      }
+    }
+  ],
+  
+  "share_target": {
+    "action": "/mentorconnect/share/",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "files",
+          "accept": ["image/*", "application/pdf"]
+        }
+      ]
+    }
+  },
+  
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "display_override": ["window-controls-overlay", "minimal-ui", "standalone", "browser"]
+}

@@ -298,6 +298,11 @@ function timeAgo($datetime) {
     return formatDate($datetime, 'M j, Y');
 }
 
+// Alias for consistency with other parts of the application
+function formatTimeAgo($datetime) {
+    return timeAgo($datetime);
+}
+
 // Generate random string
 function generateRandomString($length = 16) {
     return bin2hex(random_bytes($length / 2));

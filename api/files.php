@@ -1,5 +1,5 @@
 <?php
-require_once '../config/optimized-config.php';
+require_once '../config/database.php';
 requireLogin();
 
 header('Content-Type: application/json');
@@ -41,7 +41,7 @@ function handleDownload() {
         throw new Exception('File ID is required');
     }
     
-    // Check if user has access to this file (optimized with index hints)
+    // Check user file access
     $file = fetchOne(
         "SELECT f.*, u.first_name, u.last_name 
          FROM files f USE INDEX (PRIMARY, idx_uploader_public)
