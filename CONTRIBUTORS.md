@@ -4,31 +4,26 @@ We extend our heartfelt gratitude to all contributors who have made MentorConnec
 
 ## 🌟 Core Team
 
-### Original Creator & Project Owner
-**Shubham Singh** - [@shubhamrajput27](https://github.com/shubhamrajput27)
-- 🎯 **Role**: Founder, Creator & Lead Developer
+### Original Creator
+**Prachi Yadav** - [@PrachiYadav-16](https://github.com/PrachiYadav-16)
+- 🎯 **Role**: Founder & Original Developer
 - 💡 **Contributions**: 
-  - Original concept and vision for MentorConnect
-  - Initial project creation and development
+  - Initial concept and vision for MentorConnect
   - Core platform architecture design
   - Fundamental features implementation
   - User experience design principles
   - Database schema design
+
+### Current Lead Maintainer  
+**Shubham Singh** - [@shubhamrajput27](https://github.com/shubhamrajput27)
+- 🎯 **Role**: Lead Developer & Architect
+- 🚀 **Contributions**:
   - Performance optimization (100/100 Lighthouse scores)
   - Modern PWA implementation
   - Advanced security enhancements
   - Code refactoring and modernization
   - CI/CD pipeline improvements
   - Documentation enhancement
-
-### Key Contributor
-**Prachi Yadav** - [@PrachiYadav-16](https://github.com/PrachiYadav-16)
-- 🎯 **Role**: Development Contributor & Helper
-- 🤝 **Contributions**:
-  - Development assistance and support
-  - Code contributions and improvements
-  - Repository hosting during recovery period
-  - Collaborative development support
 
 ## 🤝 How to Contribute
 
