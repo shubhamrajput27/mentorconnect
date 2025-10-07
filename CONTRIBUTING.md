@@ -2,6 +2,8 @@
 
 We love your input! We want to make contributing to MentorConnect as easy and transparent as possible.
 
+**👥 See our [Contributors Page](CONTRIBUTORS.md) for detailed information about the team and recognition program.**
+
 ## Development Process
 
 1. Fork the repo

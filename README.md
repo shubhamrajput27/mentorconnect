@@ -244,7 +244,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🎓 MentorConnect - Empowering minds, building futures**
 
-Made with ❤️ by [Shubham](https://github.com/shubhamrajput27)
+**Collaborative Development:**
+- 🌟 **Original Creator**: [Prachi Yadav](https://github.com/PrachiYadav-16) - *Concept & Initial Development*
+- 🚀 **Current Maintainer**: [Shubham Singh](https://github.com/shubhamrajput27) - *Architecture & Optimization*
+- 🤝 **Open Source Community** - *Contributions & Support*
+
+Made with ❤️ through collaborative development
 
 [![GitHub Stars](https://img.shields.io/github/stars/shubhamrajput27/mentorconnect?style=social)](https://github.com/shubhamrajput27/mentorconnect/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/shubhamrajput27/mentorconnect?style=social)](https://github.com/shubhamrajput27/mentorconnect/network/members)
