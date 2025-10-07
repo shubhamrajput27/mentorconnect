@@ -3,7 +3,10 @@
 **A modern mentorship platform connecting students with expert mentors worldwide**
 
 [![Live Demo](https://img.shields.io/badge/Demo-Live%20Site-brightgreen?style=for-the-badge)](http://localhost/mentorconnect)
-[![PHP Version](https://img.shields.io/badge/PHP-8.4+-blue?style=for-the-badge)](https://php.net/)
+[![PHP Vers**Project Information:**
+- 🌟 **Original Creator & Owner**: [Shubham Singh](https://github.com/shubhamrajput27) - *Concept, Design & Development*
+- 🤝 **Key Contributor**: [Prachi Yadav](https://github.com/PrachiYadav-16) - *Development Assistance & Support*
+- 🌍 **Open Source Community** - *Additional Contributions & Support*(https://img.shields.io/badge/PHP-8.4+-blue?style=for-the-badge)](https://php.net/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 [![PWA Ready](https://img.shields.io/badge/PWA-Ready-purple?style=for-the-badge)](https://web.dev/progressive-web-apps/)
 
@@ -244,12 +247,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🎓 MentorConnect - Empowering minds, building futures**
 
-**Collaborative Development:**
-- 🌟 **Original Creator**: [Prachi Yadav](https://github.com/PrachiYadav-16) - *Concept & Initial Development*
-- 🚀 **Current Maintainer**: [Shubham Singh](https://github.com/shubhamrajput27) - *Architecture & Optimization*
-- 🤝 **Open Source Community** - *Contributions & Support*
+**Project Attribution:**
+- � **Original Creator & Owner**: [Shubham Singh](https://github.com/shubhamrajput27) - *Project Founder & Lead Developer*
+- 🤝 **Key Contributor**: [Prachi Yadav](https://github.com/PrachiYadav-16) - *Development Helper & Support*
+- 🌍 **Open Source Community** - *Additional Contributions*
 
-Made with ❤️ through collaborative development
+> **Repository Note**: This project was temporarily hosted under PrachiYadav-16's account during repository recovery, but remains the original creation and intellectual property of Shubham Singh.
+
+Created with ❤️ by Shubham Singh
 
 [![GitHub Stars](https://img.shields.io/github/stars/shubhamrajput27/mentorconnect?style=social)](https://github.com/shubhamrajput27/mentorconnect/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/shubhamrajput27/mentorconnect?style=social)](https://github.com/shubhamrajput27/mentorconnect/network/members)
