@@ -91,7 +91,7 @@ mentorconnect/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/PrachiYadav-16/mentorconnect.git
+   git clone https://github.com/shubhamrajput27/mentorconnect.git
    cd mentorconnect
    ```
 
@@ -232,8 +232,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - 📧 **Email**: support@mentorconnect.com
 - 💬 **Discord**: [Join our community](https://discord.gg/mentorconnect)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/PrachiYadav-16/mentorconnect/issues)
-- 📖 **Documentation**: [Wiki](https://github.com/PrachiYadav-16/mentorconnect/wiki)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/shubhamrajput27/mentorconnect/issues)
+- 📖 **Documentation**: [Wiki](https://github.com/shubhamrajput27/mentorconnect/wiki)
 
 ---
 
@@ -241,9 +241,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🎓 MentorConnect - Empowering minds, building futures**
 
-Made with ❤️ by [Prachi Yadav](https://github.com/PrachiYadav-16)
+Made with ❤️ by [Shubham](https://github.com/shubhamrajput27)
 
-[![GitHub Stars](https://img.shields.io/github/stars/PrachiYadav-16/mentorconnect?style=social)](https://github.com/PrachiYadav-16/mentorconnect/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/PrachiYadav-16/mentorconnect?style=social)](https://github.com/PrachiYadav-16/mentorconnect/network/members)
+[![GitHub Stars](https://img.shields.io/github/stars/shubhamrajput27/mentorconnect?style=social)](https://github.com/shubhamrajput27/mentorconnect/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/shubhamrajput27/mentorconnect?style=social)](https://github.com/shubhamrajput27/mentorconnect/network/members)
 
 </div>
