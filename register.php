@@ -11,6 +11,15 @@ exit();
 // Legacy code below (secured but deprecated)
 require_once 'config/database.php';
 
+// Validate password function
+function validatePassword($password) {
+    return strlen($password) >= 12 &&
+           preg_match('/[A-Z]/', $password) &&
+           preg_match('/[a-z]/', $password) &&
+           preg_match('/[0-9]/', $password) &&
+           preg_match('/[^A-Za-z0-9]/', $password);
+}
+
 $error = '';
 $success = '';
 
@@ -59,8 +68,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $success = "Registration successful! Please check your email to verify your account.";
                     
                     // Log the registration
-                    $userId = getLastInsertId();
-                    logActivity($userId, 'register', 'User registered via legacy form');
+                    $userId = $pdo->lastInsertId();
+                    if (function_exists('logActivity')) {
+                        logActivity($userId, 'register', 'User registered via legacy form');
+                    }
                 }
             } catch (Exception $e) {
                 error_log("Registration error: " . $e->getMessage());

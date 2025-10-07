@@ -44,6 +44,7 @@
             padding: 3rem;
             border-radius: 1rem;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
 
@@ -140,6 +141,14 @@
             background: rgba(239, 68, 68, 0.1);
             border-left-color: #ef4444;
         }
+        
+        .status-icon-offline {
+            color: #ef4444;
+        }
+        
+        .status-icon-online {
+            color: #10b981;
+        }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -184,7 +193,7 @@
         
         <div class="network-status" id="networkStatus">
             <div id="statusText">
-                <i class="fas fa-circle" style="color: #ef4444;"></i>
+                <i class="fas fa-circle status-icon-offline"></i>
                 <strong>Connection Status:</strong> Offline
             </div>
         </div>
@@ -236,7 +245,7 @@
             if (online) {
                 statusIcon.className = 'fas fa-wifi';
                 networkStatus.className = 'network-status status-online';
-                statusText.innerHTML = '<i class="fas fa-circle" style="color: #10b981;"></i> <strong>Connection Status:</strong> Online';
+                statusText.innerHTML = '<i class="fas fa-circle status-icon-online"></i> <strong>Connection Status:</strong> Online';
                 
                 setTimeout(() => {
                     window.location.reload();
@@ -244,7 +253,7 @@
             } else {
                 statusIcon.className = 'fas fa-wifi-slash';
                 networkStatus.className = 'network-status status-offline';
-                statusText.innerHTML = '<i class="fas fa-circle" style="color: #ef4444;"></i> <strong>Connection Status:</strong> Offline';
+                statusText.innerHTML = '<i class="fas fa-circle status-icon-offline"></i> <strong>Connection Status:</strong> Offline';
             }
         }
 
