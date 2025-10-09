@@ -37,6 +37,15 @@ desktop.ini
 *.backup
 *~
 
+# Documentation and report files (avoid creating unnecessary docs)
+*ANALYSIS*.md
+*PLAN*.md
+*REPORT*.md
+*GUIDE*.md
+*verification*.php
+*demo*.php
+*test*.php
+
 # Node modules (if you add any frontend build tools later)
 node_modules/
 npm-debug.log
