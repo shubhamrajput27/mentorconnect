@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (empty($error)) {
         try {
-            global $pdo;
+            $pdo = getDB();
             
             // Check if email already exists
             $stmt = $pdo->prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) LIMIT 1");

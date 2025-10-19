@@ -1,6 +1,6 @@
 <?php
 // Mentor-Mentee Connection Management API
-require_once '../config/config.php';
+require_once '../config/database.php';
 
 class ConnectionManager {
     private $db;

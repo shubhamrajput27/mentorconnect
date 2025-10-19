@@ -110,6 +110,9 @@ function checkRememberToken() {
     if (!isLoggedIn() && isset($_COOKIE['remember_token'])) {
         try {
             $pdo = getDB();
+            if (!$pdo) {
+                return false;
+            }
             $stmt = $pdo->prepare("SELECT id FROM users WHERE remember_token = ? AND status = 'active'");
             $stmt->execute([$_COOKIE['remember_token']]);
             $user = $stmt->fetch();
@@ -119,6 +122,8 @@ function checkRememberToken() {
                 return true;
             }
         } catch (PDOException $e) {
+            error_log("Error checking remember token: " . $e->getMessage());
+        } catch (Exception $e) {
             error_log("Error checking remember token: " . $e->getMessage());
         }
     }
@@ -321,10 +326,17 @@ function isAlphanumeric($string) {
 function executeQuery($sql, $params = []) {
     try {
         $pdo = getDB();
+        if (!$pdo) {
+            error_log("Database connection not available in executeQuery");
+            return false;
+        }
         $stmt = $pdo->prepare($sql);
         $result = $stmt->execute($params);
         return $stmt;
     } catch (PDOException $e) {
+        error_log("Database query error: " . $e->getMessage());
+        return false;
+    } catch (Exception $e) {
         error_log("Database query error: " . $e->getMessage());
         return false;
     }
@@ -334,10 +346,17 @@ function executeQuery($sql, $params = []) {
 function fetchOne($sql, $params = []) {
     try {
         $pdo = getDB();
+        if (!$pdo) {
+            error_log("Database connection not available in fetchOne");
+            return null;
+        }
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetch();
     } catch (PDOException $e) {
+        error_log("Database fetch error: " . $e->getMessage());
+        return null;
+    } catch (Exception $e) {
         error_log("Database fetch error: " . $e->getMessage());
         return null;
     }
@@ -347,10 +366,17 @@ function fetchOne($sql, $params = []) {
 function fetchAll($sql, $params = []) {
     try {
         $pdo = getDB();
+        if (!$pdo) {
+            error_log("Database connection not available in fetchAll");
+            return [];
+        }
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
     } catch (PDOException $e) {
+        error_log("Database fetch error: " . $e->getMessage());
+        return [];
+    } catch (Exception $e) {
         error_log("Database fetch error: " . $e->getMessage());
         return [];
     }
@@ -410,5 +436,80 @@ function includeFooter($additionalJS = []) {
     include __DIR__ . '/../templates/footer.php';
 }
 
-// Check remember me token on every page load
-checkRememberToken();
+/**
+ * Notification Functions
+ */
+
+// Create a notification for a user
+function createNotification($userId, $type, $title, $message, $relatedId = null) {
+    try {
+        $pdo = getDB();
+        if (!$pdo) {
+            error_log("Database connection not available in createNotification");
+            return false;
+        }
+        
+        $stmt = $pdo->prepare("
+            INSERT INTO notifications (user_id, type, title, message, related_id, created_at) 
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        
+        return $stmt->execute([$userId, $type, $title, $message, $relatedId]);
+    } catch (PDOException $e) {
+        error_log("Error creating notification: " . $e->getMessage());
+        return false;
+    } catch (Exception $e) {
+        error_log("Error creating notification: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * File Upload Functions
+ */
+
+// Upload a file with validation
+function uploadFile($file, $allowedTypes = [], $maxSize = null) {
+    if (!isset($file) || $file['error'] !== UPLOAD_ERR_OK) {
+        return ['success' => false, 'error' => 'File upload failed'];
+    }
+    
+    // Use defined constants or defaults
+    $maxFileSize = $maxSize ?? UPLOAD_MAX_SIZE;
+    $allowedFileTypes = !empty($allowedTypes) ? $allowedTypes : UPLOAD_ALLOWED_TYPES;
+    
+    // Check file size
+    if ($file['size'] > $maxFileSize) {
+        return ['success' => false, 'error' => 'File size exceeds maximum allowed size'];
+    }
+    
+    // Get file extension
+    $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    
+    // Check file type
+    if (!in_array($fileExtension, $allowedFileTypes)) {
+        return ['success' => false, 'error' => 'File type not allowed'];
+    }
+    
+    // Generate unique filename
+    $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+    $uploadPath = UPLOAD_PATH . $newFilename;
+    
+    // Create upload directory if it doesn't exist
+    if (!is_dir(UPLOAD_PATH)) {
+        mkdir(UPLOAD_PATH, 0755, true);
+    }
+    
+    // Move uploaded file
+    if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+        return [
+            'success' => true,
+            'filename' => $newFilename,
+            'path' => $uploadPath,
+            'size' => $file['size'],
+            'type' => $fileExtension
+        ];
+    }
+    
+    return ['success' => false, 'error' => 'Failed to move uploaded file'];
+}

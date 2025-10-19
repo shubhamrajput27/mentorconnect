@@ -32,6 +32,7 @@ spl_autoload_register(function ($className) {
 
 // Load core classes if they exist
 $coreClasses = [
+    'Database',
     'DatabaseManager',
     'SessionManager',
     'SecurityManager',
