@@ -36,3 +36,5 @@ if (isLoggedIn()) {
 header('Location: ' . BASE_URL . '/auth/login.php');
 exit();
 ?>
+
+

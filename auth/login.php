@@ -184,10 +184,10 @@ $csrfToken = generateCSRFToken();
     <style>
         /* CSS Variables for Theme Support */
         :root {
-            --primary-color: #667eea;
-            --primary-dark: #5a67d8;
-            --secondary-color: #764ba2;
-            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #f97316;
+            --primary-dark: #ea580c;
+            --secondary-color: #fb923c;
+            --background-gradient: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
             --text-primary: #1f2937;
             --text-secondary: #6b7280;
             --text-muted: #9ca3af;
@@ -195,7 +195,7 @@ $csrfToken = generateCSRFToken();
             --card-bg: rgba(255, 255, 255, 0.95);
             --input-bg: #ffffff;
             --input-border: #e5e7eb;
-            --input-focus: #667eea;
+            --input-focus: #f97316;
             --border-color: #e5e7eb;
             --shadow-light: rgba(0, 0, 0, 0.1);
             --shadow-medium: rgba(0, 0, 0, 0.15);
@@ -205,24 +205,7 @@ $csrfToken = generateCSRFToken();
             --logo-accent: #fbbf24;
         }
 
-        [data-theme="dark"] {
-            --primary-color: #8b5cf6;
-            --primary-dark: #7c3aed;
-            --secondary-color: #06b6d4;
-            --background-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --text-inverse: #f9fafb;
-            --card-bg: rgba(30, 41, 59, 0.95);
-            --input-bg: #374151;
-            --input-border: #4b5563;
-            --input-focus: #8b5cf6;
-            --border-color: #4b5563;
-            --shadow-light: rgba(0, 0, 0, 0.3);
-            --shadow-medium: rgba(0, 0, 0, 0.4);
-            --logo-accent: #fbbf24;
-        }
+        
 
         /* Modern Login Page Styles */
         * {
@@ -274,11 +257,7 @@ $csrfToken = generateCSRFToken();
             pointer-events: none;
         }
 
-        [data-theme="dark"] .brand-panel::before {
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-        }
+        
 
         .brand-content {
             position: relative;
@@ -324,33 +303,23 @@ $csrfToken = generateCSRFToken();
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 0%, var(--logo-accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        [data-theme="dark"] .logo-section h1 {
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--logo-accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        
 
         .logo-section p {
             font-size: 1.1rem;
-            opacity: 0.9;
+            opacity: 1;
             line-height: 1.8;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        [data-theme="dark"] .brand-panel {
-            color: var(--text-primary);
-        }
+        
 
-        [data-theme="dark"] .logo-section p {
-            color: var(--text-secondary);
-            opacity: 0.95;
-        }
+        
 
         .features-list {
             margin-bottom: 3rem;
@@ -374,21 +343,20 @@ $csrfToken = generateCSRFToken();
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        [data-theme="dark"] .feature-item h3 {
-            color: var(--text-primary);
-        }
+        
 
         .feature-item p {
-            opacity: 0.8;
+            opacity: 1;
             font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .feature-item p {
-            color: var(--text-secondary);
-            opacity: 0.9;
-        }
+        
 
         .stats-section {
             display: grid;
@@ -404,21 +372,20 @@ $csrfToken = generateCSRFToken();
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--logo-accent);
+            color: #ffffff;
             display: block;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
         }
 
         .stat-label {
             font-size: 0.875rem;
-            opacity: 0.8;
+            opacity: 1;
             margin-top: 0.25rem;
-            color: inherit;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .stat-label {
-            color: var(--text-secondary);
-            opacity: 0.9;
-        }
+        
 
         /* Form Panel */
         .form-panel {
@@ -624,13 +591,13 @@ $csrfToken = generateCSRFToken();
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 25px rgba(249, 115, 22, 0.3);
         }
 
         .btn-full {
@@ -735,24 +702,7 @@ $csrfToken = generateCSRFToken();
         }
 
         /* Theme Toggle Button */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            box-shadow: 0 10px 15px -3px var(--shadow-light), 0 4px 6px -2px var(--shadow-medium);
-        }
+        
 
         .theme-toggle:hover {
             transform: scale(1.05) translateY(-2px);
@@ -789,9 +739,7 @@ $csrfToken = generateCSRFToken();
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        [data-theme="dark"] .form-input:focus {
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
+        
 
         .form-input::placeholder {
             color: var(--text-muted);
@@ -946,9 +894,7 @@ $csrfToken = generateCSRFToken();
     </div>
     
     <!-- Theme Toggle Button -->
-    <button class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-sun" id="theme-icon"></i>
-    </button>
+    
     
     <script>
         function togglePassword(fieldId) {
@@ -1020,12 +966,7 @@ $csrfToken = generateCSRFToken();
                     console.log('Theme toggled to:', newTheme);
                     
                     // Add animation effect
-                    const themeToggle = document.querySelector('.theme-toggle');
-                    if (themeToggle) {
-                        themeToggle.style.transform = 'scale(0.9)';
-                        setTimeout(() => {
-                            themeToggle.style.transform = '';
-                        }, 150);
+                    , 150);
                     }
                 } catch (e) {
                     console.error('Theme toggle error:', e);
@@ -1033,10 +974,7 @@ $csrfToken = generateCSRFToken();
             }
             
             bindEvents() {
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', (e) => {
-                        e.preventDefault();
+                
                         this.toggleTheme();
                     });
                 }
@@ -1050,3 +988,6 @@ $csrfToken = generateCSRFToken();
     </script>
 </body>
 </html>
+
+
+

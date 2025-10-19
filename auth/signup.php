@@ -146,10 +146,10 @@ $csrfToken = $_SESSION['csrf_token'];
     <style>
         /* CSS Variables for Theme Support */
         :root {
-            --primary-color: #667eea;
-            --primary-dark: #5a67d8;
-            --secondary-color: #764ba2;
-            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --primary-color: #f97316;
+            --primary-dark: #ea580c;
+            --secondary-color: #fb923c;
+            --background-gradient: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
             --text-primary: #1f2937;
             --text-secondary: #6b7280;
             --text-muted: #9ca3af;
@@ -158,40 +158,18 @@ $csrfToken = $_SESSION['csrf_token'];
             --surface-color: #f9fafb;
             --input-bg: #ffffff;
             --input-border: #e5e7eb;
-            --input-focus: #667eea;
+            --input-focus: #f97316;
             --border-color: #e5e7eb;
             --shadow-light: rgba(0, 0, 0, 0.1);
             --shadow-medium: rgba(0, 0, 0, 0.15);
-            --shadow-color: rgba(102, 126, 234, 0.3);
+            --shadow-color: rgba(249, 115, 22, 0.3);
             --success-color: #10b981;
             --error-color: #ef4444;
             --warning-color: #f59e0b;
             --logo-accent: #fbbf24;
         }
 
-        [data-theme="dark"] {
-            --primary-color: #8b5cf6;
-            --primary-dark: #7c3aed;
-            --secondary-color: #06b6d4;
-            --background-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            --text-primary: #f9fafb;
-            --text-secondary: #d1d5db;
-            --text-muted: #9ca3af;
-            --text-inverse: #111827;
-            --card-bg: rgba(30, 41, 59, 0.95);
-            --surface-color: #1e293b;
-            --input-bg: #374151;
-            --input-border: #4b5563;
-            --input-focus: #8b5cf6;
-            --border-color: #4b5563;
-            --shadow-light: rgba(0, 0, 0, 0.3);
-            --shadow-medium: rgba(0, 0, 0, 0.4);
-            --shadow-color: rgba(139, 92, 246, 0.4);
-            --success-color: #10b981;
-            --error-color: #ef4444;
-            --warning-color: #f59e0b;
-            --logo-accent: #fbbf24;
-        }
+        
 
         /* Modern Signup Page Styles */
         * {
@@ -231,9 +209,7 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         /* Dark theme brand panel */
-        [data-theme="dark"] .brand-panel {
-            color: var(--text-primary);
-        }
+        
 
         .brand-panel::before {
             content: '';
@@ -248,11 +224,7 @@ $csrfToken = $_SESSION['csrf_token'];
             pointer-events: none;
         }
 
-        [data-theme="dark"] .brand-panel::before {
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-        }
+        
 
         .brand-content {
             position: relative;
@@ -299,29 +271,21 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #ffffff 0%, var(--logo-accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        [data-theme="dark"] .logo-section h1 {
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--logo-accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        
 
         .logo-section p {
             font-size: 1.1rem;
-            opacity: 0.9;
+            opacity: 1;
             line-height: 1.8;
-            color: inherit;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        [data-theme="dark"] .logo-section p {
-            color: var(--text-secondary);
-        }
+        
 
         .features-list {
             margin-bottom: 3rem;
@@ -345,24 +309,20 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
-            color: inherit;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        [data-theme="dark"] .feature-item h3 {
-            color: var(--text-primary);
-        }
+        
 
         .feature-item p {
-            opacity: 0.8;
+            opacity: 1;
             font-size: 0.95rem;
-            color: inherit;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .feature-item p {
-            color: var(--text-secondary);
-            opacity: 0.8;
-            font-size: 0.9rem;
-        }
+        
 
         /* Testimonial Section */
         .testimonial-section {
@@ -379,23 +339,19 @@ $csrfToken = $_SESSION['csrf_token'];
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        [data-theme="dark"] .testimonial-card {
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        
 
         .testimonial-text {
             font-style: italic;
             margin-bottom: 1rem;
             font-size: 0.95rem;
             line-height: 1.6;
-            opacity: 0.9;
-            color: inherit;
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .testimonial-text {
-            color: var(--text-secondary);
-        }
+        
 
         .testimonial-author {
             display: flex;
@@ -419,22 +375,20 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 0.9rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
-            color: inherit;
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        [data-theme="dark"] .author-info h4 {
-            color: var(--text-primary);
-        }
+        
 
         .author-info p {
             font-size: 0.8rem;
-            opacity: 0.7;
-            color: inherit;
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .author-info p {
-            color: var(--text-muted);
-        }
+        
 
         /* Statistics Section */
         .stats-section {
@@ -449,10 +403,7 @@ $csrfToken = $_SESSION['csrf_token'];
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        [data-theme="dark"] .stats-section {
-            background: rgba(30, 41, 59, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        
 
         .stat-item {
             text-align: center;
@@ -462,19 +413,19 @@ $csrfToken = $_SESSION['csrf_token'];
             display: block;
             font-size: 1.5rem;
             font-weight: 700;
-            color: var(--logo-accent);
+            color: #ffffff;
             margin-bottom: 0.25rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
         }
 
         .stat-label {
             font-size: 0.8rem;
-            opacity: 0.8;
-            color: inherit;
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .stat-label {
-            color: var(--text-secondary);
-        }
+        
 
         /* Success Stories */
         .success-stories {
@@ -485,7 +436,8 @@ $csrfToken = $_SESSION['csrf_token'];
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: var(--logo-accent);
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         .story-list {
@@ -499,13 +451,12 @@ $csrfToken = $_SESSION['csrf_token'];
             align-items: center;
             gap: 0.75rem;
             font-size: 0.85rem;
-            opacity: 0.9;
-            color: inherit;
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
-        [data-theme="dark"] .story-item {
-            color: var(--text-secondary);
-        }
+        
 
         .story-item i {
             color: var(--logo-accent);
@@ -564,11 +515,7 @@ $csrfToken = $_SESSION['csrf_token'];
             color: var(--error-color);
         }
 
-        [data-theme="dark"] .alert-error {
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #f87171;
-        }
+        
 
         .alert-success {
             background-color: rgba(16, 185, 129, 0.1);
@@ -578,11 +525,7 @@ $csrfToken = $_SESSION['csrf_token'];
             align-items: flex-start;
         }
 
-        [data-theme="dark"] .alert-success {
-            background-color: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: #4ade80;
-        }
+        
 
         .success-link {
             background: #16a34a;
@@ -651,10 +594,7 @@ $csrfToken = $_SESSION['csrf_token'];
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
-        [data-theme="dark"] .input-wrapper input:focus,
-        [data-theme="dark"] .input-wrapper textarea:focus {
-            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
-        }
+        
 
         .input-wrapper i {
             position: absolute;
@@ -695,9 +635,7 @@ $csrfToken = $_SESSION['csrf_token'];
             background: rgba(102, 126, 234, 0.1);
         }
 
-        [data-theme="dark"] .password-toggle:hover {
-            background: rgba(139, 92, 246, 0.2);
-        }
+        
 
         /* Role Selection */
         .role-selection {
@@ -725,9 +663,7 @@ $csrfToken = $_SESSION['csrf_token'];
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.15);
         }
 
-        [data-theme="dark"] .role-card:hover {
-            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.25);
-        }
+        
 
         .role-card input[type="radio"] {
             display: none;
@@ -993,24 +929,7 @@ $csrfToken = $_SESSION['csrf_token'];
         }
 
         /* Theme Toggle Button */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            box-shadow: 0 10px 15px -3px var(--shadow-light), 0 4px 6px -2px var(--shadow-medium);
-        }
+        
 
         .theme-toggle:hover {
             transform: scale(1.05) translateY(-2px);
@@ -1062,10 +981,7 @@ $csrfToken = $_SESSION['csrf_token'];
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        [data-theme="dark"] .form-input:focus, 
-        [data-theme="dark"] .form-select:focus {
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
+        
 
         .form-input::placeholder {
             color: var(--text-muted);
@@ -1480,9 +1396,7 @@ $csrfToken = $_SESSION['csrf_token'];
     <script src="../assets/js/password-strength.js"></script>
     
     <!-- Theme Toggle Button -->
-    <button class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-sun" id="theme-icon"></i>
-    </button>
+    
 
     <script>
         // Theme Management
@@ -1519,20 +1433,12 @@ $csrfToken = $_SESSION['csrf_token'];
                 this.updateThemeIcon(newTheme);
                 
                 // Add animation effect
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    themeToggle.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        themeToggle.style.transform = '';
-                    }, 150);
+                , 150);
                 }
             }
             
             bindEvents() {
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', (e) => {
-                        e.preventDefault();
+                
                         this.toggleTheme();
                     });
                 }
@@ -1546,3 +1452,6 @@ $csrfToken = $_SESSION['csrf_token'];
     </script>
 </body>
 </html>
+
+
+

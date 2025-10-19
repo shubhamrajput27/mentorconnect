@@ -120,7 +120,7 @@ $avgSessionRating = round($progressStats['avg_rating_given'] ?? $progressStats['
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #667eea;
+            --primary-color: #f97316;
             --primary-light: #764ba2;
             --success-color: #10b981;
             --warning-color: #f59e0b;

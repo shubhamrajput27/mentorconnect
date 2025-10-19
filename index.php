@@ -14,16 +14,16 @@ $pageKeywords = 'mentorship, career coaching, professional development, skill le
 $currentUrl = BASE_URL . '/index.php';
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Performance Hints -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#6366f1">
-    <meta name="msapplication-TileColor" content="#6366f1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f97316">
+    <meta name="msapplication-TileColor" content="#f97316">
     
     <!-- Critical Resource Hints -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,7 +68,7 @@ $currentUrl = BASE_URL . '/index.php';
     <link rel="apple-touch-icon" sizes="180x180" href="<?php echo BASE_URL; ?>/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="<?php echo BASE_URL; ?>/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="<?php echo BASE_URL; ?>/favicon-16x16.png">
-    <link rel="mask-icon" href="<?php echo BASE_URL; ?>/safari-pinned-tab.svg" color="#6366f1">
+    <link rel="mask-icon" href="<?php echo BASE_URL; ?>/safari-pinned-tab.svg" color="#f97316">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="<?php echo BASE_URL; ?>/manifest.json">
@@ -100,14 +100,6 @@ $currentUrl = BASE_URL . '/index.php';
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
-    <!-- Theme persistence and FOUC prevention -->
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        })();
-    </script>
     
     <!-- Resource Preloading for Performance -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" as="style" crossorigin>
@@ -150,14 +142,14 @@ $currentUrl = BASE_URL . '/index.php';
     <!-- Button Styles -->
     <style>
     .nav-links .btn{font-size:.9rem!important;padding:.75rem 1.5rem!important;font-weight:600!important;border-radius:25px!important;transition:all .3s cubic-bezier(.4,0,.2,1)!important;text-decoration:none!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:120px!important;position:relative!important;overflow:hidden!important}
-    .nav-links .btn-primary{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%)!important;color:#fff!important;border:2px solid transparent!important;box-shadow:0 4px 12px rgba(99,102,241,.3),0 2px 4px rgba(0,0,0,.1)!important;text-shadow:0 1px 2px rgba(0,0,0,.1)!important}
-    .nav-links .btn-primary:hover{background:linear-gradient(135deg,#4338ca 0%,#7c3aed 100%)!important;color:#fff!important;transform:translateY(-2px)!important;box-shadow:0 8px 20px rgba(99,102,241,.4),0 4px 8px rgba(0,0,0,.15)!important;border-color:rgba(255,255,255,.2)!important}
-    .nav-links .btn-outline{background:rgba(255,255,255,.95)!important;color:#6366f1!important;border:2px solid #6366f1!important;backdrop-filter:blur(10px)!important;box-shadow:0 2px 8px rgba(0,0,0,.1)!important;font-weight:600!important}
-    .nav-links .btn-outline:hover{background:#6366f1!important;color:#fff!important;border-color:#6366f1!important;transform:translateY(-2px)!important;box-shadow:0 6px 16px rgba(99,102,241,.3),0 2px 4px rgba(0,0,0,.1)!important}
-    [data-theme="dark"] .nav-links .btn-primary{background:linear-gradient(135deg,#818cf8 0%,#a5b4fc 100%)!important;color:#0f172a!important;text-shadow:none!important;box-shadow:0 4px 12px rgba(129,140,248,.3),0 2px 4px rgba(0,0,0,.2)!important}
-    [data-theme="dark"] .nav-links .btn-primary:hover{background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%)!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.2)!important}
-    [data-theme="dark"] .nav-links .btn-outline{background:rgba(30,41,59,.95)!important;color:#818cf8!important;border-color:#818cf8!important}
-    [data-theme="dark"] .nav-links .btn-outline:hover{background:#818cf8!important;color:#0f172a!important}
+    .nav-links .btn-primary{background:linear-gradient(135deg,#f97316 0%,#fb923c 100%)!important;color:#fff!important;border:2px solid transparent!important;box-shadow:0 4px 12px rgba(249,115,22,.3),0 2px 4px rgba(0,0,0,.1)!important;text-shadow:0 1px 2px rgba(0,0,0,.1)!important}
+    .nav-links .btn-primary:hover{background:linear-gradient(135deg,#ea580c 0%,#f97316 100%)!important;color:#fff!important;transform:translateY(-2px)!important;box-shadow:0 8px 20px rgba(249,115,22,.4),0 4px 8px rgba(0,0,0,.15)!important;border-color:rgba(255,255,255,.2)!important}
+    .nav-links .btn-outline{background:rgba(255,255,255,.95)!important;color:#f97316!important;border:2px solid #f97316!important;backdrop-filter:blur(10px)!important;box-shadow:0 2px 8px rgba(0,0,0,.1)!important;font-weight:600!important}
+    .nav-links .btn-outline:hover{background:#f97316!important;color:#fff!important;border-color:#f97316!important;transform:translateY(-2px)!important;box-shadow:0 6px 16px rgba(249,115,22,.3),0 2px 4px rgba(0,0,0,.1)!important}
+    
+    
+    
+    
     .nav-links .btn:focus{outline:2px solid #06b6d4!important;outline-offset:2px!important}
     @media (max-width:768px){.nav-links .btn{min-width:100px!important;padding:.625rem 1.25rem!important;font-size:.875rem!important}}
 
@@ -168,87 +160,6 @@ $currentUrl = BASE_URL . '/index.php';
     
     .hero-svg {
         pointer-events: none !important;
-    }
-    
-    /* Theme Toggle Enhancements */
-    .theme-toggle {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 8px !important;
-        padding: 8px 12px !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        backdrop-filter: blur(10px) !important;
-    }
-    
-    .theme-toggle:hover {
-        background: rgba(255, 255, 255, 0.2) !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    }
-    
-    /* Light Mode - Moon Icon (Dark) */
-    [data-theme="light"] .theme-toggle {
-        background: rgba(30, 41, 59, 0.1) !important;
-        border: 1px solid rgba(30, 41, 59, 0.2) !important;
-        box-shadow: 0 2px 8px rgba(30, 41, 59, 0.1) !important;
-    }
-    
-    [data-theme="light"] .theme-toggle:hover {
-        background: rgba(30, 41, 59, 0.15) !important;
-        box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2) !important;
-        border-color: rgba(30, 41, 59, 0.3) !important;
-    }
-    
-    [data-theme="light"] .theme-toggle i {
-        color: #1e293b !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3) !important;
-    }
-    
-    [data-theme="light"] .theme-toggle:hover i {
-        color: #0f172a !important;
-        transform: scale(1.1) !important;
-        text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5) !important;
-    }
-    
-    /* Dark Mode - Sun Icon (Light) */
-    [data-theme="dark"] .theme-toggle {
-        background: rgba(129, 140, 248, 0.1) !important;
-        border-color: rgba(129, 140, 248, 0.2) !important;
-        box-shadow: 0 2px 8px rgba(129, 140, 248, 0.1) !important;
-    }
-    
-    [data-theme="dark"] .theme-toggle:hover {
-        background: rgba(129, 140, 248, 0.2) !important;
-        box-shadow: 0 4px 12px rgba(129, 140, 248, 0.3) !important;
-        border-color: rgba(129, 140, 248, 0.4) !important;
-    }
-    
-    [data-theme="dark"] .theme-toggle i {
-        color: #fbbf24 !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        text-shadow: 0 0 8px rgba(251, 191, 36, 0.3) !important;
-    }
-    
-    [data-theme="dark"] .theme-toggle:hover i {
-        color: #f59e0b !important;
-        transform: scale(1.1) rotate(15deg) !important;
-        text-shadow: 0 0 12px rgba(245, 158, 11, 0.5) !important;
-    }
-    
-    /* Default fallback for theme toggle icon */
-    .theme-toggle i {
-        color: #1e293b !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    /* Theme Transition Animation */
-    .theme-transitioning * {
-        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
     }
     
     /* Mobile Menu Styles */
@@ -439,10 +350,6 @@ $currentUrl = BASE_URL . '/index.php';
                     <a href="auth/signup.php" class="btn btn-primary">Get Started</a>
                 </div>
                 <div class="nav-actions">
-                    <!-- Theme Toggle -->
-                    <button class="theme-toggle" aria-label="Toggle dark mode">
-                        <i class="fas fa-moon" id="theme-icon"></i>
-                    </button>
                     <button class="mobile-menu-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
@@ -450,57 +357,10 @@ $currentUrl = BASE_URL . '/index.php';
             </div>
         </nav>
 
-        <!-- Theme Toggle JavaScript -->
+        <!-- Mobile Menu JavaScript -->
         <script>
-            // Theme toggle functionality for landing page
+            // Mobile menu functionality
             document.addEventListener('DOMContentLoaded', function() {
-                const themeToggle = document.querySelector('.theme-toggle');
-                const themeIcon = document.getElementById('theme-icon');
-                
-                // Get current theme
-                function getCurrentTheme() {
-                    return document.documentElement.getAttribute('data-theme') || 'light';
-                }
-                
-                // Update theme icon
-                function updateThemeIcon(theme) {
-                    if (themeIcon) {
-                        themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-                    }
-                }
-                
-                // Set initial icon based on current theme
-                updateThemeIcon(getCurrentTheme());
-                
-                // Handle theme toggle click
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', function() {
-                        const currentTheme = getCurrentTheme();
-                        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                        
-                        // Add transition class for smooth animation
-                        document.documentElement.classList.add('theme-transitioning');
-                        
-                        // Update theme
-                        document.documentElement.setAttribute('data-theme', newTheme);
-                        localStorage.setItem('theme', newTheme);
-                        
-                        // Update icon
-                        updateThemeIcon(newTheme);
-                        
-                        // Add button animation
-                        themeToggle.style.transform = 'scale(0.9)';
-                        setTimeout(() => {
-                            themeToggle.style.transform = '';
-                        }, 150);
-                        
-                        // Remove transition class after animation
-                        setTimeout(() => {
-                            document.documentElement.classList.remove('theme-transitioning');
-                        }, 300);
-                    });
-                }
-                
                 // Handle mobile menu toggle
                 const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
                 const navLinks = document.querySelector('.nav-links');
@@ -555,14 +415,14 @@ $currentUrl = BASE_URL . '/index.php';
                                 </linearGradient>
                             </defs>
                             
-                            <!-- Outer Light Purple Background Circle -->
-                            <circle cx="300" cy="300" r="280" fill="#E8D5F2" opacity="0.4"/>
+                            <!-- Outer Light Orange Background Circle -->
+                            <circle cx="300" cy="300" r="280" fill="#FED7AA" opacity="0.4"/>
                             
-                            <!-- Main Light Blue Circle -->
-                            <circle cx="300" cy="300" r="220" fill="#B8E0E8" opacity="0.7"/>
+                            <!-- Main Light Peach Circle -->
+                            <circle cx="300" cy="300" r="220" fill="#FDBA74" opacity="0.6"/>
                             
-                            <!-- Light Beige Overlapping Circle -->
-                            <circle cx="380" cy="380" r="160" fill="#E8D5C4" opacity="0.8"/>
+                            <!-- Light Orange Overlapping Circle -->
+                            <circle cx="380" cy="380" r="160" fill="#FDE68A" opacity="0.5"/>
                             
                             <!-- Small floating elements -->
                             <circle cx="150" cy="120" r="5" fill="#F97316" opacity="0.8">
@@ -832,11 +692,6 @@ $currentUrl = BASE_URL . '/index.php';
     <!-- Performance Enhancements -->
     <?php if (file_exists(__DIR__ . '/assets/js/performance.js')): ?>
     <script src="assets/js/performance.js?v=<?php echo filemtime(__DIR__ . '/assets/js/performance.js'); ?>" defer></script>
-    <?php endif; ?>
-    
-    <!-- Advanced Features (if available) -->
-    <?php if (file_exists(__DIR__ . '/assets/js/theme.js')): ?>
-    <script src="assets/js/theme.js?v=<?php echo filemtime(__DIR__ . '/assets/js/theme.js'); ?>" defer></script>
     <?php endif; ?>
     
     <!-- Load non-critical CSS asynchronously -->
@@ -1121,3 +976,4 @@ $currentUrl = BASE_URL . '/index.php';
     ?>
 </body>
 </html>
+

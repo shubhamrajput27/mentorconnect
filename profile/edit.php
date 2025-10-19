@@ -149,8 +149,8 @@ $allSkills = fetchAll("SELECT * FROM skills ORDER BY category, name");
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #667eea;
-            --primary-light: #764ba2;
+            --primary-color: #f97316;
+            --primary-light: #fb923c;
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;

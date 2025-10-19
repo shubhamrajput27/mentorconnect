@@ -72,7 +72,7 @@ $isAvailable = true; // Would be calculated from mentor's schedule
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #667eea;
+            --primary-color: #f97316;
             --primary-light: #764ba2;
             --success-color: #10b981;
             --warning-color: #f59e0b;

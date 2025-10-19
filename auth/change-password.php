@@ -68,7 +68,7 @@ $csrfToken = generateCSRFToken();
     <style>
         /* CSS Variables for Theme Support */
         :root {
-            --primary-color: #667eea;
+            --primary-color: #f97316;
             --primary-dark: #5a67d8;
             --secondary-color: #764ba2;
             --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -309,24 +309,7 @@ $csrfToken = generateCSRFToken();
         }
 
         /* Theme Toggle Button */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1001;
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-            box-shadow: 0 10px 15px -3px var(--shadow-light), 0 4px 6px -2px var(--shadow-medium);
-        }
+        
 
         .theme-toggle:hover {
             transform: scale(1.05) translateY(-2px);
@@ -427,9 +410,7 @@ $csrfToken = generateCSRFToken();
     </div>
     
     <!-- Theme Toggle Button -->
-    <button class="theme-toggle" aria-label="Toggle dark mode">
-        <i class="fas fa-moon" id="theme-icon"></i>
-    </button>
+    
     
     <!-- Password Strength JavaScript -->
     <script src="../assets/js/password-strength.js"></script>
@@ -570,20 +551,12 @@ $csrfToken = generateCSRFToken();
                 this.updateThemeIcon(newTheme);
                 
                 // Add animation effect
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    themeToggle.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        themeToggle.style.transform = '';
-                    }, 150);
+                , 150);
                 }
             }
             
             bindEvents() {
-                const themeToggle = document.querySelector('.theme-toggle');
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', (e) => {
-                        e.preventDefault();
+                
                         this.toggleTheme();
                     });
                 }
@@ -597,3 +570,5 @@ $csrfToken = generateCSRFToken();
     </script>
 </body>
 </html>
+
+

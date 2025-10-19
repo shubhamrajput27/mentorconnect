@@ -1,8 +1,8 @@
 /* Critical CSS for Above-the-fold Content */
 :root {
-    --primary-color: #6366f1;
-    --primary-dark: #4338ca;
-    --primary-light: #8b5cf6;
+    --primary-color: #f97316;
+    --primary-dark: #ea580c;
+    --primary-light: #fb923c;
     --secondary-color: #06b6d4;
     --accent-color: #f59e0b;
     --background-color: #fafbfc;
@@ -17,14 +17,7 @@
     --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-[data-theme="dark"] {
-    --background-color: #0f172a;
-    --surface-color: #1e293b;
-    --text-primary: #ffffff;
-    --text-secondary: #ffffff;
-    --text-muted: #ffffff;
-    --border-color: #4b5563;
-}
+
 
 * {
     margin: 0;
@@ -46,13 +39,9 @@ body {
     padding: 0;
 }
 
-[data-theme="dark"] body {
-    color: #ffffff;
-}
 
-[data-theme="dark"] * {
-    color: #ffffff;
-}
+
+
 
 /* Landing Page Layout */
 .landing-page {
@@ -75,10 +64,7 @@ body {
     transition: all var(--transition);
 }
 
-[data-theme="dark"] .landing-nav {
-    background: rgba(15, 23, 42, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+
 
 .nav-container {
     max-width: 1200px;
@@ -99,9 +85,7 @@ body {
     font-weight: 700;
 }
 
-[data-theme="dark"] .logo {
-    color: #ffffff;
-}
+
 
 .logo i {
     font-size: 1.5rem;
@@ -130,9 +114,7 @@ body {
     color: var(--primary-color);
 }
 
-[data-theme="dark"] .nav-links a {
-    color: #ffffff;
-}
+
 
 /* Critical Button Styles for Navigation */
 .btn {
@@ -151,51 +133,38 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #4338ca 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
 }
 
 .btn-outline {
     background: rgba(255, 255, 255, 0.95);
-    color: #6366f1;
-    border: 2px solid #6366f1;
+    color: #f97316;
+    border: 2px solid #f97316;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
 }
 
 .btn-outline:hover {
-    background: #6366f1;
+    background: #f97316;
     color: #fff;
     transform: translateY(-2px);
 }
 
-[data-theme="dark"] .btn-primary {
-    background: linear-gradient(135deg, #818cf8 0%, #a5b4fc 100%);
-    color: #0f172a;
-}
 
-[data-theme="dark"] .btn-primary:hover {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: #fff;
-}
 
-[data-theme="dark"] .btn-outline {
-    background: rgba(30, 41, 59, 0.95);
-    color: #818cf8;
-    border-color: #818cf8;
-}
 
-[data-theme="dark"] .btn-outline:hover {
-    background: #818cf8;
-    color: #0f172a;
-}
+
+
+
+
 
 /* Theme Toggle */
 .theme-toggle {
@@ -223,14 +192,9 @@ body {
     color: #1e293b;
 }
 
-[data-theme="dark"] .theme-toggle {
-    background: rgba(129, 140, 248, 0.1);
-    border-color: rgba(129, 140, 248, 0.2);
-}
 
-[data-theme="dark"] .theme-toggle i {
-    color: #fbbf24;
-}
+
+
 
 /* Hero Section - Critical above-the-fold */
 .hero {
@@ -260,12 +224,7 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
-[data-theme="dark"] .hero-content h1 {
-    background: linear-gradient(135deg, #818cf8, #a5b4fc);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+
 
 .hero-content p {
     font-size: 1.25rem;
@@ -274,9 +233,7 @@ body {
     line-height: 1.6;
 }
 
-[data-theme="dark"] .hero-content p {
-    color: #ffffff;
-}
+
 
 .hero-actions {
     display: flex;
@@ -302,18 +259,14 @@ body {
     margin-bottom: 0.5rem;
 }
 
-[data-theme="dark"] .stat h3 {
-    color: #818cf8;
-}
+
 
 .stat p {
     color: var(--text-muted);
     font-weight: 500;
 }
 
-[data-theme="dark"] .stat p {
-    color: #ffffff;
-}
+
 
 /* Hero Image */
 .hero-image {
@@ -349,9 +302,7 @@ body {
     padding: 8px;
 }
 
-[data-theme="dark"] .mobile-menu-toggle {
-    color: #ffffff;
-}
+
 
 /* Responsive Design */
 @media (max-width: 1024px) {
@@ -437,3 +388,4 @@ body {
 .theme-transitioning * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
 }
+
