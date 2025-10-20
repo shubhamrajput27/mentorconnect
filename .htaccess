@@ -205,13 +205,13 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{THE_REQUEST} /+[^?\s]*?/+[?\s]
 RewriteRule ^(.*)/ /$1 [R=301,L]
 
-# Block bad bots and scrapers
-<IfModule mod_rewrite.c>
-    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
-    RewriteCond %{HTTP_USER_AGENT} (bot|spider|crawler|scraper) [NC,OR]
-    RewriteCond %{HTTP_USER_AGENT} (curl|wget|python|perl) [NC]
-    RewriteRule .* - [F,L]
-</IfModule>
+# Block bad bots and scrapers (disabled for development)
+# <IfModule mod_rewrite.c>
+#     RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+#     RewriteCond %{HTTP_USER_AGENT} (bot|spider|crawler|scraper) [NC,OR]
+#     RewriteCond %{HTTP_USER_AGENT} (curl|wget|python|perl) [NC]
+#     RewriteRule .* - [F,L]
+# </IfModule>
 
 # Rate limiting (basic protection)
 <IfModule mod_evasive24.c>
@@ -293,11 +293,11 @@ ServerSignature Off
     RewriteCond %{QUERY_STRING} (\|%7C) [NC]
     RewriteRule .* - [R=403,L]
     
-    # Block requests with no referrer on sensitive actions
-    RewriteCond %{HTTP_REFERER} ^$
-    RewriteCond %{REQUEST_METHOD} ^POST$ [NC]
-    RewriteCond %{REQUEST_URI} \.(php)$ [NC]
-    RewriteRule .* - [R=403,L]
+    # Block requests with no referrer on sensitive actions (disabled for development)
+    # RewriteCond %{HTTP_REFERER} ^$
+    # RewriteCond %{REQUEST_METHOD} ^POST$ [NC]
+    # RewriteCond %{REQUEST_URI} \.(php)$ [NC]
+    # RewriteRule .* - [R=403,L]
 </IfModule>
 
 # Enable Keep-Alive for better performance
