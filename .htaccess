@@ -3,7 +3,7 @@
 
 # Enable rewrite engine
 RewriteEngine On
-RewriteBase /mentorconnect/
+# RewriteBase disabled - not needed without pretty URLs
 
 # Performance Optimizations
 # ==========================
@@ -188,10 +188,10 @@ RewriteBase /mentorconnect/
     Require all denied
 </FilesMatch>
 
-# Pretty URLs
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
+# Pretty URLs - disabled to prevent redirect loops
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
 
 # Redirect to HTTPS (uncomment for production)
 # RewriteCond %{HTTPS} !=on
