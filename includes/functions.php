@@ -209,14 +209,14 @@ function logActivity($userId, $action, $description = '', $metadata = []) {
                 CREATE TABLE activities (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT NOT NULL,
-                    action VARCHAR(100) NOT NULL,
+                    activity_type VARCHAR(100) NOT NULL,
                     description TEXT,
                     metadata JSON,
                     ip_address VARCHAR(45),
                     user_agent TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     INDEX idx_user_id (user_id),
-                    INDEX idx_action (action),
+                    INDEX idx_activity_type (activity_type),
                     INDEX idx_created_at (created_at)
                 )
             ";
@@ -224,7 +224,7 @@ function logActivity($userId, $action, $description = '', $metadata = []) {
         }
         
         $stmt = $pdo->prepare("
-            INSERT INTO activities (user_id, action, description, metadata, ip_address, user_agent) 
+            INSERT INTO activities (user_id, activity_type, description, metadata, ip_address, user_agent) 
             VALUES (?, ?, ?, ?, ?, ?)
         ");
         
