@@ -1,0 +1,232 @@
+// MentorConnect data model (PostgreSQL).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  MENTEE
+  MENTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum TokenType {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+}
+
+enum SessionStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+  CANCELLED
+  COMPLETED
+}
+
+model User {
+  id              String     @id @default(cuid())
+  email           String     @unique
+  passwordHash    String
+  name            String
+  role            Role       @default(MENTEE)
+  status          UserStatus @default(ACTIVE)
+  headline        String?
+  bio             String?
+  location        String?
+  timezone        String     @default("Asia/Kolkata")
+  goals           String?
+  onboarded       Boolean    @default(false)
+  emailVerifiedAt DateTime?
+  // Bumped on every photo upload; used to bust caches. Null means no photo.
+  photoVersion    Int?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  mentorProfile     MentorProfile?
+  skills            UserSkill[]
+  authSessions      AuthSession[]
+  availability      Availability[]
+  mentorConnections Connection[]    @relation("MentorConnections")
+  menteeConnections Connection[]    @relation("MenteeConnections")
+  mentorSessions    MentorSession[] @relation("MentorSessions")
+  menteeSessions    MentorSession[] @relation("MenteeSessions")
+  messages          Message[]
+  reviewsReceived   Review[]        @relation("ReviewsReceived")
+  reviewsWritten    Review[]        @relation("ReviewsWritten")
+  notifications     Notification[]
+  tokens            UserToken[]
+  photo             UserPhoto?
+}
+
+// Small profile photo stored in the database (resized to 256px in the browser).
+model UserPhoto {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  data      Bytes
+  mimeType  String
+  updatedAt DateTime @updatedAt
+}
+
+// One-time links for email verification and password reset. Only the hash is stored.
+model UserToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      TokenType
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, type])
+}
+
+model MentorProfile {
+  userId           String  @id
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle         String?
+  company          String?
+  yearsExperience  Int     @default(0)
+  hourlyRate       Int     @default(0) // in INR; 0 means free
+  sessionMinutes   Int     @default(60)
+  languages        String  @default("English")
+  linkedinUrl      String?
+  acceptingMentees Boolean @default(true)
+}
+
+model Skill {
+  id    String      @id @default(cuid())
+  name  String      @unique
+  slug  String      @unique
+  users UserSkill[]
+}
+
+model UserSkill {
+  userId  String
+  skillId String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill   Skill  @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId])
+  @@index([skillId])
+}
+
+// Login sessions. The cookie holds a random token; only its SHA-256 hash is stored.
+model AuthSession {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Weekly recurring availability, in the mentor's own timezone.
+model Availability {
+  id          String @id @default(cuid())
+  mentorId    String
+  mentor      User   @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int // 0 = Sunday … 6 = Saturday
+  startMinute Int // minutes after midnight
+  endMinute   Int
+
+  @@index([mentorId])
+}
+
+model Connection {
+  id          String           @id @default(cuid())
+  mentorId    String
+  menteeId    String
+  mentor      User             @relation("MentorConnections", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentee      User             @relation("MenteeConnections", fields: [menteeId], references: [id], onDelete: Cascade)
+  status      ConnectionStatus @default(PENDING)
+  message     String?
+  createdAt   DateTime         @default(now())
+  respondedAt DateTime?
+  messages    Message[]
+
+  @@unique([mentorId, menteeId])
+  @@index([menteeId])
+}
+
+model MentorSession {
+  id              String        @id @default(cuid())
+  mentorId        String
+  menteeId        String
+  mentor          User          @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentee          User          @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
+  startsAt        DateTime
+  durationMinutes Int
+  topic           String
+  agenda          String?
+  meetingUrl      String?
+  status          SessionStatus @default(PENDING)
+  // "<mentorId>:<startsAt ISO>" while the session is PENDING or CONFIRMED, otherwise null.
+  // The unique index makes the database reject a second booking of the same slot.
+  slotKey         String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  review          Review?
+
+  @@index([mentorId, startsAt])
+  @@index([menteeId, startsAt])
+}
+
+model Message {
+  id           String     @id @default(cuid())
+  connectionId String
+  connection   Connection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  senderId     String
+  sender       User       @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body         String
+  createdAt    DateTime   @default(now())
+  readAt       DateTime?
+
+  @@index([connectionId, createdAt])
+}
+
+model Review {
+  id        String        @id @default(cuid())
+  sessionId String        @unique
+  session   MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  mentorId  String
+  authorId  String
+  mentor    User          @relation("ReviewsReceived", fields: [mentorId], references: [id], onDelete: Cascade)
+  author    User          @relation("ReviewsWritten", fields: [authorId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String
+  createdAt DateTime      @default(now())
+
+  @@index([mentorId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, createdAt])
+}
