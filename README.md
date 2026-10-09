@@ -1,5 +1,7 @@
 # MentorConnect
 
+**Live demo:** https://mentorconnect-alpha.vercel.app
+
 A mentorship platform that connects mentees with experienced mentors. Mentees find a mentor, send a request, book 1:1 sessions from the mentor's live availability, chat between sessions, and leave reviews afterwards.
 
 ## Features
@@ -129,7 +131,7 @@ The app is set up for [Vercel](https://vercel.com) with a [Neon](https://neon.te
 
 1. In Vercel, import this GitHub repository. Next.js is detected automatically.
 2. In the project's **Storage** tab, create a **Neon** database and connect it. This sets `DATABASE_URL` (pooled, used by the app) and `DATABASE_URL_UNPOOLED` (direct, used for migrations).
-3. In **Settings → Environment Variables**, add `APP_URL` (your site's URL, e.g. `https://mentorconnect.vercel.app`). Optionally add `RESEND_API_KEY` and `EMAIL_FROM` so emails are sent.
+3. In **Settings → Environment Variables**, add `APP_URL` (your site's URL, e.g. `https://mentorconnect-alpha.vercel.app`). Optionally add `RESEND_API_KEY` and `EMAIL_FROM` so emails are sent.
 4. Redeploy. The `vercel-build` script runs `prisma migrate deploy` before building, so the tables are created and kept up to date on every deploy.
 5. Optional demo data (wipes the database first): `SEED_ALLOW_REMOTE=1 SEED_ADMIN_PASSWORD='<strong password>' DATABASE_URL='<Neon URL>' npm run db:seed`
 
