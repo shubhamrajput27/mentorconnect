@@ -38,6 +38,8 @@ test("request → accept → book → confirm → join", async ({ page }) => {
   await login(page, "arjun@mentorconnect.dev");
   await page.goto("/sessions?tab=requests");
   await page.locator("div.rounded-2xl", { hasText: "Docker basics" }).getByRole("button", { name: "Confirm" }).click();
+  // Wait for the server to save it: the session leaves the Requests list.
+  await expect(page.locator("div.rounded-2xl", { hasText: "Docker basics" })).toHaveCount(0);
   await page.goto("/sessions?tab=upcoming");
   const card = page.locator("div.rounded-2xl", { hasText: "Docker basics" });
   await expect(card.getByText("Confirmed")).toBeVisible();

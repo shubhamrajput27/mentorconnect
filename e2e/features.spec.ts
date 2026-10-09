@@ -49,6 +49,8 @@ test("chat messages reach the other person", async ({ browser }) => {
 test("upload and remove a profile photo", async ({ page }) => {
   await login(page, "sneha@mentorconnect.dev");
   await page.goto("/settings/profile");
+  // The upload handler is attached once the page's JavaScript has loaded.
+  await page.waitForLoadState("networkidle");
 
   await page.locator("input[type=file]").setInputFiles({
     name: "me.png",
