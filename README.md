@@ -125,11 +125,18 @@ src/
 
 ## Deploying to production
 
-1. **Create a hosted PostgreSQL database.** [Neon](https://neon.tech) and [Supabase](https://supabase.com) both have free tiers. Copy the connection string.
-2. **Deploy.** Vercel works with no extra configuration. Set `DATABASE_URL`, `APP_URL`, `RESEND_API_KEY` and `EMAIL_FROM`, and run `npm run db:deploy` as part of the release.
-3. **Possible upgrades:**
-   - Real-time chat with Pusher, Ably or Supabase Realtime instead of polling.
-   - Rate limiting shared across instances, using Upstash Redis.
-   - Email notifications for bookings and messages, reusing `src/lib/email.ts`.
-   - Payments for paid sessions with Razorpay or Stripe.
-   - Profile photos in object storage (Vercel Blob, S3 or Cloudinary) once there are many users.
+The app is set up for [Vercel](https://vercel.com) with a [Neon](https://neon.tech) PostgreSQL database.
+
+1. In Vercel, import this GitHub repository. Next.js is detected automatically.
+2. In the project's **Storage** tab, create a **Neon** database and connect it. This sets `DATABASE_URL` (pooled, used by the app) and `DATABASE_URL_UNPOOLED` (direct, used for migrations).
+3. In **Settings → Environment Variables**, add `APP_URL` (your site's URL, e.g. `https://mentorconnect.vercel.app`). Optionally add `RESEND_API_KEY` and `EMAIL_FROM` so emails are sent.
+4. Redeploy. The `vercel-build` script runs `prisma migrate deploy` before building, so the tables are created and kept up to date on every deploy.
+5. Optional demo data (wipes the database first): `SEED_ALLOW_REMOTE=1 SEED_ADMIN_PASSWORD='<strong password>' DATABASE_URL='<Neon URL>' npm run db:seed`
+
+### Possible upgrades
+
+- Real-time chat with Pusher, Ably or Supabase Realtime instead of polling.
+- Rate limiting shared across instances, using Upstash Redis.
+- Email notifications for bookings and messages, reusing `src/lib/email.ts`.
+- Payments for paid sessions with Razorpay or Stripe.
+- Profile photos in object storage (Vercel Blob, S3 or Cloudinary) once there are many users.

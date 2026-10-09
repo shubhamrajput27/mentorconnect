@@ -1,11 +1,19 @@
-// Demo data for local development. Run with `npm run db:seed`.
-// Every demo account uses the password "password123".
+// Demo data. Run with `npm run db:seed`. WARNING: deletes all existing data first.
+// Every demo account uses the password "password123", except the admin when
+// SEED_ADMIN_PASSWORD is set (always set it for a public site).
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }) });
+const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+if (!url) throw new Error("DATABASE_URL is not set.");
+// Refuse to wipe a remote database by accident.
+const host = new URL(url).hostname;
+if (!["localhost", "127.0.0.1", "::1"].includes(host) && process.env.SEED_ALLOW_REMOTE !== "1") {
+  throw new Error(`Refusing to seed (and wipe) the database on ${host}. Set SEED_ALLOW_REMOTE=1 if you really mean it.`);
+}
+const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const HOUR = 60 * 60 * 1000;
@@ -180,8 +188,9 @@ async function main() {
   const skillLinks = (list: string[]) => ({ create: list.map((n) => ({ skillId: skills.get(n)! })) });
 
   console.log("Creating users…");
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
   await db.user.create({
-    data: { name: "Admin", email: "admin@mentorconnect.dev", passwordHash, role: "ADMIN", onboarded: true, emailVerifiedAt: new Date(), headline: "Platform administrator" },
+    data: { name: "Admin", email: "admin@mentorconnect.dev", passwordHash: adminPassword ? await bcrypt.hash(adminPassword, 12) : passwordHash, role: "ADMIN", onboarded: true, emailVerifiedAt: new Date(), headline: "Platform administrator" },
   });
 
   const mentorIds: string[] = [];
