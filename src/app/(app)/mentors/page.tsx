@@ -84,7 +84,7 @@ export default async function MentorsPage({ searchParams }: PageProps<"/mentors"
       </div>
 
       {mentors.length ? (
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {mentors.map((m) => (
             <MentorCard key={m.id} mentor={m} />
           ))}

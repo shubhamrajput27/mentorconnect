@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import { MentorCard } from "@/components/mentor-card";
 import { SessionBadge } from "@/components/session-badge";
-import { Avatar, ButtonLink, Card, CardHeader, EmptyState, StatCard } from "@/components/ui";
+import { Avatar, ButtonLink, Card, CardHeader, EmptyState } from "@/components/ui";
+import { StatCard } from "@/components/stat-card";
 import { requireUser, type CurrentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { searchMentors } from "@/lib/mentors";
@@ -132,7 +133,7 @@ async function MenteeDashboard({ user }: { user: CurrentUser }) {
               Browse all <ArrowRight className="size-4" />
             </Link>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {recommended.map((m) => <MentorCard key={m.id} mentor={m} />)}
           </div>
         </section>

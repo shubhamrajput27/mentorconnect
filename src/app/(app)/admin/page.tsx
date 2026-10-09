@@ -4,7 +4,8 @@ import { CalendarCheck, GraduationCap, MessageSquare, Presentation, Search, Star
 import { setUserStatus } from "@/actions/admin";
 import { ConfirmButton } from "@/components/confirm-button";
 import { SubmitButton } from "@/components/form";
-import { Avatar, Badge, Button, Card, CardHeader, Input, PageHeader, Select, StatCard } from "@/components/ui";
+import { Avatar, Badge, Button, Card, CardHeader, Input, PageHeader, Select } from "@/components/ui";
+import { StatCard } from "@/components/stat-card";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";

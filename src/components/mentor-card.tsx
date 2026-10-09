@@ -8,7 +8,7 @@ export function MentorCard({ mentor }: { mentor: MentorCardData }) {
   const profile = mentor.mentorProfile;
   const skills = mentor.skills.map((s) => s.skill);
   return (
-    <Link href={`/mentors/${mentor.id}`} className="group block h-full">
+    <Link href={`/mentors/${mentor.id}`} className="group block h-full min-w-0">
       <Card className="flex h-full flex-col p-5 transition-shadow group-hover:shadow-md group-hover:ring-brand-200">
         <div className="flex items-start gap-4">
           <Avatar user={mentor} size="lg" />

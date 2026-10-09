@@ -1,5 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import Aurora from "@/components/reactbits/Aurora";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,9 +11,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="w-full max-w-sm">{children}</div>
         </div>
       </div>
-      <div className="relative hidden overflow-hidden bg-linear-to-br from-brand-800 to-brand-950 lg:flex lg:items-center lg:justify-center">
-        <div aria-hidden className="absolute -top-24 -right-24 size-96 rounded-full bg-brand-500/20 blur-3xl" />
-        <div aria-hidden className="absolute -bottom-32 -left-16 size-96 rounded-full bg-sky-400/10 blur-3xl" />
+      <div className="relative isolate hidden overflow-hidden bg-brand-950 lg:flex lg:items-center lg:justify-center">
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-90">
+          <Aurora colorStops={["#18337c", "#3864de", "#1a3d9c"]} amplitude={1.1} blend={0.6} speed={0.5} />
+        </div>
         <div className="relative max-w-md px-10 text-white">
           <h2 className="text-3xl font-semibold tracking-tight">The shortest path to your next level is someone who&apos;s been there.</h2>
           <ul className="mt-10 space-y-4 text-brand-100">
