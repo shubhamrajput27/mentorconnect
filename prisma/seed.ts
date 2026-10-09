@@ -5,9 +5,10 @@ import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { directDatabaseUrl } from "../src/lib/database-url";
 
-const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
-if (!url) throw new Error("DATABASE_URL is not set.");
+const url = directDatabaseUrl();
+if (!url) throw new Error("No postgres:// DATABASE_URL is set.");
 // Refuse to wipe a remote database by accident.
 const host = new URL(url).hostname;
 if (!["localhost", "127.0.0.1", "::1"].includes(host) && process.env.SEED_ALLOW_REMOTE !== "1") {

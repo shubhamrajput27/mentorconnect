@@ -1,5 +1,6 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
+import { directDatabaseUrl } from "./src/lib/database-url";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -8,8 +9,7 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    // Migrations need a direct connection; hosted Postgres (e.g. Neon on Vercel)
-    // also provides a pooled DATABASE_URL for the app, which the CLI can't use.
-    url: process.env["DATABASE_URL_UNPOOLED"] ?? process.env["DATABASE_URL"],
+    // Migrations need a direct postgres:// connection (see src/lib/database-url.ts).
+    url: directDatabaseUrl(),
   },
 });
