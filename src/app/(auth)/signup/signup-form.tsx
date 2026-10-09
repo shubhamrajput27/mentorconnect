@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { GraduationCap, Presentation } from "lucide-react";
 import { signup } from "@/actions/auth";
@@ -66,7 +67,9 @@ export function SignupForm({ defaultRole }: { defaultRole: "MENTEE" | "MENTOR" }
         Create account
       </SubmitButton>
       <p className="text-center text-xs text-slate-500">
-        By signing up you agree to be kind, respectful and on time.
+        By signing up you agree to our{" "}
+        <Link href="/terms" className="font-medium text-slate-700 underline underline-offset-2 hover:text-slate-900">Terms</Link> and{" "}
+        <Link href="/privacy" className="font-medium text-slate-700 underline underline-offset-2 hover:text-slate-900">Privacy policy</Link>.
       </p>
     </form>
   );

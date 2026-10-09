@@ -28,22 +28,3 @@ export async function SiteHeader() {
     </header>
   );
 }
-
-export function SiteFooter() {
-  return (
-    <footer className="border-t border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div>
-          <Logo />
-          <p className="mt-2 text-sm text-slate-500">Your bridge to expert mentorship.</p>
-        </div>
-        <nav className="flex flex-wrap gap-6 text-sm text-slate-600">
-          <Link href="/mentors" className="hover:text-slate-900">Mentors</Link>
-          <Link href="/signup?role=MENTOR" className="hover:text-slate-900">Become a mentor</Link>
-          <Link href="/login" className="hover:text-slate-900">Log in</Link>
-        </nav>
-        <p className="text-sm text-slate-400">© {new Date().getFullYear()} MentorConnect</p>
-      </div>
-    </footer>
-  );
-}
